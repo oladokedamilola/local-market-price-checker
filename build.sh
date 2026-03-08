@@ -5,6 +5,10 @@ set -o errexit
 # Print commands for debugging
 set -x
 
+# Show Python version
+echo "Python version being used:"
+python --version
+
 # Install dependencies
 pip install -r requirements.txt
 
