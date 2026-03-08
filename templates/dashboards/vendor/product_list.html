@@ -1,0 +1,253 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}My Products - Vendor{% endblock %}
+
+{% block page_title %}My Products{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">My Products</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <!-- Action Bar -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+          <div class="d-flex gap-2">
+            <a href="{% url 'add_product' %}" class="btn btn-primary">
+              <i class="bi bi-plus-circle me-2"></i> Add New Product
+            </a>
+            <a href="{% url 'bulk_price_update' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-pencil-square me-2"></i> Bulk Update
+            </a>
+            <a href="{% url 'export_products' %}" class="btn btn-outline-success">
+              <i class="bi bi-download me-2"></i> Export
+            </a>
+          </div>
+          <div class="text-muted">
+            <i class="bi bi-box me-1"></i> {{ total_results }} Total Products
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Filter Products</h5>
+      </div>
+      <div class="card-body">
+        <form method="GET" class="row g-3">
+          <div class="col-md-4">
+            <label for="search" class="form-label">Search</label>
+            <input type="text" class="form-control" id="search" name="search" value="{{ search }}" placeholder="Product or market name...">
+          </div>
+          <div class="col-md-3">
+            <label for="category" class="form-label">Category</label>
+            <select class="form-select" id="category" name="category">
+              <option value="">All Categories</option>
+              {% for category in categories %}
+              <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                {{ category.name }} ({{ category.product_count }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="market" class="form-label">Market</label>
+            <select class="form-select" id="market" name="market">
+              <option value="">All Markets</option>
+              {% for market in markets %}
+              <option value="{{ market.id }}" {% if selected_market == market.id|stringformat:"s" %}selected{% endif %}>
+                {{ market.name }} ({{ market.product_count }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label for="sort" class="form-label">Sort By</label>
+            <select class="form-select" id="sort" name="sort">
+              <option value="-last_updated" {% if sort_by == '-last_updated' %}selected{% endif %}>Newest</option>
+              <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+              <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+              <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Name: A to Z</option>
+              <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>Name: Z to A</option>
+              <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-filter me-2"></i> Apply Filters
+            </button>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-counterclockwise me-2"></i> Reset
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Product Listings</h5>
+        <span class="badge bg-info">{{ products.paginator.count }} Total</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Market</th>
+                <th>Price (₦)</th>
+                <th>Last Updated</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in products %}
+              <tr>
+                <td>
+                  <div class="fw-bold">{{ product.product.name }}</div>
+                  <small class="text-muted">Unit: {{ product.product.unit }}</small>
+                </td>
+                <td>
+                  {% if product.product.category %}
+                    <span class="badge bg-secondary">{{ product.product.category.name }}</span>
+                  {% else %}
+                    <span class="badge bg-light text-dark">Uncategorized</span>
+                  {% endif %}
+                </td>
+                <td>{{ product.market.name }}</td>
+                <td class="fw-bold">₦{{ product.price|floatformat:2 }}</td>
+                <td>
+                  <div>{{ product.last_updated|date:"M d, Y" }}</div>
+                  <small class="text-muted">{{ product.last_updated|timesince }} ago</small>
+                </td>
+                <td>
+                  <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                    <a href="{% url 'update_product' product.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'duplicate_product' product.pk %}" class="btn btn-sm btn-outline-info" title="Duplicate">
+                      <i class="bi bi-files"></i>
+                    </a>
+                    <a href="{% url 'delete_product' product.pk %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center py-5">
+                  <i class="bi bi-box fs-1 text-muted d-block mb-3"></i>
+                  <h5>No products found</h5>
+                  <p class="text-muted">Start by adding your first product listing</p>
+                  <a href="{% url 'add_product' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i> Add Product
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      {% if products.paginator.num_pages > 1 %}
+      <div class="card-footer bg-white">
+        <nav aria-label="Product pagination">
+          <ul class="pagination justify-content-center mb-0">
+            {% if products.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ products.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            {% endif %}
+            
+            {% for num in products.paginator.page_range %}
+              {% if products.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+              {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+              </li>
+              {% endif %}
+            {% endfor %}
+            
+            {% if products.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ products.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ products.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_market %}&market={{ selected_market }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" aria-label="Last">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Quick Stats Row -->
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <i class="bi bi-box fs-1 text-primary mb-2"></i>
+        <h3 class="fw-bold">{{ products.paginator.count }}</h3>
+        <p class="text-muted">Total Products</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <i class="bi bi-tags fs-1 text-success mb-2"></i>
+        <h3 class="fw-bold">{{ categories_count }}</h3>
+        <p class="text-muted">Categories</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <i class="bi bi-geo-alt fs-1 text-info mb-2"></i>
+        <h3 class="fw-bold">{{ markets_count }}</h3>
+        <p class="text-muted">Markets</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body text-center">
+        <i class="bi bi-clock-history fs-1 text-warning mb-2"></i>
+        <h3 class="fw-bold">{{ recent_updates }}</h3>
+        <p class="text-muted">Updated (7d)</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Reports - MarketLens Admin{% endblock %}
+
+{% block page_title %}System Reports{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item active" aria-current="page">Reports</li>
+{% endblock %}
+
+{% block content %}
+<!-- Date Range Filter -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Time Period</label>
+        <select name="days" class="form-select">
+          <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 Days</option>
+          <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 Days</option>
+          <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 Days</option>
+          <option value="365" {% if days == 365 %}selected{% endif %}>Last Year</option>
+        </select>
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-bar-chart me-2"></i> Generate Report
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-5">
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <span class="stat-label text-muted">New Users</span>
+          <h3 class="stat-value">{{ new_users }}</h3>
+        </div>
+        <div class="stat-icon primary">
+          <i class="bi bi-people"></i>
+        </div>
+      </div>
+      <p class="text-success small mt-2">
+        <i class="bi bi-arrow-up"></i> Last {{ days }} days
+      </p>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <span class="stat-label text-muted">New Vendors</span>
+          <h3 class="stat-value">{{ new_vendors }}</h3>
+        </div>
+        <div class="stat-icon warning">
+          <i class="bi bi-shop"></i>
+        </div>
+      </div>
+      <p class="text-success small mt-2">
+        <i class="bi bi-arrow-up"></i> Last {{ days }} days
+      </p>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <span class="stat-label text-muted">KYC Approved</span>
+          <h3 class="stat-value">{{ kyc_approved }}</h3>
+        </div>
+        <div class="stat-icon success">
+          <i class="bi bi-shield-check"></i>
+        </div>
+      </div>
+      <p class="text-success small mt-2">
+        <i class="bi bi-arrow-up"></i> Last {{ days }} days
+      </p>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <span class="stat-label text-muted">Price Updates</span>
+          <h3 class="stat-value">{{ product_updates }}</h3>
+        </div>
+        <div class="stat-icon primary">
+          <i class="bi bi-arrow-repeat"></i>
+        </div>
+      </div>
+      <p class="text-success small mt-2">
+        <i class="bi bi-arrow-up"></i> Last {{ days }} days
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-5">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">User Growth</h5>
+      </div>
+      <div class="card-body">
+        <div class="text-center py-4">
+          <i class="bi bi-graph-up" style="font-size: 4rem; color: var(--color-muted);"></i>
+          <p class="text-muted mt-3">User growth chart will be available soon</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Product Activity</h5>
+      </div>
+      <div class="card-body">
+        <div class="text-center py-4">
+          <i class="bi bi-bar-chart" style="font-size: 4rem; color: var(--color-muted);"></i>
+          <p class="text-muted mt-3">Product activity chart will be available soon</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Activity Table -->
+<div class="card">
+  <div class="card-header bg-white">
+    <h5 class="mb-0 fw-bold">Recent Platform Activity</h5>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Event</th>
+            <th>User</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{% now "M d, Y H:i" %}</td>
+            <td><span class="badge bg-success">New User</span></td>
+            <td>john.doe@example.com</td>
+            <td>Registered as Consumer</td>
+          </tr>
+          <tr>
+            <td>{% now "M d, Y H:i" %}</td>
+            <td><span class="badge bg-warning">KYC Submitted</span></td>
+            <td>vendor@example.com</td>
+            <td>Submitted NIN for verification</td>
+          </tr>
+          <tr>
+            <td>{% now "M d, Y H:i" %}</td>
+            <td><span class="badge bg-primary">Product Added</span></td>
+            <td>market_vendor</td>
+            <td>Added Tomatoes - ₦500</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="d-flex gap-3 justify-content-end">
+      <button class="btn btn-outline-primary">
+        <i class="bi bi-file-earmark-pdf me-2"></i> Export as PDF
+      </button>
+      <button class="btn btn-outline-primary">
+        <i class="bi bi-file-earmark-excel me-2"></i> Export as CSV
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

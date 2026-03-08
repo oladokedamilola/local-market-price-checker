@@ -1,0 +1,241 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - MarketLens{% endblock %}
+
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h2 fw-bold mb-2">Welcome, {{ user.first_name|default:user.username }}!</h1>
+    <p class="text-muted">Here's what's happening with your platform today.</p>
+  </div>
+  <div>
+    <span class="badge bg-primary fs-6 p-2">Administrator</span>
+  </div>
+</div>
+
+<!-- System Overview -->
+<div class="row g-4 mb-5">
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="stat-icon primary">
+          <i class="bi bi-people"></i>
+        </div>
+        <span class="text-muted small">Total</span>
+      </div>
+      <h3 class="fw-bold mb-1">{{ total_users }}</h3>
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Registered Users</span>
+        <div>
+          <span class="badge bg-info text-white">{{ total_vendors }} Vendors</span>
+          <span class="badge bg-success text-white">{{ total_consumers }} Shoppers</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="stat-icon warning">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <span class="text-muted small">KYC</span>
+      </div>
+      <h3 class="fw-bold mb-1">{{ pending_kyc }}</h3>
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Pending Verification</span>
+        <span class="badge bg-warning text-white">Awaiting Review</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="stat-icon primary">
+          <i class="bi bi-box"></i>
+        </div>
+        <span class="text-muted small">Products</span>
+      </div>
+      <h3 class="fw-bold mb-1">{{ total_vendor_products }}</h3>
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Listed by Vendors</span>
+        <span class="badge bg-primary text-white">{{ total_products }} Products</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="stat-icon success">
+          <i class="bi bi-geo-alt"></i>
+        </div>
+        <span class="text-muted small">Markets</span>
+      </div>
+      <h3 class="fw-bold mb-1">{{ total_markets }}</h3>
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Active Markets</span>
+        <span class="badge bg-info text-white">Alimosho LGA</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Recent KYC Submissions -->
+  <div class="col-lg-6 mb-4">
+    <div class="card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Recent KYC Submissions</h5>
+        <a href="{% url 'admin_vendor_verification' %}" class="btn btn-sm btn-primary">View All</a>
+      </div>
+      <div class="card-body">
+        {% if recent_kyc %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Vendor</th>
+                <th>ID Type</th>
+                <th>Submitted</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for kyc in recent_kyc %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <i class="bi bi-person-circle me-2"></i>
+                    {{ kyc.vendor.user.username }}
+                  </div>
+                </td>
+                <td><span class="badge bg-secondary">{{ kyc.get_id_type_display }}</span></td>
+                <td><small>{{ kyc.submitted_at|timesince }} ago</small></td>
+                <td>
+                  <a href="{% url 'admin_verify_vendor' kyc.id %}" class="btn btn-sm btn-outline-primary">
+                    Review
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-3">No pending KYC submissions</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Recent Users -->
+  <div class="col-lg-6 mb-4">
+    <div class="card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Recent Users</h5>
+        <a href="{% url 'admin_users' %}" class="btn btn-sm btn-primary">View All</a>
+      </div>
+      <div class="card-body">
+        {% if recent_users %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Joined</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in recent_users %}
+              <tr>
+                <td>
+                  <div>
+                    <strong>{{ user.first_name|default:user.username }} {{ user.last_name }}</strong>
+                    <br>
+                    <small class="text-muted">{{ user.email }}</small>
+                  </div>
+                </td>
+                <td>
+                  {% if user.is_staff %}
+                  <span class="badge bg-danger">{{ user.role_display }}</span>
+                  {% elif 'VENDOR' in user.groups %}
+                  <span class="badge bg-primary">{{ user.role_display }}</span>
+                  {% elif 'CONSUMER' in user.groups %}
+                  <span class="badge bg-success">{{ user.role_display }}</span>
+                  {% elif not user.is_active %}
+                  <span class="badge bg-secondary">{{ user.role_display }}</span>
+                  {% else %}
+                  <span class="badge bg-secondary">{{ user.role_display }}</span>
+                  {% endif %}
+                </td>
+                <td><small>{{ user.date_joined|timesince }} ago</small></td>
+                <td>
+                  {% if user.is_active %}
+                  <span class="badge bg-success">Active</span>
+                  {% else %}
+                  <span class="badge bg-danger">Inactive</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-3">No recent users</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Quick Actions</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <a href="{% url 'admin_vendor_verification' %}" class="btn btn-outline-primary w-100 py-3">
+              <i class="bi bi-shield-check me-2"></i> Verify Vendors
+              {% if pending_kyc %}
+              <span class="badge bg-danger ms-2">{{ pending_kyc }}</span>
+              {% endif %}
+            </a>
+          </div>
+          <div class="col-md-3">
+            <a href="{% url 'admin_users' %}" class="btn btn-outline-primary w-100 py-3">
+              <i class="bi bi-people me-2"></i> Manage Users
+            </a>
+          </div>
+          <div class="col-md-3">
+            <a href="{% url 'admin_reports' %}" class="btn btn-outline-primary w-100 py-3">
+              <i class="bi bi-bar-chart me-2"></i> View Reports
+            </a>
+          </div>
+          <div class="col-md-3">
+            <a href="/admin/" target="_blank" class="btn btn-outline-primary w-100 py-3">
+              <i class="bi bi-shield-lock me-2"></i> Django Admin
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

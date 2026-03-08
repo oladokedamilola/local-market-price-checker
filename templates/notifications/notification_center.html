@@ -1,0 +1,257 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Notification Center - MarketLens{% endblock %}
+
+{% block page_title %}Notification Center{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Notifications</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-lg-3 mb-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Filters</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="?filter=all" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if filter_type == 'all' %}active{% endif %}">
+                    All Notifications
+                    <span class="badge bg-primary rounded-pill">{{ stats.total }}</span>
+                </a>
+                <a href="?filter=unread" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if filter_type == 'unread' %}active{% endif %}">
+                    Unread
+                    <span class="badge bg-danger rounded-pill">{{ stats.unread }}</span>
+                </a>
+                <a href="?filter=read" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if filter_type == 'read' %}active{% endif %}">
+                    Read
+                    <span class="badge bg-secondary rounded-pill">{{ stats.read }}</span>
+                </a>
+                
+                <div class="list-group-item bg-light">
+                    <small class="text-muted">Type</small>
+                </div>
+                
+                {% if request.user.is_staff %}
+                <a href="?filter=admin" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if filter_type == 'admin' %}active{% endif %}">
+                    <i class="bi bi-shield-shaded me-2"></i> Admin
+                </a>
+                {% endif %}
+                
+                {% if request.user.groups.filter.name == 'VENDOR' %}
+                <a href="?filter=vendor" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if filter_type == 'vendor' %}active{% endif %}">
+                    <i class="bi bi-shop me-2"></i> Vendor
+                </a>
+                {% endif %}
+                
+                {% if request.user.groups.filter.name == 'CONSUMER' %}
+                <a href="?filter=consumer" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if filter_type == 'consumer' %}active{% endif %}">
+                    <i class="bi bi-person me-2"></i> Consumer
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer bg-white">
+                <button class="btn btn-outline-primary btn-sm w-100" id="markAllRead">
+                    <i class="bi bi-check-all me-2"></i> Mark All Read
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifications List -->
+    <div class="col-lg-9">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">Notifications</h5>
+                <div>
+                    <button class="btn btn-sm btn-outline-danger" id="archiveAllRead">
+                        <i class="bi bi-archive"></i> Archive Read
+                    </button>
+                </div>
+            </div>
+            
+            <div class="list-group list-group-flush" id="notificationList">
+                {% for notification in notifications %}
+                <div class="list-group-item list-group-item-action notification-item {% if not notification.is_read %}unread{% endif %}" data-id="{{ notification.id }}">
+                    <div class="d-flex w-100 justify-content-between align-items-start">
+                        <div class="d-flex gap-3">
+                            <i class="bi {{ notification.get_icon_class }} {{ notification.get_color_class }} fs-4"></i>
+                            <div>
+                                <h6 class="mb-1 fw-bold {% if notification.priority == 'high' %}text-danger{% endif %}">
+                                    {{ notification.title }}
+                                </h6>
+                                <p class="mb-1 text-muted">{{ notification.message }}</p>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i> {{ notification.created_at|timesince }} ago
+                                </small>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-link" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% if not notification.is_read %}
+                                <li>
+                                    <button class="dropdown-item mark-read" data-id="{{ notification.id }}">
+                                        <i class="bi bi-check me-2"></i> Mark as Read
+                                    </button>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <button class="dropdown-item archive-notification" data-id="{{ notification.id }}">
+                                        <i class="bi bi-archive me-2"></i> Archive
+                                    </button>
+                                </li>
+                                {% if notification.action_url %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ notification.action_url }}">
+                                        <i class="bi bi-box-arrow-up-right me-2"></i> View Details
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <i class="bi bi-bell-slash" style="font-size: 4rem; color: var(--color-muted);"></i>
+                    <h5 class="fw-bold mt-3">No Notifications</h5>
+                    <p class="text-muted">You're all caught up!</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.paginator.num_pages > 1 %}
+            <div class="card-footer bg-white">
+                <nav aria-label="Notification pagination">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&filter={{ filter_type }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for i in page_obj.paginator.page_range %}
+                            {% if page_obj.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ i }}&filter={{ filter_type }}">{{ i }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}&filter={{ filter_type }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .notification-item.unread {
+        background-color: rgba(77, 168, 218, 0.05);
+        border-left: 3px solid var(--color-accent);
+    }
+    .notification-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+$(document).ready(function() {
+    // Mark single notification as read
+    $('.mark-read').click(function() {
+        const notificationId = $(this).data('id');
+        const listItem = $(this).closest('.notification-item');
+        
+        $.ajax({
+            url: "{% url 'notifications:api_mark_read' 0 %}".replace('0', notificationId),
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                listItem.removeClass('unread');
+                updateUnreadCount(response.unread_count);
+            }
+        });
+    });
+    
+    // Mark all as read
+    $('#markAllRead').click(function() {
+        $.ajax({
+            url: "{% url 'notifications:api_mark_all_read' %}",
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                $('.notification-item').removeClass('unread');
+                updateUnreadCount(0);
+            }
+        });
+    });
+    
+    // Archive notification
+    $('.archive-notification').click(function() {
+        const notificationId = $(this).data('id');
+        const listItem = $(this).closest('.notification-item');
+        
+        $.ajax({
+            url: "{% url 'notifications:api_archive' 0 %}".replace('0', notificationId),
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function() {
+                listItem.fadeOut(300, function() {
+                    $(this).remove();
+                });
+            }
+        });
+    });
+    
+    // Archive all read
+    $('#archiveAllRead').click(function() {
+        $.ajax({
+            url: "{% url 'notifications:api_archive_all_read' %}",
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.updated > 0) {
+                    location.reload();
+                }
+            }
+        });
+    });
+    
+    function updateUnreadCount(count) {
+        $('.unread-notifications-badge').text(count);
+        if (count > 0) {
+            $('.unread-notifications-badge').show();
+        } else {
+            $('.unread-notifications-badge').hide();
+        }
+    }
+});
+</script>
+{% endblock %}

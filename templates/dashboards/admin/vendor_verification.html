@@ -1,0 +1,91 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Vendor Verification - MarketLens Admin{% endblock %}
+
+{% block page_title %}Vendor Verification{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item active" aria-current="page">Vendor Verification</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h2 fw-bold mb-2">Vendor Verification</h1>
+    <p class="text-muted">Review and verify vendor KYC submissions</p>
+  </div>
+  <div>
+    <span class="badge bg-warning fs-6 p-2">{{ count }} Pending</span>
+  </div>
+</div>
+
+{% if pending_kyc %}
+<div class="row">
+  {% for kyc in pending_kyc %}
+  <div class="col-lg-6 mb-4">
+    <div class="card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">
+          <i class="bi bi-person-circle me-2"></i>
+          {{ kyc.vendor.user.get_full_name|default:kyc.vendor.user.username }}
+        </h5>
+        <span class="badge bg-warning">Pending</span>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <small class="text-muted d-block">Username</small>
+            <strong>{{ kyc.vendor.user.username }}</strong>
+          </div>
+          <div class="col-md-6">
+            <small class="text-muted d-block">Email</small>
+            <strong>{{ kyc.vendor.user.email }}</strong>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <small class="text-muted d-block">ID Type</small>
+            <strong>{{ kyc.get_id_type_display }}</strong>
+          </div>
+          <div class="col-md-6">
+            <small class="text-muted d-block">Submitted</small>
+            <strong>{{ kyc.submitted_at|date:"M d, Y H:i" }}</strong>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <small class="text-muted d-block">ID Document</small>
+          <a href="{{ kyc.id_document.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-file-earmark-pdf me-1"></i> View Document
+          </a>
+        </div>
+        
+        <hr>
+        
+        <div class="d-flex gap-2">
+          <a href="{% url 'admin_verify_vendor' kyc.id %}" class="btn btn-primary flex-grow-1">
+            <i class="bi bi-check-circle me-2"></i> Review Application
+          </a>
+          <a href="{% url 'admin_user_detail' kyc.vendor.user.id %}" class="btn btn-outline-secondary">
+            <i class="bi bi-person"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+  <h3 class="fw-bold mt-3">All Caught Up!</h3>
+  <p class="text-muted">No pending vendor verifications at the moment.</p>
+  <a href="{% url 'admin_dashboard' %}" class="btn btn-primary mt-3">
+    <i class="bi bi-arrow-left me-2"></i> Back to Dashboard
+  </a>
+</div>
+{% endif %}
+{% endblock %}

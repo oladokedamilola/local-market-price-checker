@@ -1,0 +1,507 @@
+# Created by: MarketLens Project
+# Editor: Visual Studio Code
+# Django Version: 6.0
+# Python Version: 3.12
+
+# ============================================================================
+# PYTHON
+# ============================================================================
+*.py[cod]
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+pip-selfcheck.json
+poetry.lock
+.poetry/
+.venv
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+pythonenv*
+*.manifest
+*.spec
+
+# ============================================================================
+# DJANGO
+# ============================================================================
+*.log
+*.pot
+*.pid
+*.sqlite3
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static_root/
+staticfiles/
+.collected-static/
+local_settings.py
+*.env
+.env.local
+.env.production
+.env.development
+.env.staging
+*.env.local
+*.env.*.local
+
+# Django migrations - exclude all migration files
+accounts/migrations/*.py
+market/migrations/*.py
+vendor/migrations/*.py
+core/migrations/*.py
+notifications/migrations/*.py
+
+# But keep the __init__.py files so the migrations package is recognized
+!accounts/migrations/__init__.py
+!market/migrations/__init__.py
+!vendor/migrations/__init__.py
+!core/migrations/__init__.py
+!notifications/migrations/__init__.py
+
+# Django specific
+*.wsgi
+*.asgi
+django_error.log
+
+# ============================================================================
+# DATABASES
+# ============================================================================
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+*.sqlite3-wal
+*.sqlite3-shm
+
+# ============================================================================
+# MEDIA FILES (User Uploads)
+# ============================================================================
+media/
+media/**
+!media/.gitkeep
+media/products/
+media/profile_pics/
+media/vendor_kyc/
+media/markets/
+
+# ============================================================================
+# STATIC FILES (Collected)
+# ============================================================================
+staticfiles/
+static_root/
+collected-static/
+
+# ============================================================================
+# IDE / EDITORS
+# ============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.~lock*
+*.lock
+*.tmp
+*.temp
+.project
+.classpath
+.settings/
+.metadata/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.loadpath
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Vim
+*.swp
+*.swo
+*.un~
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# ============================================================================
+# OS GENERATED FILES
+# ============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.icloud
+*.lnk
+desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.msi
+*.msm
+*.msp
+
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# TEST COVERAGE
+# ============================================================================
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+test.db
+test.sqlite3
+
+# ============================================================================
+# PACKAGING / BUILD
+# ============================================================================
+*.egg-info/
+dist/
+build/
+develop-eggs/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg
+MANIFEST
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+dist/
+build/
+
+# ============================================================================
+# VIRTUAL ENVIRONMENT
+# ============================================================================
+venv/
+env/
+.env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+virtualenv/
+virtualenvs/
+.virtualenv/
+
+# ============================================================================
+# DJANGO SECRET FILES
+# ============================================================================
+*.key
+*.pem
+*.crt
+*.csr
+*.p12
+.secrets/
+secrets/
+config/secrets.yml
+.secrets.*
+credentials.json
+client_secret*.json
+
+# ============================================================================
+# LOGS AND DATABASES
+# ============================================================================
+*.log
+logs/
+*.log.*
+error.log
+access.log
+debug.log
+celerybeat-schedule
+celerybeat.pid
+*.pid
+*.pid.lock
+*.socket
+
+# ============================================================================
+# SECRETS AND CONFIGURATION
+# ============================================================================
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+.env.*
+!.env.example
+!.env.template
+config/settings/local.py
+config/settings/development.py
+local_settings.py
+*.secret
+*.secret.json
+*.secret.yaml
+*.secret.yml
+service-account.json
+firebase-credentials.json
+
+# ============================================================================
+# PYTHON PACKAGES
+# ============================================================================
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+bin/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+pip-log.txt
+pip-delete-this-directory.txt
+pip-selfcheck.json
+poetry.lock
+poetry.toml
+Pipfile.lock
+pyproject.toml
+requirements.lock
+
+# ============================================================================
+# CELERY
+# ============================================================================
+celerybeat-schedule
+celerybeat.pid
+*.pid
+*.pid.lock
+
+# ============================================================================
+# SPHINX DOCUMENTATION
+# ============================================================================
+docs/_build/
+docs/api/
+docs/source/api/
+
+# ============================================================================
+# JUPYTER NOTEBOOKS
+# ============================================================================
+.ipynb_checkpoints/
+*.ipynb
+
+# ============================================================================
+# DEBUG TOOLS
+# ============================================================================
+debug.log
+profile/
+profiles/
+__pycache__/debug.*.pyc
+
+# ============================================================================
+# NPM / NODE (if you use any frontend build tools)
+# ============================================================================
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ============================================================================
+# WEBPACK / ASSET BUILD
+# ============================================================================
+/static/bundles/
+/webpack-stats.json
+/webpack-stats-*.json
+/assets/webpack/
+/static/dist/
+
+# ============================================================================
+# DOCKER
+# ============================================================================
+docker-compose.override.yml
+.docker/
+docker-compose.local.yml
+Dockerfile.local
+.dockerignore
+*.docker
+
+# ============================================================================
+# VS CODE DEBUG CONFIGURATION
+# ============================================================================
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/settings.json
+!.vscode/extensions.json
+.history/
+
+# ============================================================================
+# FIXTURES DATA (Optional - uncomment if you want to exclude)
+# ============================================================================
+# fixtures/*.json
+# !fixtures/README.md
+# !fixtures/.gitkeep
+
+# ============================================================================
+# TEMPORARY FILES
+# ============================================================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+*.bak
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================================================
+# PROJECT SPECIFIC - MarketLens
+# ============================================================================
+# Media upload directories (keep structure but not files)
+media/products/
+media/profile_pics/
+media/vendor_kyc/
+media/markets/
+!.gitkeep
+
+# Static collected files
+staticfiles/
+static_root/
+
+# Database
+*.sqlite3
+*.sqlite3-journal
+
+# Local environment file
+.env.local
+.env.development.local
+.env.production.local
+.env.staging.local
+
+# Test database
+test_db.sqlite3
+test_*.sqlite3
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Pytest
+.pytest_cache/
+.pytest.ini
+pytest.ini
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# profile data
+.prof
+.profraw
+.profdata
+
+# ============================================================================
+# KEEP THESE FILES (Don't ignore)
+# ============================================================================
+!.gitignore
+!.gitkeep
+!.env.example
+!requirements.txt
+!requirements-dev.txt
+!README.md
+!LICENSE
+!manage.py
+!Procfile
+!runtime.txt
+!Dockerfile
+!docker-compose.yml
+!docker-compose.prod.yml
+!Makefile
+!pyproject.toml
+!setup.cfg
+!.editorconfig
+!.pre-commit-config.yaml
+!.github/workflows/
+
+# ============================================================================
+# SECURITY NOTE
+# ============================================================================
+# Never commit files containing sensitive information like:
+# - Secret keys
+# - Database passwords
+# - API keys
+# - Email credentials
+# - OAuth secrets
+# - Private keys
+# - Environment variables with real credentials
+# - Local settings files

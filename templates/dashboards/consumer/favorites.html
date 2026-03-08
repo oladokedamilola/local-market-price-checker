@@ -1,0 +1,284 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}My Favorites - MarketLens{% endblock %}
+
+{% block page_title %}My Favorites{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Favorites</li>
+{% endblock %}
+
+{% block content %}
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs mb-4" id="favoritesTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab">
+            <i class="bi bi-box me-2"></i>Favorite Products ({{ products_count }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="vendors-tab" data-bs-toggle="tab" data-bs-target="#vendors" type="button" role="tab">
+            <i class="bi bi-shop me-2"></i>Favorite Vendors ({{ vendors_count }})
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="favoritesTabsContent">
+    <!-- Favorite Products Tab -->
+    <div class="tab-pane fade show active" id="products" role="tabpanel">
+        {% if favorite_products %}
+        <div class="row g-4">
+            {% for favorite in favorite_products %}
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card h-100 favorite-card">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center position-relative" style="height: 140px;">
+                        {% if favorite.product.product.image %}
+                        <img src="{{ favorite.product.product.image.url }}" alt="{{ favorite.product.product.name }}" 
+                             class="w-100 h-100" style="object-fit: cover;">
+                        {% else %}
+                        <i class="bi bi-box" style="font-size: 3rem; color: var(--color-muted);"></i>
+                        {% endif %}
+                        <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 remove-favorite" 
+                                data-favorite-id="{{ favorite.id }}" data-type="product" title="Remove from favorites">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">{{ favorite.product.product.name }}</h6>
+                            <span class="badge bg-primary">₦{{ favorite.product.price }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="small text-muted mb-1">
+                                <i class="bi bi-shop me-1"></i> {{ favorite.product.vendor.user.get_full_name|default:favorite.product.vendor.user.username }}
+                            </div>
+                            <div class="small text-muted">
+                                <i class="bi bi-geo-alt me-1"></i> {{ favorite.product.market.name }}
+                            </div>
+                        </div>
+                        
+                        {% if favorite.notes %}
+                        <div class="bg-light p-2 rounded small mb-3">
+                            <i class="bi bi-chat-text me-1"></i> {{ favorite.notes }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'consumer_product_detail' favorite.product.id %}" class="btn btn-sm btn-outline-primary flex-grow-1">
+                                View
+                            </a>
+                            <button class="btn btn-sm btn-outline-secondary edit-notes" data-favorite-id="{{ favorite.id }}" 
+                                    data-type="product" data-notes="{{ favorite.notes }}" title="Add notes">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-star text-muted" style="font-size: 4rem;"></i>
+            <h3 class="fw-bold mt-3">No Favorite Products</h3>
+            <p class="text-muted mb-4">Start adding products to your favorites to see them here.</p>
+            <a href="{% url 'search' %}" class="btn btn-primary">
+                <i class="bi bi-search me-2"></i> Browse Products
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Favorite Vendors Tab -->
+    <div class="tab-pane fade" id="vendors" role="tabpanel">
+        {% if favorite_vendors %}
+        <div class="row g-4">
+            {% for favorite in favorite_vendors %}
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card h-100 favorite-card">
+                    <div class="card-body text-center">
+                        <div class="position-relative mb-3">
+                            {% if favorite.vendor.user.profile.profile_picture %}
+                            <img src="{{ favorite.vendor.user.profile.profile_picture.url }}" 
+                                 alt="{{ favorite.vendor.user.get_full_name }}"
+                                 class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto bg-primary" 
+                                 style="width: 80px; height: 80px;">
+                                <span class="fw-bold text-white fs-2">
+                                    {{ favorite.vendor.user.get_full_name|first|default:favorite.vendor.user.username|first|upper }}
+                                </span>
+                            </div>
+                            {% endif %}
+                            <button class="btn btn-sm btn-danger position-absolute top-0 end-0 remove-favorite" 
+                                    data-favorite-id="{{ favorite.id }}" data-type="vendor" title="Remove from favorites">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        
+                        <h6 class="fw-bold mb-1">{{ favorite.vendor.user.get_full_name|default:favorite.vendor.user.username }}</h6>
+                        <p class="small text-muted mb-2">{{ favorite.vendor.user.email }}</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge {% if favorite.vendor.is_verified %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ favorite.vendor.is_verified|yesno:"Verified,Pending" }}
+                            </span>
+                            <span class="badge bg-info">{{ favorite.vendor.products.count }} products</span>
+                        </div>
+                        
+                        {% if favorite.notes %}
+                        <div class="bg-light p-2 rounded small mb-3">
+                            <i class="bi bi-chat-text me-1"></i> {{ favorite.notes }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'admin_user_detail' favorite.vendor.user.id %}" class="btn btn-sm btn-outline-primary flex-grow-1">
+                                View
+                            </a>
+                            <button class="btn btn-sm btn-outline-secondary edit-notes" data-favorite-id="{{ favorite.id }}" 
+                                    data-type="vendor" data-notes="{{ favorite.notes }}" title="Add notes">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
+            <h3 class="fw-bold mt-3">No Favorite Vendors</h3>
+            <p class="text-muted mb-4">Follow your favorite vendors to see their latest products.</p>
+            <a href="{% url 'search' %}" class="btn btn-primary">
+                <i class="bi bi-search me-2"></i> Browse Vendors
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Recent Products from Favorite Vendors -->
+{% if recent_from_favorites %}
+<div class="mt-5">
+    <h4 class="fw-bold mb-3">Recent from Your Favorite Vendors</h4>
+    <div class="row g-4">
+        {% for product in recent_from_favorites %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="card h-100">
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 120px;">
+                    {% if product.product.image %}
+                    <img src="{{ product.product.image.url }}" alt="{{ product.product.name }}" 
+                         class="w-100 h-100" style="object-fit: cover;">
+                    {% else %}
+                    <i class="bi bi-box" style="font-size: 2rem; color: var(--color-muted);"></i>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h6 class="fw-bold mb-1">{{ product.product.name }}</h6>
+                    <small class="text-muted d-block mb-2">{{ product.market.name }}</small>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-primary">₦{{ product.price }}</span>
+                        <a href="{% url 'consumer_product_detail' product.id %}" class="btn btn-sm btn-outline-primary">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Edit Notes Modal -->
+<div class="modal fade" id="notesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Add Notes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="notesForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Your Notes</label>
+                        <textarea name="notes" id="notesTextarea" class="form-control" rows="3" 
+                                  placeholder="Add personal notes about this item..."></textarea>
+                        <small class="text-muted">These notes are private and only visible to you.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Notes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .favorite-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid var(--color-border);
+    }
+    .favorite-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-soft);
+    }
+    .remove-favorite {
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    .favorite-card:hover .remove-favorite {
+        opacity: 1;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle remove favorite
+    document.querySelectorAll('.remove-favorite').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const favoriteId = this.dataset.favoriteId;
+            const type = this.dataset.type;
+            const url = type === 'product' 
+                ? "{% url 'consumer_remove_favorite_product' 0 %}".replace('0', favoriteId)
+                : "{% url 'consumer_remove_favorite_vendor' 0 %}".replace('0', favoriteId);
+            
+            if (confirm('Are you sure you want to remove this from your favorites?')) {
+                window.location.href = url;
+            }
+        });
+    });
+    
+    // Handle edit notes
+    document.querySelectorAll('.edit-notes').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const favoriteId = this.dataset.favoriteId;
+            const type = this.dataset.type;
+            const notes = this.dataset.notes || '';
+            
+            document.getElementById('notesTextarea').value = notes;
+            
+            const form = document.getElementById('notesForm');
+            form.action = "{% url 'consumer_update_favorite_notes' 'type' 0 %}"
+                .replace('type', type)
+                .replace('0', favoriteId);
+            
+            new bootstrap.Modal(document.getElementById('notesModal')).show();
+        });
+    });
+});
+</script>
+{% endblock %}

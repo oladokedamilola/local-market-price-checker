@@ -1,0 +1,602 @@
+[
+  {
+    "model": "market.category",
+    "pk": 1,
+    "fields": {
+      "name": "Fresh Tomatoes",
+      "slug": "fresh-tomatoes",
+      "description": "Fresh, ripe tomatoes for cooking and salads",
+      "icon": "bi-egg-fried",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 2,
+    "fields": {
+      "name": "Peppers",
+      "slug": "peppers",
+      "description": "Fresh peppers including bell peppers, scotch bonnet, and tatashe",
+      "icon": "bi-flower1",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 3,
+    "fields": {
+      "name": "Onions",
+      "slug": "onions",
+      "description": "Fresh onions - red, white, and spring onions",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 4,
+    "fields": {
+      "name": "Leafy Vegetables",
+      "slug": "leafy-vegetables",
+      "description": "Fresh leafy greens including spinach, ugu, and waterleaf",
+      "icon": "bi-flower1",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 5,
+    "fields": {
+      "name": "Root Vegetables",
+      "slug": "root-vegetables",
+      "description": "Potatoes, carrots, yams, and other root vegetables",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 6,
+    "fields": {
+      "name": "Yams",
+      "slug": "yams",
+      "description": "Fresh yam tubers - white yam, water yam, and yellow yam",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 7,
+    "fields": {
+      "name": "Cassava",
+      "slug": "cassava",
+      "description": "Fresh cassava tubers for garri, fufu, and other dishes",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 8,
+    "fields": {
+      "name": "Rice",
+      "slug": "rice",
+      "description": "Various rice types - local rice, parboiled, basmati, and more",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 9,
+    "fields": {
+      "name": "Beans",
+      "slug": "beans",
+      "description": "Various beans - brown beans, black-eyed peas, honey beans",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 10,
+    "fields": {
+      "name": "Garri",
+      "slug": "garri",
+      "description": "Processed cassava flakes - white and yellow garri",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 11,
+    "fields": {
+      "name": "Beef",
+      "slug": "beef",
+      "description": "Fresh beef cuts for various Nigerian dishes",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 12,
+    "fields": {
+      "name": "Goat Meat",
+      "slug": "goat-meat",
+      "description": "Fresh goat meat for pepper soup, asun, and other delicacies",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 13,
+    "fields": {
+      "name": "Chicken",
+      "slug": "chicken",
+      "description": "Fresh and frozen chicken - whole and cuts",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 14,
+    "fields": {
+      "name": "Fish",
+      "slug": "fish",
+      "description": "Fresh and dried fish including tilapia, catfish, croaker",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 15,
+    "fields": {
+      "name": "Stockfish",
+      "slug": "stockfish",
+      "description": "Dried fish for soups and stews",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 16,
+    "fields": {
+      "name": "Palm Oil",
+      "slug": "palm-oil",
+      "description": "Natural red palm oil for cooking",
+      "icon": "bi-droplet",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 17,
+    "fields": {
+      "name": "Vegetable Oil",
+      "slug": "vegetable-oil",
+      "description": "Refined vegetable oil for frying and cooking",
+      "icon": "bi-droplet",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 18,
+    "fields": {
+      "name": "Groundnut Oil",
+      "slug": "groundnut-oil",
+      "description": "Pure groundnut oil for cooking and frying",
+      "icon": "bi-droplet",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 19,
+    "fields": {
+      "name": "Spices",
+      "slug": "spices",
+      "description": "Ground and whole spices for Nigerian cooking",
+      "icon": "bi-flower1",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 20,
+    "fields": {
+      "name": "Seasonings",
+      "slug": "seasonings",
+      "description": "Stock cubes, seasoning powders, and bouillon",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 21,
+    "fields": {
+      "name": "Flour",
+      "slug": "flour",
+      "description": "Wheat flour, semolina, and other baking flours",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 22,
+    "fields": {
+      "name": "Pasta",
+      "slug": "pasta",
+      "description": "Spaghetti, macaroni, and other pasta varieties",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 23,
+    "fields": {
+      "name": "Noodles",
+      "slug": "noodles",
+      "description": "Instant noodles and pasta noodles",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 24,
+    "fields": {
+      "name": "Canned Goods",
+      "slug": "canned-goods",
+      "description": "Canned tomatoes, fish, baked beans, and more",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 25,
+    "fields": {
+      "name": "Beverages",
+      "slug": "beverages",
+      "description": "Soft drinks, juices, and bottled water",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 26,
+    "fields": {
+      "name": "Milk",
+      "slug": "milk",
+      "description": "Evaporated milk, powdered milk, and fresh milk",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 27,
+    "fields": {
+      "name": "Tea & Coffee",
+      "slug": "tea-coffee",
+      "description": "Tea bags, instant coffee, and ground coffee",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 28,
+    "fields": {
+      "name": "Sugar",
+      "slug": "sugar",
+      "description": "Granulated sugar, brown sugar, and cubes",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 29,
+    "fields": {
+      "name": "Salt",
+      "slug": "salt",
+      "description": "Cooking salt and seasoning salt",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 30,
+    "fields": {
+      "name": "Bread",
+      "slug": "bread",
+      "description": "Fresh bread - sliced, unsliced, and speciality breads",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 31,
+    "fields": {
+      "name": "Eggs",
+      "slug": "eggs",
+      "description": "Fresh chicken eggs",
+      "icon": "bi-egg-fried",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 32,
+    "fields": {
+      "name": "Butter & Margarine",
+      "slug": "butter-margarine",
+      "description": "Butter, margarine, and spreads",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 33,
+    "fields": {
+      "name": "Yogurt",
+      "slug": "yogurt",
+      "description": "Fresh and flavored yogurt",
+      "icon": "bi-cup",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 34,
+    "fields": {
+      "name": "Fruits",
+      "slug": "fruits",
+      "description": "Fresh fruits - oranges, bananas, apples, and more",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 35,
+    "fields": {
+      "name": "Plantains",
+      "slug": "plantains",
+      "description": "Fresh plantains - ripe and unripe",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 36,
+    "fields": {
+      "name": "Bananas",
+      "slug": "bananas",
+      "description": "Fresh bananas - sweet bananas and cooking bananas",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 37,
+    "fields": {
+      "name": "Citrus Fruits",
+      "slug": "citrus-fruits",
+      "description": "Oranges, lemons, limes, and grapefruits",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 38,
+    "fields": {
+      "name": "Cleaning Supplies",
+      "slug": "cleaning-supplies",
+      "description": "Detergents, soaps, and cleaning products",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 39,
+    "fields": {
+      "name": "Personal Care",
+      "slug": "personal-care",
+      "description": "Soap, shampoo, toothpaste, and toiletries",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 40,
+    "fields": {
+      "name": "Baby Products",
+      "slug": "baby-products",
+      "description": "Diapers, baby food, and baby care items",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 41,
+    "fields": {
+      "name": "Biscuits & Snacks",
+      "slug": "biscuits-snacks",
+      "description": "Cookies, crackers, chips, and snack foods",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 42,
+    "fields": {
+      "name": "Cereals",
+      "slug": "cereals",
+      "description": "Breakfast cereals and grains",
+      "icon": "bi-box",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 43,
+    "fields": {
+      "name": "Honey",
+      "slug": "honey",
+      "description": "Natural honey and sweeteners",
+      "icon": "bi-droplet",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 44,
+    "fields": {
+      "name": "Groundnuts",
+      "slug": "groundnuts",
+      "description": "Raw and roasted groundnuts",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 45,
+    "fields": {
+      "name": "Coconut",
+      "slug": "coconut",
+      "description": "Fresh coconuts and coconut products",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 46,
+    "fields": {
+      "name": "Okra",
+      "slug": "okra",
+      "description": "Fresh okra for soups and stews",
+      "icon": "bi-flower1",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 47,
+    "fields": {
+      "name": "Garden Eggs",
+      "slug": "garden-eggs",
+      "description": "Fresh garden eggs for salads and sauces",
+      "icon": "bi-circle",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 48,
+    "fields": {
+      "name": "Bitter Leaf",
+      "slug": "bitter-leaf",
+      "description": "Fresh bitter leaf for soups",
+      "icon": "bi-flower1",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 49,
+    "fields": {
+      "name": "Utazi",
+      "slug": "utazi",
+      "description": "Fresh utazi leaves for traditional dishes",
+      "icon": "bi-flower1",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.category",
+    "pk": 50,
+    "fields": {
+      "name": "Scent Leaves",
+      "slug": "scent-leaves",
+      "description": "Fresh scent leaves for soups and stews",
+      "icon": "bi-flower1",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  }
+]

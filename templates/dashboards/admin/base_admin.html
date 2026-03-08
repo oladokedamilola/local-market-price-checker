@@ -1,0 +1,140 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+  .admin-sidebar {
+    background: var(--color-primary);
+    min-height: calc(100vh - 76px);
+    color: white;
+  }
+  
+  .admin-sidebar .nav-link {
+    color: rgba(255,255,255,0.8);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.25rem;
+    border-radius: var(--radius);
+  }
+  
+  .admin-sidebar .nav-link:hover,
+  .admin-sidebar .nav-link.active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+  
+  .admin-sidebar .nav-link i {
+    width: 24px;
+  }
+  
+  .admin-content {
+    padding: 2rem;
+    background: var(--color-bg);
+    min-height: calc(100vh - 76px);
+  }
+  
+  .stat-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.3s ease;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(77, 168, 218, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    font-size: 1.5rem;
+  }
+  
+  .badge-pending {
+    background: var(--color-warning);
+    color: white;
+  }
+  
+  .badge-approved {
+    background: var(--color-success);
+    color: white;
+  }
+  
+  .badge-rejected {
+    background: var(--color-danger);
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-lg-2 p-0 admin-sidebar">
+      <div class="p-3">
+        <h6 class="text-white-50 mb-3">MAIN MENU</h6>
+        <nav class="nav flex-column">
+          <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" 
+             href="{% url 'admin_dashboard' %}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}" 
+             href="{% url 'admin_users' %}">
+            <i class="bi bi-people"></i> All Users
+          </a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'admin_vendor_verification' %}active{% endif %}" 
+             href="{% url 'admin_vendor_verification' %}">
+            <i class="bi bi-shield-check"></i> Pending Verifications
+            {% if pending_kyc_count %}
+            <span class="badge bg-danger ms-2">{{ pending_kyc_count }}</span>
+            {% endif %}
+          </a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'admin_vendor_products' %}active{% endif %}" 
+             href="{% url 'admin_vendor_products' %}">
+            <i class="bi bi-box"></i> Vendor Products
+          </a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'admin_consumers' %}active{% endif %}" 
+             href="{% url 'admin_consumers' %}">
+            <i class="bi bi-person"></i> Consumers
+          </a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'admin_markets' %}active{% endif %}" 
+             href="{% url 'admin_markets' %}">
+            <i class="bi bi-geo-alt"></i> Markets
+          </a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'admin_categories' %}active{% endif %}" 
+             href="{% url 'admin_categories' %}">
+            <i class="bi bi-tags"></i> Categories
+          </a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}" 
+             href="{% url 'admin_reports' %}">
+            <i class="bi bi-bar-chart"></i> Reports
+          </a>
+        </nav>
+        
+        <hr class="border-secondary my-3">
+        
+        <h6 class="text-white-50 mb-3">SYSTEM</h6>
+        <nav class="nav flex-column">
+          <a class="nav-link" href="/admin/" target="_blank">
+            <i class="bi bi-shield-lock"></i> Django Admin
+          </a>
+        </nav>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-lg-10 p-0">
+      <div class="admin-content">
+        {% block admin_content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3" style="color: var(--color-primary);">Contact Us</h1>
+                <p class="lead text-muted">Get in touch with the MarketLens team</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Contact Form -->
+                <div class="col-md-7">
+                    <div class="card border-0 shadow-soft">
+                        <div class="card-body p-4">
+                            <h4 class="fw-bold mb-4">Send Us a Message</h4>
+                            
+                            <form method="POST">
+                                {% csrf_token %}
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Your Name</label>
+                                        <input type="text" name="name" class="form-control" required 
+                                               value="{% if user.is_authenticated %}{{ user.get_full_name }}{% endif %}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Your Email</label>
+                                        <input type="email" name="email" class="form-control" required
+                                               value="{% if user.is_authenticated %}{{ user.email }}{% endif %}">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Subject</label>
+                                        <select name="subject" class="form-select" required>
+                                            <option value="">Select a subject</option>
+                                            <option value="general">General Inquiry</option>
+                                            <option value="support">Technical Support</option>
+                                            <option value="vendor">Vendor Question</option>
+                                            <option value="consumer">Consumer Question</option>
+                                            <option value="feedback">Feedback</option>
+                                            <option value="report">Report an Issue</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Message</label>
+                                        <textarea name="message" class="form-control" rows="5" required placeholder="How can we help you?"></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                                            <i class="bi bi-send me-2"></i>Send Message
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="col-md-5">
+                    <div class="card border-0 shadow-soft mb-4">
+                        <div class="card-body">
+                            <h4 class="fw-bold mb-4">Contact Information</h4>
+                            
+                            <div class="d-flex mb-4">
+                                <i class="bi bi-envelope fs-3 text-primary me-3"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Email</h6>
+                                    <p class="text-muted mb-0">support@marketlens.com</p>
+                                    <p class="text-muted">info@marketlens.com</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex mb-4">
+                                <i class="bi bi-telephone fs-3 text-primary me-3"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Phone</h6>
+                                    <p class="text-muted mb-0">+234 (0) 123 456 7890</p>
+                                    <p class="text-muted">+234 (0) 123 456 7891</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex mb-4">
+                                <i class="bi bi-building fs-3 text-primary me-3"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Office Address</h6>
+                                    <p class="text-muted mb-0">Alimosho Local Government</p>
+                                    <p class="text-muted mb-0">Lagos State, Nigeria</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex">
+                                <i class="bi bi-clock fs-3 text-primary me-3"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Support Hours</h6>
+                                    <p class="text-muted mb-0">Monday - Friday: 8am - 8pm</p>
+                                    <p class="text-muted">Saturday: 9am - 5pm</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media -->
+                    <div class="card border-0 shadow-soft">
+                        <div class="card-body">
+                            <h4 class="fw-bold mb-3">Follow Us</h4>
+                            <div class="d-flex gap-3">
+                                <a href="#" class="btn btn-outline-primary rounded-circle p-3">
+                                    <i class="bi bi-twitter fs-5"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-primary rounded-circle p-3">
+                                    <i class="bi bi-facebook fs-5"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-primary rounded-circle p-3">
+                                    <i class="bi bi-instagram fs-5"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-primary rounded-circle p-3">
+                                    <i class="bi bi-whatsapp fs-5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map (Optional) -->
+            <div class="card border-0 shadow-soft mt-4">
+                <div class="card-body p-0">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63430.43069448807!2d3.259476346020179!3d6.611127287143357!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b93b5c8b3d4e7%3A0x8b3f1f8c9f1b5f9!2sAlimosho%2C%20Lagos!5e0!3m2!1sen!2sng!4v1645567890123!5m2!1sen!2sng" 
+                        width="100%" 
+                        height="300" 
+                        style="border:0; border-radius: 10px;" 
+                        allowfullscreen="" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

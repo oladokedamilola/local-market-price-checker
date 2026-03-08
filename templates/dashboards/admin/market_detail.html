@@ -1,0 +1,370 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ market.name }} - MarketLens Admin{% endblock %}
+
+{% block page_title %}Market Details{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_markets' %}">Markets</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ market.name }}</li>
+{% endblock %}
+
+{% block content %}
+<!-- Market Header -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-soft">
+      <div class="row g-0">
+        <div class="col-md-4">
+          <div class="bg-light d-flex align-items-center justify-content-center h-100" style="min-height: 250px;">
+            {% if market.cover_image %}
+            <img src="{{ market.cover_image.url }}" alt="{{ market.name }}" class="img-fluid w-100 h-100" style="object-fit: cover;">
+            {% else %}
+            <i class="bi bi-image" style="font-size: 4rem; color: var(--color-muted);"></i>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h2 class="fw-bold mb-2">{{ market.name }}</h2>
+                <p class="text-muted mb-2">
+                  <i class="bi bi-geo-alt me-2"></i> {{ market.location }}
+                </p>
+                <p class="text-muted mb-2">
+                  <i class="bi bi-pin-map me-2"></i> {{ market.address|default:"No address provided" }}
+                </p>
+              </div>
+              <div>
+                {% if market.is_active %}
+                <span class="badge bg-success fs-6 p-2">Active Market</span>
+                {% else %}
+                <span class="badge bg-secondary fs-6 p-2">Inactive</span>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="row mb-4">
+              <div class="col-md-4">
+                <div class="bg-light p-3 rounded text-center">
+                  <span class="text-muted d-block mb-1">Total Products</span>
+                  <h3 class="fw-bold mb-0">{{ product_count }}</h3>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="bg-light p-3 rounded text-center">
+                  <span class="text-muted d-block mb-1">Total Vendors</span>
+                  <h3 class="fw-bold mb-0">{{ vendor_count }}</h3>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="bg-light p-3 rounded text-center">
+                  <span class="text-muted d-block mb-1">Established</span>
+                  <h3 class="fw-bold mb-0">{{ market.created_at|date:"Y" }}</h3>
+                </div>
+              </div>
+            </div>
+            
+            {% if market.opening_hours or market.contact_number %}
+            <div class="row">
+              {% if market.opening_hours %}
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-clock text-primary fs-4 me-3"></i>
+                  <div>
+                    <span class="text-muted d-block">Opening Hours</span>
+                    <strong>{{ market.opening_hours }}</strong>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              {% if market.contact_number %}
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-telephone text-primary fs-4 me-3"></i>
+                  <div>
+                    <span class="text-muted d-block">Contact</span>
+                    <strong>{{ market.contact_number }}</strong>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Market Description -->
+{% if market.description %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-soft">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">About {{ market.name }}</h5>
+      </div>
+      <div class="card-body">
+        <p class="mb-0">{{ market.description|linebreaks }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Vendors and Products Tabs -->
+<div class="row">
+  <div class="col-12">
+    <ul class="nav nav-tabs mb-4" id="marketTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="vendors-tab" data-bs-toggle="tab" data-bs-target="#vendors" type="button" role="tab">
+          <i class="bi bi-shop me-2"></i>Vendors ({{ vendor_count }})
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab">
+          <i class="bi bi-box me-2"></i>Recent Products ({{ products|length }})
+        </button>
+      </li>
+    </ul>
+    
+    <div class="tab-content" id="marketTabsContent">
+      <!-- Vendors Tab -->
+      <div class="tab-pane fade show active" id="vendors" role="tabpanel">
+        <div class="card border-0 shadow-soft">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Vendors in {{ market.name }}</h5>
+            <span class="badge bg-primary">{{ vendor_count }} Vendors</span>
+          </div>
+          <div class="card-body">
+            {% if vendors %}
+            <div class="row g-4">
+              {% for vendor in vendors %}
+              <div class="col-md-6 col-lg-4">
+                <div class="card h-100 vendor-card">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                      <!-- Vendor Profile Image with better styling -->
+                      <div class="flex-shrink-0 me-3">
+                        {% if vendor.user.profile and vendor.user.profile.profile_picture %}
+                        <div class="vendor-avatar">
+                          <img src="{{ vendor.user.profile.profile_picture.url }}" 
+                               alt="{{ vendor.user.get_full_name|default:vendor.user.username }}"
+                               class="rounded-circle img-fluid"
+                               style="width: 60px; height: 60px; object-fit: cover; border: 3px solid var(--color-accent);">
+                        </div>
+                        {% else %}
+                        <div class="vendor-avatar-placeholder rounded-circle d-flex align-items-center justify-content-center" 
+                             style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); color: white;">
+                          <span class="fw-bold fs-4">
+                            {{ vendor.user.get_full_name|default:vendor.user.username|first|upper }}
+                          </span>
+                        </div>
+                        {% endif %}
+                      </div>
+                      <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-1">{{ vendor.user.get_full_name|default:vendor.user.username }}</h6>
+                        <small class="text-muted d-block">{{ vendor.user.email }}</small>
+                        {% if vendor.business_name %}
+                        <small class="text-muted">{{ vendor.business_name }}</small>
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                    <div class="mb-3 d-flex gap-2 flex-wrap">
+                      <span class="badge {% if vendor.is_verified %}bg-success{% else %}bg-warning{% endif %}">
+                        <i class="bi {% if vendor.is_verified %}bi-check-circle{% else %}bi-hourglass{% endif %} me-1"></i>
+                        {{ vendor.is_verified|yesno:"Verified,Pending" }}
+                      </span>
+                      <span class="badge bg-info">
+                        <i class="bi bi-box me-1"></i>{{ vendor.product_count }} products
+                      </span>
+                    </div>
+                    
+                    <div class="d-grid">
+                      <a href="{% url 'admin_user_detail' vendor.user.id %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-person-lines-fill me-2"></i>View Full Profile
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <i class="bi bi-shop text-muted" style="font-size: 3rem;"></i>
+              <h5 class="fw-bold mt-3">No Vendors Found</h5>
+              <p class="text-muted">No vendors are currently operating in this market.</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Products Tab -->
+      <div class="tab-pane fade" id="products" role="tabpanel">
+        <div class="card border-0 shadow-soft">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Recent Products in {{ market.name }}</h5>
+            <a href="{% url 'admin_vendor_products' %}?market={{ market.id }}" class="btn btn-sm btn-primary">
+              View All Products
+            </a>
+          </div>
+          <div class="card-body">
+            {% if products %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Vendor</th>
+                    <th>Price</th>
+                    <th>Category</th>
+                    <th>Last Updated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for product in products %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="bg-light rounded p-1 me-2" style="width: 40px; height: 40px; overflow: hidden;">
+                          {% if product.product.image %}
+                          <img src="{{ product.product.image.url }}" alt="{{ product.product.name }}" 
+                               style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                          {% else %}
+                          <i class="bi bi-box text-muted d-flex align-items-center justify-content-center h-100"></i>
+                          {% endif %}
+                        </div>
+                        <div>
+                          <strong>{{ product.product.name }}</strong>
+                          <br>
+                          <small class="text-muted">{{ product.product.unit }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        {% if product.vendor.user.profile and product.vendor.user.profile.profile_picture %}
+                        <img src="{{ product.vendor.user.profile.profile_picture.url }}" 
+                             alt="{{ product.vendor.user.username }}"
+                             style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
+                        {% else %}
+                        <i class="bi bi-person-circle me-2 text-muted"></i>
+                        {% endif %}
+                        <a href="{% url 'admin_user_detail' product.vendor.user.id %}" class="text-decoration-none">
+                          {{ product.vendor.user.get_full_name|default:product.vendor.user.username }}
+                        </a>
+                      </div>
+                    </td>
+                    <td><span class="fw-bold text-primary">₦{{ product.price }}</span></td>
+                    <td>
+                      {% if product.product.category %}
+                      <span class="badge bg-secondary">{{ product.product.category.name }}</span>
+                      {% else %}
+                      <span class="badge bg-light text-dark">Uncategorized</span>
+                      {% endif %}
+                    </td>
+                    <td><small>{{ product.last_updated|timesince }} ago</small></td>
+                    <td>
+                      <a href="{% url 'admin_vendor_product_detail' product.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <i class="bi bi-box text-muted" style="font-size: 3rem;"></i>
+              <h5 class="fw-bold mt-3">No Products Found</h5>
+              <p class="text-muted">No products have been listed in this market yet.</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-soft">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-lightning text-warning me-2"></i>Quick Actions</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="{% url 'admin_market_update' market.id %}" class="btn btn-primary">
+            <i class="bi bi-pencil me-2"></i>Edit Market
+          </a>
+          <a href="{% url 'admin_vendor_products' %}?market={{ market.id }}" class="btn btn-outline-primary">
+            <i class="bi bi-box me-2"></i>View All Products
+          </a>
+          <a href="{% url 'admin_users' %}?role=vendors" class="btn btn-outline-primary">
+            <i class="bi bi-people me-2"></i>View All Vendors
+          </a>
+          <a href="{% url 'admin_market_delete' market.id %}" class="btn btn-outline-danger ms-auto">
+            <i class="bi bi-trash me-2"></i>Delete Market
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .vendor-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--color-border);
+  }
+  
+  .vendor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .vendor-avatar {
+    position: relative;
+  }
+  
+  .vendor-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background-color: {% if vendor.is_verified %}#2ecc71{% else %}#f39c12{% endif %};
+    border: 2px solid white;
+    border-radius: 50%;
+  }
+  
+  .vendor-avatar-placeholder {
+    position: relative;
+  }
+  
+  .vendor-avatar-placeholder::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background-color: {% if vendor.is_verified %}#2ecc71{% else %}#f39c12{% endif %};
+    border: 2px solid white;
+    border-radius: 50%;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,360 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Rejected KYC - MarketLens Admin{% endblock %}
+
+{% block page_title %}Rejected KYC Submissions{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_vendor_verification' %}">Vendor Verification</a></li>
+<li class="breadcrumb-item active" aria-current="page">Rejected KYC</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h2 fw-bold mb-2">Rejected KYC Submissions</h1>
+    <p class="text-muted">Review rejected vendor verification requests</p>
+  </div>
+  <div>
+    <span class="badge bg-danger fs-6 p-2">{{ count }} Rejected</span>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" class="row g-3">
+      <div class="col-md-10">
+        <input type="text" name="search" class="form-control" placeholder="Search by vendor name, email, or business..." value="{{ search }}">
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-search me-2"></i> Search
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stat-icon danger me-3">
+            <i class="bi bi-x-circle"></i>
+          </div>
+          <div>
+            <h3 class="fw-bold mb-0">{{ count }}</h3>
+            <span class="text-muted">Total Rejected</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stat-icon warning me-3">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <div>
+            <h3 class="fw-bold mb-0">{{ rejected_kyc|length }}</h3>
+            <span class="text-muted">Showing Now</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stat-icon primary me-3">
+            <i class="bi bi-arrow-repeat"></i>
+          </div>
+          <div>
+            <h3 class="fw-bold mb-0">
+              <a href="{% url 'admin_vendor_verification' %}" class="text-decoration-none">View Pending</a>
+            </h3>
+            <span class="text-muted">Pending Reviews</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rejected KYC Table -->
+{% if rejected_kyc %}
+<div class="card">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 fw-bold">Rejected KYC Submissions</h5>
+    <div>
+      <span class="badge bg-secondary me-2">ID: {{ request.GET.search|default:"All" }}</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Business</th>
+            <th>Document Type</th>
+            <th>Submitted</th>
+            <th>Reviewed</th>
+            <th>Rejection Reason</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for kyc in rejected_kyc %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-person-circle fs-5 me-2 text-danger"></i>
+                <div>
+                  <strong>{{ kyc.vendor.user.get_full_name|default:kyc.vendor.user.username }}</strong>
+                  <br>
+                  <small class="text-muted">{{ kyc.vendor.user.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <strong>{{ kyc.business_name|default:"—" }}</strong>
+              <br>
+              <small class="text-muted">{{ kyc.market_location|truncatechars:30 }}</small>
+            </td>
+            <td>
+              <span class="badge bg-secondary">{{ kyc.get_id_type_display }}</span>
+            </td>
+            <td>
+              <small>{{ kyc.submitted_at|date:"M d, Y" }}</small>
+              <br>
+              <small class="text-muted">{{ kyc.submitted_at|timesince }} ago</small>
+            </td>
+            <td>
+              <small>{{ kyc.reviewed_at|date:"M d, Y" }}</small>
+              <br>
+              <small class="text-muted">{{ kyc.reviewed_at|timesince }} ago</small>
+            </td>
+            <td>
+              <div class="rejection-reason-cell" style="max-width: 250px;">
+                <span class="badge bg-danger mb-1">Rejected</span>
+                <br>
+                <small class="text-muted">{{ kyc.rejection_reason|truncatechars:60|default:"No reason provided" }}</small>
+              </div>
+            </td>
+            <td>
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewDetailsModal{{ kyc.id }}">
+                  <i class="bi bi-eye"></i> View
+                </button>
+                <a href="{% url 'admin_verify_vendor' kyc.id %}" class="btn btn-sm btn-outline-warning">
+                  <i class="bi bi-arrow-repeat"></i> Reset
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- View Details Modals -->
+{% for kyc in rejected_kyc %}
+<div class="modal fade" id="viewDetailsModal{{ kyc.id }}" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">KYC Details - {{ kyc.vendor.user.get_full_name|default:kyc.vendor.user.username }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="fw-bold mb-3">Vendor Information</h6>
+            <table class="table table-sm">
+              <tr>
+                <th class="text-muted" style="width: 120px;">Username</th>
+                <td>{{ kyc.vendor.user.username }}</td>
+              </tr>
+              <tr>
+                <th class="text-muted">Email</th>
+                <td>{{ kyc.vendor.user.email }}</td>
+              </tr>
+              <tr>
+                <th class="text-muted">Full Name</th>
+                <td>{{ kyc.vendor.user.get_full_name|default:"—" }}</td>
+              </tr>
+              <tr>
+                <th class="text-muted">Joined</th>
+                <td>{{ kyc.vendor.user.date_joined|date:"M d, Y" }}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-bold mb-3">Business Information</h6>
+            <table class="table table-sm">
+              <tr>
+                <th class="text-muted" style="width: 120px;">Business</th>
+                <td>{{ kyc.business_name|default:"—" }}</td>
+              </tr>
+              <tr>
+                <th class="text-muted">Market</th>
+                <td>{{ kyc.market_location|default:"—" }}</td>
+              </tr>
+              <tr>
+                <th class="text-muted">Document Type</th>
+                <td>{{ kyc.get_id_type_display }}</td>
+              </tr>
+              <tr>
+                <th class="text-muted">Document</th>
+                <td>
+                  <a href="{{ kyc.id_document.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-file-earmark-pdf"></i> View
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+          <div class="col-12">
+            <h6 class="fw-bold mb-3 text-danger">Rejection Details</h6>
+            <div class="alert alert-danger">
+              <p class="mb-1"><strong>Reason:</strong> {{ kyc.rejection_reason|default:"No specific reason provided." }}</p>
+              <p class="mb-0 small">Reviewed on: {{ kyc.reviewed_at|date:"F j, Y \a\t g:i A" }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-12">
+            <h6 class="fw-bold mb-3">Document Preview</h6>
+            <div class="border rounded p-3 bg-light text-center">
+              {% if kyc.id_document.url|lower|slice:"-4:" == ".pdf" %}
+              <i class="bi bi-file-earmark-pdf fs-1 text-danger mb-2"></i>
+              <p class="mb-1">{{ kyc.id_document.name|slice:"12:" }}</p>
+              <a href="{{ kyc.id_document.url }}" target="_blank" class="btn btn-sm btn-primary mt-2">
+                <i class="bi bi-eye me-1"></i> Open PDF
+              </a>
+              {% else %}
+              <img src="{{ kyc.id_document.url }}" alt="Document" class="img-fluid" style="max-height: 300px;">
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="{% url 'admin_verify_vendor' kyc.id %}" class="btn btn-warning">
+          <i class="bi bi-arrow-repeat me-2"></i> Reset to Pending
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+  <h3 class="fw-bold mt-3">No Rejected KYC</h3>
+  <p class="text-muted">
+    {% if search %}
+    No rejected KYC submissions match your search criteria "{{ search }}".
+    {% else %}
+    There are no rejected KYC submissions at the moment.
+    {% endif %}
+  </p>
+  <a href="{% url 'admin_vendor_verification' %}" class="btn btn-primary mt-3">
+    <i class="bi bi-shield-check me-2"></i> View Pending Verifications
+  </a>
+</div>
+{% endif %}
+
+<!-- Bulk Actions (Optional) -->
+{% if rejected_kyc %}
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Bulk Actions</h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{% url 'admin_bulk_reset_kyc' %}">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-8">
+              <select name="action" class="form-select">
+                <option value="">Select action...</option>
+                <option value="reset_selected">Reset selected to pending</option>
+                <option value="delete_selected">Delete selected</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <button type="submit" class="btn btn-warning w-100">
+                <i class="bi bi-arrow-repeat me-2"></i> Apply to Selected
+              </button>
+            </div>
+          </div>
+          <small class="text-muted">Select checkboxes above to apply actions</small>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+  
+  .stat-icon.danger {
+    background: rgba(230, 57, 70, 0.1);
+    color: var(--color-danger);
+  }
+  
+  .stat-icon.warning {
+    background: rgba(244, 162, 97, 0.1);
+    color: var(--color-warning);
+  }
+  
+  .stat-icon.primary {
+    background: rgba(77, 168, 218, 0.1);
+    color: var(--color-accent);
+  }
+  
+  .rejection-reason-cell {
+    max-width: 250px;
+    word-wrap: break-word;
+  }
+  
+  .table th {
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+  
+  .btn-group {
+    gap: 0.25rem;
+  }
+</style>
+{% endblock %}

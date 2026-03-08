@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cookie Policy - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3" style="color: var(--color-primary);">Cookie Policy</h1>
+                <p class="lead text-muted">How we use cookies and similar technologies</p>
+                <small class="text-muted">Last Updated: {{ last_updated }}</small>
+            </div>
+
+            <!-- What are Cookies -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">What Are Cookies?</h2>
+                </div>
+                <div class="card-body">
+                    <p>Cookies are small text files stored on your device when you visit websites. They help websites remember your preferences and improve your browsing experience.</p>
+                </div>
+            </div>
+
+            <!-- How We Use Cookies -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">How We Use Cookies</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Cookie Type</th>
+                                    <th>Purpose</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Essential Cookies</strong></td>
+                                    <td>Required for basic site functionality (login, security)</td>
+                                    <td>Session / Persistent</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Preference Cookies</strong></td>
+                                    <td>Remember your settings and preferences</td>
+                                    <td>1 year</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Analytics Cookies</strong></td>
+                                    <td>Understand how users interact with our platform</td>
+                                    <td>2 years</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Session Cookies</strong></td>
+                                    <td>Keep you logged in during your visit</td>
+                                    <td>Session</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Specific Cookies We Use -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">Specific Cookies We Use</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Cookie Name</th>
+                                    <th>Provider</th>
+                                    <th>Purpose</th>
+                                    <th>Expiry</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>sessionid</code></td>
+                                    <td>MarketLens</td>
+                                    <td>Maintains user session</td>
+                                    <td>Session</td>
+                                </tr>
+                                <tr>
+                                    <td><code>csrftoken</code></td>
+                                    <td>MarketLens</td>
+                                    <td>CSRF protection</td>
+                                    <td>1 year</td>
+                                </tr>
+                                <tr>
+                                    <td><code>theme</code></td>
+                                    <td>MarketLens</td>
+                                    <td>Remembers dark/light mode preference</td>
+                                    <td>1 year</td>
+                                </tr>
+                                <tr>
+                                    <td><code>comparison_products</code></td>
+                                    <td>MarketLens</td>
+                                    <td>Stores temporary comparison list</td>
+                                    <td>Session</td>
+                                </tr>
+                                <tr>
+                                    <td><code>recently_viewed</code></td>
+                                    <td>MarketLens</td>
+                                    <td>Tracks recently viewed products</td>
+                                    <td>30 days</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Third-Party Cookies -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">Third-Party Cookies</h2>
+                </div>
+                <div class="card-body">
+                    <p>We use the following third-party services that may set cookies:</p>
+                    <ul>
+                        <li><strong>Google Analytics:</strong> Analyzes site usage</li>
+                        <li><strong>Bootstrap CDN:</strong> Delivers CSS and JavaScript</li>
+                        <li><strong>Google Fonts:</strong> Provides typography</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Managing Cookies -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">Managing Cookies</h2>
+                </div>
+                <div class="card-body">
+                    <p>You can control cookies through your browser settings:</p>
+                    
+                    <h5 class="fw-bold mb-3 mt-3">Browser Instructions</h5>
+                    <ul>
+                        <li><strong>Chrome:</strong> Settings → Privacy and Security → Cookies and other site data</li>
+                        <li><strong>Firefox:</strong> Options → Privacy & Security → Cookies and Site Data</li>
+                        <li><strong>Safari:</strong> Preferences → Privacy → Cookies and website data</li>
+                        <li><strong>Edge:</strong> Settings → Site permissions → Cookies and site data</li>
+                    </ul>
+
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Note:</strong> Disabling essential cookies may affect site functionality.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consent -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">Cookie Consent</h2>
+                </div>
+                <div class="card-body">
+                    <p>When you first visit MarketLens, you'll see a cookie banner. By continuing to use our site, you consent to our use of cookies as described in this policy.</p>
+                </div>
+            </div>
+
+            <!-- Updates to Policy -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">Updates to This Policy</h2>
+                </div>
+                <div class="card-body">
+                    <p>We may update this cookie policy periodically. Changes will be posted on this page with an updated revision date.</p>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">Contact Us</h2>
+                </div>
+                <div class="card-body">
+                    <p>If you have questions about our cookie policy:</p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-envelope me-2"></i> privacy@marketlens.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

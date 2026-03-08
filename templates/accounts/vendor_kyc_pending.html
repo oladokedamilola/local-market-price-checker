@@ -1,0 +1,298 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}KYC Pending - MarketLens{% endblock %}
+
+{% block extra_head %}
+<style>
+  .pending-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+  
+  .status-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+  }
+  
+  .pending-icon {
+    width: 100px;
+    height: 100px;
+    background: rgba(244, 162, 97, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--color-warning);
+    font-size: 3rem;
+  }
+  
+  .timeline-container {
+    margin: 2rem 0;
+    padding: 1rem 0;
+  }
+  
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .timeline-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 40px;
+    bottom: -20px;
+    width: 2px;
+    background: #e0e0e0;
+  }
+  
+  .timeline-item:last-child::before {
+    display: none;
+  }
+  
+  .timeline-icon {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 2px solid;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    z-index: 2;
+    background: white;
+    flex-shrink: 0;
+  }
+  
+  .timeline-item.completed .timeline-icon {
+    border-color: var(--color-success);
+    color: var(--color-success);
+  }
+  
+  .timeline-item.active .timeline-icon {
+    border-color: var(--color-warning);
+    color: var(--color-warning);
+    background: rgba(244, 162, 97, 0.05);
+  }
+  
+  .timeline-item.pending .timeline-icon {
+    border-color: var(--color-muted);
+    color: var(--color-muted);
+  }
+  
+  .timeline-content {
+    flex: 1;
+    text-align: left;
+  }
+  
+  .timeline-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  
+  .timeline-time {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: var(--radius);
+  }
+  
+  .info-item {
+    text-align: left;
+  }
+  
+  .info-label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+  
+  .info-value {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  
+  .progress-container {
+    margin: 2rem 0;
+  }
+  
+  .progress-bar-custom {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    width: 33%;
+    background: var(--color-warning);
+    border-radius: 4px;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  
+  .estimated-time {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  @media (max-width: 576px) {
+    .status-card {
+      padding: 1.5rem;
+    }
+    
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}KYC Verification Status{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'vendor_kyc' %}">KYC Verification</a></li>
+<li class="breadcrumb-item active" aria-current="page">Pending Review</li>
+{% endblock %}
+
+{% block content %}
+<div class="pending-container">
+  <div class="status-card">
+    <!-- Icon -->
+    <div class="pending-icon">
+      <i class="bi bi-hourglass-split"></i>
+    </div>
+    
+    <h2 class="fw-bold mb-3">KYC Under Review</h2>
+    <p class="text-muted mb-4">
+      Your KYC documents have been submitted successfully and are currently being reviewed by our team.
+    </p>
+    
+    <!-- Timeline -->
+    <div class="timeline-container">
+      <div class="timeline-item completed">
+        <div class="timeline-icon">
+          <i class="bi bi-check-lg"></i>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-title">Documents Submitted</div>
+          <div class="timeline-time">{{ kyc.submitted_at|date:"F j, Y \a\t g:i A" }}</div>
+        </div>
+      </div>
+      
+      <div class="timeline-item active">
+        <div class="timeline-icon">
+          <i class="bi bi-hourglass"></i>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-title">Under Review</div>
+          <div class="timeline-time">In progress</div>
+        </div>
+      </div>
+      
+      <div class="timeline-item pending">
+        <div class="timeline-icon">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-title">Verification Complete</div>
+          <div class="timeline-time">Pending</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar-custom">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="estimated-time">
+        <i class="bi bi-clock me-1"></i>
+        Estimated completion: <strong>{{ estimated_completion|date:"F j, Y \a\t g:i A" }}</strong>
+      </div>
+    </div>
+    
+    <!-- Submission Details -->
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Business Name</div>
+        <div class="info-value">{{ kyc.business_name }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Market Location</div>
+        <div class="info-value">{{ kyc.market_location }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Document Type</div>
+        <div class="info-value">{{ kyc.get_id_type_display }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Submission ID</div>
+        <div class="info-value">#KYC-{{ kyc.id }}</div>
+      </div>
+    </div>
+    
+    <!-- Important Notes -->
+    <div class="alert alert-info bg-light border-0 text-start">
+      <h6 class="fw-bold mb-2"><i class="bi bi-info-circle me-2"></i>What happens next?</h6>
+      <ul class="small mb-0">
+        <li class="mb-1">Our team will review your documents within 24-48 hours</li>
+        <li class="mb-1">You'll receive an email and in-app notification once verified</li>
+        <li class="mb-1">If approved, you can start listing products immediately</li>
+        <li class="mb-0">If rejected, you'll receive instructions on how to proceed</li>
+      </ul>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+        <i class="bi bi-house me-2"></i>Go to Dashboard
+      </a>
+      <a href="mailto:support@marketlens.com" class="btn btn-outline-secondary">
+        <i class="bi bi-envelope me-2"></i>Contact Support
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

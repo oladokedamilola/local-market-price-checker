@@ -1,0 +1,376 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}User Details - MarketLens Admin{% endblock %}
+
+{% block page_title %}User Details{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_users' %}">Users</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ user.username }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- User Profile Card -->
+  <div class="col-lg-4 mb-4">
+    <div class="card border-0 shadow-soft h-100">
+      <div class="card-body text-center p-4">
+        <!-- User Avatar with Profile Picture -->
+        <div class="position-relative d-inline-block mb-4">
+          {% if user.profile.profile_picture %}
+          <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.first_name|default:user.username }}" 
+               class="rounded-circle img-fluid border border-3" style="width: 120px; height: 120px; object-fit: cover; border-color: var(--color-accent) !important;">
+          {% elif vendor_profile and vendor_profile.user.profile.profile_picture %}
+          <img src="{{ vendor_profile.user.profile.profile_picture.url }}" alt="{{ user.first_name|default:user.username }}" 
+               class="rounded-circle img-fluid border border-3" style="width: 120px; height: 120px; object-fit: cover; border-color: var(--color-accent) !important;">
+          {% elif consumer_profile and consumer_profile.user.profile.profile_picture %}
+          <img src="{{ consumer_profile.user.profile.profile_picture.url }}" alt="{{ user.first_name|default:user.username }}" 
+               class="rounded-circle img-fluid border border-3" style="width: 120px; height: 120px; object-fit: cover; border-color: var(--color-accent) !important;">
+          {% else %}
+          <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+               style="width: 120px; height: 120px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent));">
+            <span class="fw-bold text-white" style="font-size: 3rem;">
+              {{ user.first_name|first|default:user.username|first|upper }}
+            </span>
+          </div>
+          {% endif %}
+          
+          <!-- Status Badge -->
+          <div class="position-absolute bottom-0 end-0">
+            {% if user.is_active %}
+            <span class="badge bg-success rounded-circle p-3" style="width: 24px; height: 24px;" title="Active">
+              <i class="bi bi-check"></i>
+            </span>
+            {% else %}
+            <span class="badge bg-danger rounded-circle p-3" style="width: 24px; height: 24px;" title="Inactive">
+              <i class="bi bi-x"></i>
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        
+        <h4 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h4>
+        <p class="text-muted mb-3">{{ user.email }}</p>
+        
+        <!-- Role and Status Badges -->
+        <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+          {% if user.is_staff %}
+          <span class="badge bg-danger">Admin</span>
+          {% elif user.groups.filter.name == 'VENDOR' %}
+          <span class="badge bg-primary">Vendor</span>
+          {% elif user.groups.filter.name == 'CONSUMER' %}
+          <span class="badge bg-success">Consumer</span>
+          {% elif not user.is_active %}
+          <span class="badge bg-secondary">Pending Email</span>
+          {% else %}
+          <span class="badge bg-secondary">No Role</span>
+          {% endif %}
+          
+          {% if user.is_active %}
+          <span class="badge bg-success">Active</span>
+          {% else %}
+          <span class="badge bg-danger">Inactive</span>
+          {% endif %}
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="row mt-4">
+          <div class="col-6 border-end">
+            <div class="fw-bold fs-4">{{ user.date_joined|date:"Y" }}</div>
+            <small class="text-muted">Member Since</small>
+          </div>
+          <div class="col-6">
+            <div class="fw-bold fs-4">
+              {% if user.groups.filter.name == 'VENDOR' %}
+                {% if vendor_profile and vendor_profile.is_verified %}
+                <span class="text-success">✓</span>
+                {% else %}
+                <span class="text-warning">⏳</span>
+                {% endif %}
+              {% else %}
+                <span class="text-info">✓</span>
+              {% endif %}
+            </div>
+            <small class="text-muted">
+              {% if user.groups.filter.name == 'VENDOR' %}
+                {% if vendor_profile and vendor_profile.is_verified %}Verified{% else %}Pending{% endif %}
+              {% else %}
+                Active
+              {% endif %}
+            </small>
+          </div>
+        </div>
+        
+        <!-- Contact Info -->
+        <div class="text-start mt-4 border-top pt-3">
+          <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Contact Information</h6>
+          <p class="mb-2">
+            <i class="bi bi-envelope me-2 text-muted"></i>
+            <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+          </p>
+          {% if user.profile.phone_number %}
+          <p class="mb-2">
+            <i class="bi bi-telephone me-2 text-muted"></i>
+            {{ user.profile.phone_number }}
+          </p>
+          {% endif %}
+          <p class="mb-0">
+            <i class="bi bi-calendar me-2 text-muted"></i>
+            Joined: {{ user.date_joined|date:"F j, Y" }}
+          </p>
+          <p class="mb-0">
+            <i class="bi bi-clock me-2 text-muted"></i>
+            Last Login: {{ user.last_login|date:"F j, Y H:i"|default:"Never" }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-8 mb-4">
+    <!-- Vendor Information -->
+    {% if user_type == 'VENDOR' and vendor_profile %}
+    <div class="card mb-4 border-0 shadow-soft">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-shop me-2 text-primary"></i>Vendor Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="text-muted d-block">Business Name</label>
+            <p class="fw-bold">{{ vendor_profile.business_name|default:"Not provided" }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="text-muted d-block">Verification Status</label>
+            {% if vendor_profile.is_verified %}
+            <span class="badge bg-success fs-6">Verified</span>
+            {% else %}
+            <span class="badge bg-warning fs-6">Pending</span>
+            {% endif %}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="text-muted d-block">Market Location</label>
+            <p class="fw-bold">{{ vendor_profile.market_location|default:"Not provided" }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="text-muted d-block">Vendor Since</label>
+            <p class="fw-bold">{{ vendor_profile.created_at|date:"F d, Y" }}</p>
+          </div>
+        </div>
+        
+        {% if kyc %}
+        <hr>
+        <h6 class="fw-bold mb-3">KYC Information</h6>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="text-muted d-block">ID Type</label>
+            <p class="fw-bold">{{ kyc.get_id_type_display }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="text-muted d-block">Submitted On</label>
+            <p class="fw-bold">{{ kyc.submitted_at|date:"F d, Y H:i" }}</p>
+          </div>
+          {% if kyc.reviewed_at %}
+          <div class="col-md-6 mb-3">
+            <label class="text-muted d-block">Reviewed On</label>
+            <p class="fw-bold">{{ kyc.reviewed_at|date:"F d, Y H:i" }}</p>
+          </div>
+          {% endif %}
+          {% if kyc.rejection_reason %}
+          <div class="col-12 mb-3">
+            <label class="text-muted d-block">Rejection Reason</label>
+            <div class="alert alert-danger">
+              {{ kyc.rejection_reason }}
+            </div>
+          </div>
+          {% endif %}
+          <div class="col-12">
+            <label class="text-muted d-block">ID Document</label>
+            <a href="{{ kyc.id_document.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-file-earmark-pdf me-1"></i> View Document
+            </a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    {% if products %}
+    <div class="card border-0 shadow-soft">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-box me-2 text-primary"></i>Products Listed</h5>
+        <span class="badge bg-primary">{{ products|length }} Products</span>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Market</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Last Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in products %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="bg-light rounded p-1 me-2" style="width: 40px; height: 40px; overflow: hidden;">
+                      {% if product.product.image %}
+                      <img src="{{ product.product.image.url }}" alt="{{ product.product.name }}" 
+                           style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                      {% else %}
+                      <i class="bi bi-box text-muted d-flex align-items-center justify-content-center h-100"></i>
+                      {% endif %}
+                    </div>
+                    <div>
+                      <strong>{{ product.product.name }}</strong>
+                      <br>
+                      <small class="text-muted">{{ product.product.unit }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ product.market.name }}</td>
+                <td><span class="fw-bold text-primary">₦{{ product.price }}</span></td>
+                <td>
+                  {% if product.product.category %}
+                  <span class="badge bg-info">{{ product.product.category.name }}</span>
+                  {% else %}
+                  <span class="badge bg-secondary">Uncategorized</span>
+                  {% endif %}
+                </td>
+                <td><small>{{ product.last_updated|timesince }} ago</small></td>
+                <td>
+                  <a href="{% url 'admin_vendor_product_detail' product.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% elif user_type == 'CONSUMER' and consumer_profile %}
+    <div class="card border-0 shadow-soft">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-person me-2 text-success"></i>Consumer Information</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="text-muted d-block">Member Since</label>
+            <p class="fw-bold">{{ consumer_profile.created_at|date:"F d, Y" }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="text-muted d-block">Account Status</label>
+            {% if user.is_active %}
+            <span class="badge bg-success">Active</span>
+            {% else %}
+            <span class="badge bg-danger">Inactive</span>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Consumer Stats (if you have favorites, price alerts, etc.) -->
+        <hr>
+        <div class="row text-center">
+          <div class="col-4">
+            <h5 class="fw-bold mb-0">0</h5>
+            <small class="text-muted">Favorites</small>
+          </div>
+          <div class="col-4">
+            <h5 class="fw-bold mb-0">0</h5>
+            <small class="text-muted">Price Alerts</small>
+          </div>
+          <div class="col-4">
+            <h5 class="fw-bold mb-0">0</h5>
+            <small class="text-muted">Comparisons</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Admin Actions -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-soft">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-gear me-2 text-warning"></i>Admin Actions</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex gap-3">
+          <a href="/admin/auth/user/{{ user.id }}/change/" target="_blank" class="btn btn-primary">
+            <i class="bi bi-pencil-square me-2"></i> Edit in Django Admin
+          </a>
+          <a href="{% url 'admin_users' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Back to Users
+          </a>
+          {% if user.groups.filter.name == 'VENDOR' and not user.is_staff %}
+          <button type="button" class="btn btn-outline-danger ms-auto" data-bs-toggle="modal" data-bs-target="#suspendVendorModal">
+            <i class="bi bi-exclamation-triangle me-2"></i> Suspend Vendor
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Suspend Vendor Modal -->
+{% if user.groups.filter.name == 'VENDOR' and not user.is_staff %}
+<div class="modal fade" id="suspendVendorModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Suspend Vendor Account</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to suspend <strong>{{ user.get_full_name|default:user.username }}</strong>?</p>
+        <p class="text-muted small">This will deactivate their account and remove their products from the marketplace.</p>
+        <div class="mb-3">
+          <label class="form-label">Reason (optional)</label>
+          <textarea class="form-control" rows="3" placeholder="Enter reason for suspension..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form method="POST" action="#">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>Suspend Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+  .position-relative .position-absolute {
+    transform: translate(25%, 25%);
+  }
+  
+  .card {
+    transition: all 0.2s ease;
+  }
+  
+  .table td {
+    vertical-align: middle;
+  }
+</style>
+{% endblock %}

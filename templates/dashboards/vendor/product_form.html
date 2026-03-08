@@ -1,0 +1,604 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{% if is_update %}Edit{% else %}Add{% endif %} Product - MarketLens Vendor{% endblock %}
+
+{% block page_title %}{% if is_update %}Edit Product{% else %}Add New Product{% endif %}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'product_list' %}">Products</a></li>
+<li class="breadcrumb-item active" aria-current="page">{% if is_update %}Edit{% else %}Add{% endif %}</li>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .market-info-card {
+    background: #f8f9fa;
+    border-left: 4px solid var(--color-accent);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+  }
+  
+  .market-info-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(77, 168, 218, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+  }
+  
+  .current-image-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .current-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 2px solid var(--color-border);
+  }
+  
+  .remove-current-image {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    background: var(--color-danger);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  .remove-current-image:hover {
+    transform: scale(1.1);
+    background: #c82333;
+  }
+  
+  .upload-area {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .upload-area:hover {
+    border-color: var(--color-accent);
+    background: rgba(77, 168, 218, 0.05);
+  }
+  
+  .selected-image-container {
+    position: relative;
+    display: inline-block;
+    margin-top: 1rem;
+  }
+  
+  .selected-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 2px solid var(--color-accent);
+  }
+  
+  .remove-selected-image {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    background: var(--color-danger);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  .remove-selected-image:hover {
+    transform: scale(1.1);
+    background: #c82333;
+  }
+  
+  /* Modal Styles */
+  .preview-circle {
+    width: 300px;
+    height: 300px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 0 auto;
+    border: 3px solid var(--color-accent);
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .preview-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #f8f9fa;
+  }
+  
+  /* Hide the actual file input */
+  #id_image {
+    display: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card shadow-soft border-0">
+      <div class="card-header bg-white py-3">
+        <h5 class="fw-bold mb-0">
+          {% if is_update %}
+          <i class="bi bi-pencil-square me-2 text-primary"></i>Edit Product
+          {% else %}
+          <i class="bi bi-plus-circle me-2 text-primary"></i>Add New Product
+          {% endif %}
+        </h5>
+      </div>
+      <div class="card-body p-4">
+        <!-- Market Information (Fixed from KYC) -->
+        {% if vendor_market %}
+        <div class="market-info-card">
+          <div class="d-flex align-items-center gap-3">
+            <div class="market-info-icon">
+              <i class="bi bi-shop"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold mb-1">Your Business Location</h6>
+              <p class="mb-0 text-muted">{{ vendor_market }}</p>
+              <small class="text-info">
+                <i class="bi bi-info-circle me-1"></i>This location is from your KYC verification and cannot be changed.
+              </small>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <form method="POST" enctype="multipart/form-data" id="productForm">
+          {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          <!-- Product Name -->
+          <div class="mb-3">
+            <label for="{{ form.product_name.id_for_label }}" class="form-label">
+              {{ form.product_name.label }} <span class="text-danger">*</span>
+            </label>
+            {{ form.product_name }}
+            {% if form.product_name.errors %}
+            <div class="text-danger small mt-1">{{ form.product_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="row mb-3">
+            <!-- Category -->
+            <div class="col-md-6">
+              <label for="{{ form.category.id_for_label }}" class="form-label">
+                {{ form.category.label }} <span class="text-danger">*</span>
+              </label>
+              {{ form.category }}
+              {% if form.category.errors %}
+              <div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text">
+                <a href="{% url 'request_category' %}" class="text-primary">Can't find your category? Request a new one</a>
+              </div>
+            </div>
+            
+            <!-- Unit -->
+            <div class="col-md-6">
+              <label for="{{ form.unit.id_for_label }}" class="form-label">
+                {{ form.unit.label }} <span class="text-danger">*</span>
+              </label>
+              {{ form.unit }}
+              {% if form.unit.errors %}
+              <div class="text-danger small mt-1">{{ form.unit.errors.0 }}</div>
+              {% endif %}
+              <div class="form-text">{{ form.unit.help_text }}</div>
+            </div>
+          </div>
+          
+          <!-- Description -->
+          <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}" class="form-label">
+              {{ form.description.label }}
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <!-- Price -->
+          <div class="mb-3">
+            <label for="{{ form.price.id_for_label }}" class="form-label">
+              {{ form.price.label }} <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text">₦</span>
+              {{ form.price }}
+            </div>
+            {% if form.price.errors %}
+            <div class="text-danger small mt-1">{{ form.price.errors.0 }}</div>
+            {% endif %}
+            <div class="form-text">{{ form.price.help_text }}</div>
+          </div>
+          
+          <!-- Current Image (for update) -->
+          {% if is_update and product.product.image %}
+          <div class="mb-3">
+            <label class="form-label">Current Image</label>
+            <div class="current-image-container">
+              <img src="{{ product.product.image.url }}" alt="{{ product.product.name }}" class="current-image" id="currentImage">
+              <button type="button" class="remove-current-image" id="removeCurrentImageBtn" title="Remove current image">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+            <input type="hidden" name="remove_current_image" id="removeCurrentImage" value="false">
+          </div>
+          {% endif %}
+          
+          <!-- Selected Image Display -->
+          <div id="selectedImageContainer" style="display: none;" class="mb-3 text-center">
+            <label class="form-label">Selected Image</label>
+            <div class="selected-image-container">
+              <img src="" alt="Selected" class="selected-image" id="selectedImage">
+              <button type="button" class="remove-selected-image" id="removeSelectedImageBtn" title="Remove selected image">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Image Upload Area -->
+          <div class="mb-3">
+            <label class="form-label">
+              Product Image {% if not is_update %}<span class="text-danger">*</span>{% endif %}
+            </label>
+            
+            <!-- Custom upload area -->
+            <div class="upload-area" id="uploadArea">
+              <i class="bi bi-cloud-arrow-up fs-1 text-muted mb-2"></i>
+              <p class="mb-1">Click to upload or drag and drop</p>
+              <p class="small text-muted mb-0">JPG, PNG (Max: 5MB)</p>
+            </div>
+            
+            <!-- Hidden file input -->
+            <input type="file" name="image" accept="image/*" id="id_image">
+            
+            {% if form.image.errors %}
+            <div class="text-danger small mt-1">{{ form.image.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <hr class="my-4">
+          
+          <div class="d-flex gap-3 justify-content-end">
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-x-circle me-2"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <i class="bi bi-check-circle me-2"></i>
+              {% if is_update %}Update{% else %}Add{% endif %} Product
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    {% if not is_update %}
+    <!-- Tips Card -->
+    <div class="card shadow-soft border-0 mt-4">
+      <div class="card-body p-4">
+        <h6 class="fw-bold mb-3"><i class="bi bi-lightbulb text-warning me-2"></i>Tips for adding products</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-card-text fs-2 text-primary mb-2"></i>
+              <h6 class="fw-bold mb-1">Clear Name</h6>
+              <small class="text-muted">Use descriptive product names</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-camera fs-2 text-success mb-2"></i>
+              <h6 class="fw-bold mb-1">Quality Image</h6>
+              <small class="text-muted">Clear, well-lit photos sell better</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-currency-exchange fs-2 text-warning mb-2"></i>
+              <h6 class="fw-bold mb-1">Competitive Price</h6>
+              <small class="text-muted">Check market rates for pricing</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-image me-2 text-primary"></i>
+          Preview Image
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-4">
+          <div class="preview-circle">
+            <img src="" alt="Preview" id="modalImagePreview">
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-center mb-3">
+          <label for="modalFileInput" class="btn btn-outline-primary file-input-label">
+            <i class="bi bi-folder2-open me-2"></i>
+            Choose Different Image
+          </label>
+          <input type="file" id="modalFileInput" accept="image/*" style="display: none;">
+        </div>
+        
+        <div class="alert alert-info bg-light border-0 small">
+          <i class="bi bi-info-circle me-2"></i>
+          For best results, use a clear, well-lit image of your product.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg me-2"></i>
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="confirmImageBtn">
+          <i class="bi bi-check-lg me-2"></i>
+          Use This Image
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('id_image');
+    const modalFileInput = document.getElementById('modalFileInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+    const modalImagePreview = document.getElementById('modalImagePreview');
+    const confirmBtn = document.getElementById('confirmImageBtn');
+    const selectedImageContainer = document.getElementById('selectedImageContainer');
+    const selectedImage = document.getElementById('selectedImage');
+    const removeSelectedBtn = document.getElementById('removeSelectedImageBtn');
+    const form = document.getElementById('productForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // For update page - current image handling
+    const removeCurrentBtn = document.getElementById('removeCurrentImageBtn');
+    const removeCurrentInput = document.getElementById('removeCurrentImage');
+    const currentImage = document.getElementById('currentImage');
+    
+    let selectedFile = null;
+    
+    // Handle remove current image (for update page)
+    if (removeCurrentBtn) {
+      removeCurrentBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to remove the current image?')) {
+          currentImage.style.opacity = '0.5';
+          removeCurrentInput.value = 'true';
+          removeCurrentBtn.style.display = 'none';
+          
+          // Show message that image will be removed on save
+          const toastContainer = document.querySelector('.toast-container');
+          if (toastContainer) {
+            const toastHtml = `
+              <div class="toast show align-items-center text-white bg-warning border-0 mb-2" role="alert">
+                <div class="d-flex">
+                  <div class="toast-body">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Current image will be removed when you save changes.
+                  </div>
+                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+              </div>
+            `;
+            toastContainer.innerHTML = toastHtml;
+            setTimeout(() => {
+              toastContainer.innerHTML = '';
+            }, 5000);
+          }
+        }
+      });
+    }
+    
+    // Handle click on upload area
+    uploadArea.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      imageInput.click();
+    });
+    
+    // Handle drag and drop
+    uploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.style.borderColor = 'var(--color-accent)';
+      this.style.background = 'rgba(77, 168, 218, 0.05)';
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.style.borderColor = 'var(--color-border)';
+      this.style.background = 'transparent';
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.style.borderColor = 'var(--color-border)';
+      this.style.background = 'transparent';
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        const file = files[0];
+        if (file.type.startsWith('image/')) {
+          handleFileSelect(file);
+        } else {
+          alert('Please drop an image file.');
+        }
+      }
+    });
+    
+    // Handle file selection from main input
+    imageInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        handleFileSelect(file);
+      }
+    });
+    
+    // Handle file selection from modal input
+    modalFileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        handleFileSelect(file);
+      }
+    });
+    
+    function handleFileSelect(file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file (JPG, PNG, etc.).');
+        imageInput.value = '';
+        return;
+      }
+      
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must be less than 5MB.');
+        imageInput.value = '';
+        return;
+      }
+      
+      selectedFile = file;
+      
+      // Show preview in modal
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        modalImagePreview.src = e.target.result;
+        modal.show();
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    // Confirm image selection
+    confirmBtn.addEventListener('click', function() {
+      if (selectedFile) {
+        // Update the file input
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(selectedFile);
+        imageInput.files = dataTransfer.files;
+        
+        // Show selected image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          selectedImage.src = e.target.result;
+          selectedImageContainer.style.display = 'block';
+          
+          // Change upload area appearance
+          const icon = uploadArea.querySelector('i');
+          const text = uploadArea.querySelector('p:first-of-type');
+          icon.className = 'bi bi-check-circle-fill fs-1 text-success mb-2';
+          text.innerHTML = 'Image selected! Click to change';
+        };
+        reader.readAsDataURL(selectedFile);
+        
+        // Close modal
+        modal.hide();
+      }
+    });
+    
+    // Remove selected image
+    if (removeSelectedBtn) {
+      removeSelectedBtn.addEventListener('click', function() {
+        selectedFile = null;
+        imageInput.value = '';
+        selectedImageContainer.style.display = 'none';
+        
+        // Reset upload area
+        const icon = uploadArea.querySelector('i');
+        const text = uploadArea.querySelector('p:first-of-type');
+        icon.className = 'bi bi-cloud-arrow-up fs-1 text-muted mb-2';
+        text.innerHTML = 'Click to upload or drag and drop';
+        
+        // Reset modal file input
+        modalFileInput.value = '';
+      });
+    }
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+      {% if not is_update %}
+      // For new products, image is required
+      if (!imageInput.files || imageInput.files.length === 0) {
+        e.preventDefault();
+        alert('Please upload a product image.');
+        return false;
+      }
+      {% endif %}
+      
+      // Check if we're updating and user wants to remove current image but no new image selected
+      {% if is_update %}
+      if (removeCurrentInput && removeCurrentInput.value === 'true' && (!imageInput.files || imageInput.files.length === 0)) {
+        const proceed = confirm('You are about to remove the current image without selecting a new one. Continue?');
+        if (!proceed) {
+          e.preventDefault();
+          return false;
+        }
+      }
+      {% endif %}
+      
+      // Disable submit button
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+      
+      return true;
+    });
+  });
+</script>
+{% endblock %}

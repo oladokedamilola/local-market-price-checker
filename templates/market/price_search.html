@@ -1,0 +1,41 @@
+<h2>Price Comparison</h2>
+
+<form method="get">
+  {{ form.as_p }}
+  <button type="submit">Search</button>
+</form>
+
+<hr>
+
+<table border="1" cellpadding="8">
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Market</th>
+      <th>Price</th>
+      {% if not is_vendor %}
+        <th>Vendor</th>
+      {% endif %}
+      <th>Last Updated</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in results %}
+      <tr>
+        <td>{{ item.product.name }} ({{ item.product.unit }})</td>
+        <td>{{ item.market.name }}</td>
+        <td>₦{{ item.price }}</td>
+
+        {% if not is_vendor %}
+          <td>{{ item.vendor.user.username }}</td>
+        {% endif %}
+
+        <td>{{ item.last_updated|date:"M d, Y H:i" }}</td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="5">No results found.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

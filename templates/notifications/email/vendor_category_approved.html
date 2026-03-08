@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 40px 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .success-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .category-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #28a745;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #28a745;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ Category Request Approved</h1>
+        </div>
+        
+        <div class="content">
+            <div class="success-card">
+                <h2>Great news {{ user.first_name|default:user.username }}!</h2>
+                
+                <p>Your request for a new category has been approved.</p>
+                
+                <div class="category-name">
+                    "{{ related_object.name }}"
+                </div>
+                
+                <p>You can now select this category when adding new products to your inventory.</p>
+                
+                <div style="margin-top: 30px;">
+                    <a href="{{ site_url }}{% url 'add_product' %}" class="button">
+                        Add Product in New Category
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {% now "Y" %} MarketLens. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

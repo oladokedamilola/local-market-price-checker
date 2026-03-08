@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #1E2A38, #2C3E50);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 40px 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #4DA8DA;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #3b94c7;
+        }
+        .button-secondary {
+            background-color: #28a745;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .steps {
+            margin: 30px 0;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #4DA8DA;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .step-content {
+            flex-grow: 1;
+        }
+        .step-content h4 {
+            margin: 0 0 5px 0;
+            color: #1E2A38;
+        }
+        .step-content p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to MarketLens! 🎉</h1>
+        </div>
+        
+        <div class="content">
+            <h2 style="margin-top: 0; color: #1E2A38;">Hello {{ user.first_name|default:user.username }}!</h2>
+            
+            <p style="font-size: 16px;">Thank you for joining MarketLens as a vendor. We're excited to help you grow your business and reach more customers in Alimosho!</p>
+            
+            <div class="steps">
+                <h3 style="color: #1E2A38;">Next Steps to Start Selling:</h3>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Complete KYC Verification</h4>
+                        <p>Upload your identification documents for verification</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Add Your Products</h4>
+                        <p>List your products with prices and market locations</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Start Selling</h4>
+                        <p>Reach customers across Alimosho markets</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{ kyc_url }}" class="button">Complete KYC Now</a>
+                <p style="margin: 15px 0 0 0; font-size: 14px; color: #6c757d;">
+                    Your account is pending verification. Complete KYC to start selling.
+                </p>
+            </div>
+            
+            <hr style="border: none; border-top: 1px solid #dee2e6; margin: 30px 0;">
+            
+            <h3 style="color: #1E2A38;">Vendor Benefits:</h3>
+            <ul style="color: #6c757d; font-size: 14px;">
+                <li>✓ Your pricing strategy stays private - competitors can't see your prices</li>
+                <li>✓ Free to list and update products</li>
+                <li>✓ Reach customers across all Alimosho markets</li>
+                <li>✓ Build trust with KYC verification badge</li>
+            </ul>
+            
+            <p style="font-size: 14px; color: #6c757d; text-align: center; margin-top: 30px;">
+                Questions? Contact our support team at support@marketlens.com
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {% now "Y" %} MarketLens. All rights reserved.</p>
+            <p>Alimosho Local Government, Lagos, Nigeria</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Duplicate Product - MarketLens Vendor{% endblock %}
+
+{% block page_title %}Duplicate Product{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'vendor_dashboard' %}">Vendor Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'product_list' %}">My Products</a></li>
+<li class="breadcrumb-item active" aria-current="page">Duplicate</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card shadow-soft border-0">
+      <div class="card-header bg-white py-3">
+        <h5 class="fw-bold mb-0">Duplicate Product</h5>
+      </div>
+      <div class="card-body p-4">
+        <!-- Original Product Summary -->
+        <div class="alert alert-info bg-light border-0 mb-4">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-info-circle fs-4 me-3 text-primary"></i>
+            <div>
+              <h6 class="fw-bold mb-1">You are duplicating:</h6>
+              <p class="mb-0">{{ original_product.product.name }} - ₦{{ original_product.price }} ({{ original_product.market.name }})</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mb-4">
+          <div class="duplicate-icon mb-3">
+            <i class="bi bi-copy" style="font-size: 4rem; color: var(--color-accent);"></i>
+          </div>
+          <h4 class="fw-bold mb-2">Create a Copy</h4>
+          <p class="text-muted">
+            A new product listing will be created with the same details. You can edit it after creation.
+          </p>
+        </div>
+
+        <!-- Product Preview -->
+        <div class="card bg-light border-0 mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="fw-bold mb-3">Original Product</h6>
+                <table class="table table-sm">
+                  <tr>
+                    <th class="text-muted">Product</th>
+                    <td>{{ original_product.product.name }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-muted">Category</th>
+                    <td>{{ original_product.product.category.name|default:"Uncategorized" }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-muted">Price</th>
+                    <td>₦{{ original_product.price }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-muted">Market</th>
+                    <td>{{ original_product.market.name }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-muted">Unit</th>
+                    <td>{{ original_product.product.unit }}</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-md-6">
+                <h6 class="fw-bold mb-3">Duplicate</h6>
+                <table class="table table-sm">
+                  <tr>
+                    <th class="text-muted">Product</th>
+                    <td>{{ original_product.product.name }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-muted">Category</th>
+                    <td>{{ original_product.product.category.name|default:"Uncategorized" }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-muted">Price</th>
+                    <td>₦{{ original_product.price }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-muted">Market</th>
+                    <td>{{ original_product.market.name }}</td>
+                  </tr>
+                  <tr>
+                    <th class="text-muted">Unit</th>
+                    <td>{{ original_product.product.unit }}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning -->
+        <div class="alert alert-warning bg-light border-0 mb-4">
+          <div class="d-flex">
+            <i class="bi bi-exclamation-triangle text-warning fs-4 me-3"></i>
+            <div>
+              <h6 class="fw-bold mb-2">Please note:</h6>
+              <ul class="small mb-0">
+                <li>The duplicated product will be created as a new, separate listing</li>
+                <li>You will be redirected to edit the new product after creation</li>
+                <li>The original product remains unchanged</li>
+                <li>You can modify the price, market, and other details after duplication</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <form method="POST" id="duplicateForm">
+          {% csrf_token %}
+          <div class="d-flex gap-3 justify-content-center">
+            <button type="submit" class="btn btn-primary btn-lg px-5">
+              <i class="bi bi-copy me-2"></i>Duplicate Product
+            </button>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-lg px-5">
+              <i class="bi bi-x-circle me-2"></i>Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tips Card -->
+    <div class="card shadow-soft border-0 mt-4">
+      <div class="card-body p-4">
+        <h6 class="fw-bold mb-3"><i class="bi bi-lightbulb text-warning me-2"></i>Tips for duplicating products</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-pencil fs-2 text-primary mb-2"></i>
+              <h6 class="fw-bold mb-1">Edit After Duplication</h6>
+              <small class="text-muted">You'll be able to modify all details</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-tags fs-2 text-success mb-2"></i>
+              <h6 class="fw-bold mb-1">Different Markets</h6>
+              <small class="text-muted">Sell the same product in multiple markets</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <i class="bi bi-clock-history fs-2 text-warning mb-2"></i>
+              <h6 class="fw-bold mb-1">Time Saver</h6>
+              <small class="text-muted">Quickly create similar product listings</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('duplicateForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function(e) {
+      // Disable button to prevent double submission
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Duplicating...';
+    });
+  });
+</script>
+
+<style>
+  .duplicate-icon {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  
+  .table th {
+    font-weight: 500;
+    width: 40%;
+    color: var(--color-muted);
+  }
+  
+  .table td {
+    font-weight: 500;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,159 @@
+<!--templates\dashboards\admin\categories.html-->
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Categories - MarketLens Admin{% endblock %}
+
+{% block page_title %}Product Categories{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item active" aria-current="page">Categories</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h2 fw-bold mb-2">Product Categories</h1>
+    <p class="text-muted">Manage product categories</p>
+  </div>
+  <div>
+    <a href="{% url 'admin_category_create' %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle me-2"></i> Add New Category
+    </a>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" class="row g-3">
+      <div class="col-md-10">
+        <input type="text" name="search" class="form-control" placeholder="Search categories..." value="{{ search }}">
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-search me-2"></i> Search
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Results Summary and Sort -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <p class="text-muted mb-0">
+    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} categories
+  </p>
+  <div class="dropdown">
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      <i class="bi bi-sort me-1"></i> Sort by
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item {% if sort == 'name' %}active{% endif %}" href="?{% if search %}search={{ search }}&{% endif %}sort=name{% if limit %}&limit={{ limit }}{% endif %}">Name</a></li>
+      <li><a class="dropdown-item {% if sort == 'newest' %}active{% endif %}" href="?{% if search %}search={{ search }}&{% endif %}sort=newest{% if limit %}&limit={{ limit }}{% endif %}">Newest</a></li>
+      <li><a class="dropdown-item {% if sort == 'oldest' %}active{% endif %}" href="?{% if search %}search={{ search }}&{% endif %}sort=oldest{% if limit %}&limit={{ limit }}{% endif %}">Oldest</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Categories Grid -->
+{% if categories %}
+<div class="row g-4">
+  {% for category in categories %}
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="stat-icon primary me-3">
+            <i class="bi {% if category.icon %}{{ category.icon }}{% else %}bi-tag{% endif %}"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-1">{{ category.name }}</h5>
+            <span class="badge bg-info">{{ category.product_count }} Products</span>
+          </div>
+        </div>
+        
+        <p class="text-muted small mb-3">{{ category.description|truncatechars:80|default:"No description" }}</p>
+        
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted">Created: {{ category.created_at|date:"M d, Y" }}</small>
+          <div class="btn-group">
+            <a href="{% url 'admin_category_update' category.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <a href="{% url 'admin_category_delete' category.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+              <i class="bi bi-trash"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-tags text-muted" style="font-size: 3rem;"></i>
+  <h3 class="fw-bold mt-3">No Categories Found</h3>
+  <p class="text-muted">{{ search|yesno:"No categories match your search criteria.,Categories will appear here once they are added." }}</p>
+  <a href="{% url 'admin_category_create' %}" class="btn btn-primary mt-3">
+    <i class="bi bi-plus-circle me-2"></i> Add Your First Category
+  </a>
+</div>
+{% endif %}
+
+<!-- Pagination Controls -->
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="d-flex justify-content-center mt-5">
+  <nav aria-label="Categories pagination">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% for i in page_obj.paginator.page_range %}
+        {% if page_obj.number == i %}
+          <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+        {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ i }}{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ i }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endif %}
+
+<!-- Items Per Page Selector -->
+<div class="d-flex justify-content-end mt-3">
+  <div class="btn-group btn-group-sm" role="group" aria-label="Items per page">
+    <a href="?page=1{% if search %}&search={{ search }}{% endif %}&limit=10{% if sort %}&sort={{ sort }}{% endif %}" class="btn {% if limit == 10 %}btn-primary{% else %}btn-outline-primary{% endif %}">10</a>
+    <a href="?page=1{% if search %}&search={{ search }}{% endif %}&limit=25{% if sort %}&sort={{ sort }}{% endif %}" class="btn {% if limit == 25 %}btn-primary{% else %}btn-outline-primary{% endif %}">25</a>
+    <a href="?page=1{% if search %}&search={{ search }}{% endif %}&limit=50{% if sort %}&sort={{ sort }}{% endif %}" class="btn {% if limit == 50 %}btn-primary{% else %}btn-outline-primary{% endif %}">50</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+<!--templates/errors/404/html-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found | MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 text-center">
+            <!-- Error Illustration -->
+            <div class="error-illustration mb-4">
+                <div class="position-relative" style="height: 200px;">
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="bi bi-search-x" style="font-size: 8rem; color: var(--color-muted); opacity: 0.2;"></i>
+                    </div>
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="bi bi-map" style="font-size: 5rem; color: var(--color-accent);"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Content -->
+            <h1 class="display-4 fw-bold mb-3" style="color: var(--color-primary);">404</h1>
+            <h2 class="h3 mb-4">Market Not Found</h2>
+            <p class="lead text-muted mb-4">
+                Oops! The page you're looking for seems to have wandered off to another market. 
+                It might have been moved, deleted, or perhaps never existed.
+            </p>
+            
+            <!-- What could have happened -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-info-circle me-2"></i>What could have happened?
+                    </h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-dot text-primary me-2"></i>
+                            The page may have been moved or renamed
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-dot text-primary me-2"></i>
+                            You might have typed the URL incorrectly
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-dot text-primary me-2"></i>
+                            The page might be temporarily unavailable
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-house me-2"></i>Back to Home
+                </a>
+                <a href="{% url 'search' %}" class="btn btn-outline-primary btn-lg px-4">
+                    <i class="bi bi-search me-2"></i>Search Products
+                </a>
+                <button onclick="window.history.back()" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-arrow-left me-2"></i>Go Back
+                </button>
+            </div>
+            
+            <!-- Support Contact -->
+            <div class="mt-5 pt-4 border-top">
+                <p class="text-muted">
+                    Still lost? 
+                    <a href="mailto:support@marketlens.com" class="text-decoration-none">
+                        Contact our support team
+                    </a>
+                    for help finding your way.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-illustration {
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    @media (max-width: 768px) {
+        .display-4 {
+            font-size: 3rem;
+        }
+    }
+</style>
+{% endblock %}

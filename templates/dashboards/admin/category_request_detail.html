@@ -1,0 +1,216 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Category Request: {{ request.name }} - MarketLens Admin{% endblock %}
+
+{% block page_title %}Category Request Details{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_category_requests' %}">Category Requests</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ request.name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">Review Category Request</h5>
+                <span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'approved' %}bg-success{% elif request.status == 'rejected' %}bg-danger{% else %}bg-info{% endif %} fs-6">
+                    {{ request.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <!-- Request Details -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">Request Information</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted d-block">Category Name</label>
+                            <p class="fw-bold fs-5">{{ request.name }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted d-block">Submitted On</label>
+                            <p class="fw-bold">{{ request.created_at|date:"F j, Y H:i" }}</p>
+                            <small class="text-muted">{{ request.created_at|timesince }} ago</small>
+                        </div>
+                        {% if request.description %}
+                        <div class="col-12 mb-3">
+                            <label class="text-muted d-block">Description</label>
+                            <p class="bg-light p-3 rounded">{{ request.description|linebreaks }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Vendor Information -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">Vendor Information</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted d-block">Name</label>
+                            <p class="fw-bold">{{ request.vendor.user.get_full_name|default:request.vendor.user.username }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted d-block">Email</label>
+                            <p class="fw-bold">{{ request.vendor.user.email }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted d-block">Username</label>
+                            <p class="fw-bold">{{ request.vendor.user.username }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted d-block">Vendor Status</label>
+                            {% if request.vendor.is_verified %}
+                            <span class="badge bg-success">Verified</span>
+                            {% else %}
+                            <span class="badge bg-warning">Pending Verification</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if request.admin_notes %}
+                <hr>
+                <!-- Admin Notes -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">Admin Notes</h6>
+                    <div class="bg-light p-3 rounded">
+                        {{ request.admin_notes|linebreaks }}
+                    </div>
+                    {% if request.reviewed_by %}
+                    <small class="text-muted d-block mt-2">
+                        Reviewed by {{ request.reviewed_by.get_full_name|default:request.reviewed_by.username }} 
+                        on {{ request.reviewed_at|date:"F j, Y H:i" }}
+                    </small>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if request.status == 'pending' or request.status == 'in_review' %}
+                <hr>
+                <!-- Decision Form -->
+                <form method="POST" action="{% url 'admin_process_category_request' request.id %}" id="decisionForm">
+                    {% csrf_token %}
+                    
+                    <h6 class="fw-bold mb-3">Make Decision</h6>
+                    
+                    <div class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="form-check p-3 border rounded">
+                                    <input class="form-check-input" type="radio" name="action" id="approve" value="approve" required>
+                                    <label class="form-check-label fw-bold" for="approve">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Approve
+                                    </label>
+                                    <p class="text-muted small ms-4 mb-0">Category will be created immediately</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-check p-3 border rounded">
+                                    <input class="form-check-input" type="radio" name="action" id="reject" value="reject" required>
+                                    <label class="form-check-label fw-bold" for="reject">
+                                        <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                        Reject
+                                    </label>
+                                    <p class="text-muted small ms-4 mb-0">Request will be declined</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-check p-3 border rounded">
+                                    <input class="form-check-input" type="radio" name="action" id="review" value="in_review" required>
+                                    <label class="form-check-label fw-bold" for="review">
+                                        <i class="bi bi-eye-fill text-info me-2"></i>
+                                        Mark In Review
+                                    </label>
+                                    <p class="text-muted small ms-4 mb-0">Set status to under review</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="admin_notes" class="form-label fw-bold">Admin Notes</label>
+                        <textarea name="admin_notes" id="admin_notes" rows="4" class="form-control" placeholder="Add notes about your decision..."></textarea>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary btn-lg flex-grow-1" id="submitBtn">
+                            <span class="btn-text">Submit Decision</span>
+                            <span class="spinner" style="display: none;"></span>
+                        </button>
+                        <a href="{% url 'admin_category_requests' %}" class="btn btn-outline-secondary btn-lg">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn-loading .btn-text {
+    visibility: hidden;
+}
+
+.btn-loading .spinner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('decisionForm');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const action = document.querySelector('input[name="action"]:checked');
+            
+            if (!action) {
+                e.preventDefault();
+                alert('Please select an action');
+                return;
+            }
+            
+            // Show loading spinner
+            submitBtn.classList.add('btn-loading');
+            submitBtn.disabled = true;
+            
+            const btnText = submitBtn.querySelector('.btn-text');
+            const spinner = submitBtn.querySelector('.spinner');
+            
+            btnText.style.visibility = 'hidden';
+            spinner.style.display = 'block';
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3" style="color: var(--color-primary);">Frequently Asked Questions</h1>
+                <p class="lead text-muted">Find answers to common questions about MarketLens</p>
+            </div>
+
+            <!-- Search FAQ -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" id="faqSearch" class="form-control" placeholder="Search FAQ...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Categories -->
+            <div class="mb-4">
+                <ul class="nav nav-pills nav-fill" id="faqTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all" type="button">All</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="general-tab" data-bs-toggle="pill" data-bs-target="#general" type="button">General</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="shoppers-tab" data-bs-toggle="pill" data-bs-target="#shoppers" type="button">Shoppers</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="vendors-tab" data-bs-toggle="pill" data-bs-target="#vendors" type="button">Vendors</button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- FAQ Content -->
+            <div class="tab-content" id="faqTabContent">
+                <!-- All FAQs -->
+                <div class="tab-pane fade show active" id="all" role="tabpanel">
+                    <div class="accordion" id="accordionAll">
+                        {% for faq in faqs %}
+                        <div class="accordion-item border-0 mb-3 shadow-soft faq-item" data-category="{% if 'vendor' in faq.question|lower %}vendors{% elif 'shopper' in faq.question|lower %}shoppers{% else %}general{% endif %}">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqAll{{ forloop.counter }}">
+                                    {{ faq.question }}
+                                </button>
+                            </h2>
+                            <div id="faqAll{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordionAll">
+                                <div class="accordion-body text-muted">
+                                    {{ faq.answer }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- General FAQs -->
+                <div class="tab-pane fade" id="general" role="tabpanel">
+                    <div class="accordion" id="accordionGeneral">
+                        {% for faq in faqs %}
+                            {% if 'vendor' not in faq.question|lower and 'shopper' not in faq.question|lower %}
+                            <div class="accordion-item border-0 mb-3 shadow-soft">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqGeneral{{ forloop.counter }}">
+                                        {{ faq.question }}
+                                    </button>
+                                </h2>
+                                <div id="faqGeneral{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordionGeneral">
+                                    <div class="accordion-body text-muted">
+                                        {{ faq.answer }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Shoppers FAQs -->
+                <div class="tab-pane fade" id="shoppers" role="tabpanel">
+                    <div class="accordion" id="accordionShoppers">
+                        {% for faq in faqs %}
+                            {% if 'shopper' in faq.question|lower %}
+                            <div class="accordion-item border-0 mb-3 shadow-soft">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqShopper{{ forloop.counter }}">
+                                        {{ faq.question }}
+                                    </button>
+                                </h2>
+                                <div id="faqShopper{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordionShoppers">
+                                    <div class="accordion-body text-muted">
+                                        {{ faq.answer }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Vendors FAQs -->
+                <div class="tab-pane fade" id="vendors" role="tabpanel">
+                    <div class="accordion" id="accordionVendors">
+                        {% for faq in faqs %}
+                            {% if 'vendor' in faq.question|lower %}
+                            <div class="accordion-item border-0 mb-3 shadow-soft">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqVendor{{ forloop.counter }}">
+                                        {{ faq.question }}
+                                    </button>
+                                </h2>
+                                <div id="faqVendor{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordionVendors">
+                                    <div class="accordion-body text-muted">
+                                        {{ faq.answer }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Still Have Questions -->
+            <div class="card border-0 bg-primary text-white mt-5">
+                <div class="card-body text-center py-4">
+                    <h3 class="fw-bold mb-3">Still Have Questions?</h3>
+                    <p class="mb-4">Can't find the answer you're looking for? Our support team is here to help.</p>
+                    <a href="{% url 'contact_us' %}" class="btn btn-light btn-lg px-5">
+                        <i class="bi bi-envelope me-2"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('faqSearch');
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        faqItems.forEach(item => {
+            const question = item.querySelector('.accordion-button').textContent.toLowerCase();
+            if (question.includes(searchTerm)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+
+<style>
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(77, 168, 218, 0.1);
+        color: var(--color-primary);
+    }
+    .nav-pills .nav-link.active {
+        background-color: var(--color-accent);
+    }
+    .faq-item {
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}

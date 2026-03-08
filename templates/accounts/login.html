@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In - MarketLens{% endblock %}
+
+{% block extra_head %}
+<style>
+  .login-container {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+  }
+  
+  .login-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-soft);
+    width: 100%;
+    max-width: 450px;
+  }
+  
+  .social-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  
+  .social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    background: white;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .social-btn:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .social-btn:active {
+    transform: translateY(0);
+  }
+  
+  .social-btn.google {
+    color: #DB4437;
+    border-color: #DB4437;
+  }
+  
+  .social-btn.google:hover {
+    background: #DB4437;
+    color: white;
+  }
+  
+  .social-btn.google:hover i {
+    color: white;
+  }
+  
+  .social-btn.facebook {
+    color: #4267B2;
+    border-color: #4267B2;
+  }
+  
+  .social-btn.facebook:hover {
+    background: #4267B2;
+    color: white;
+  }
+  
+  .social-btn i {
+    font-size: 1.25rem;
+    transition: color 0.3s ease;
+  }
+  
+  .divider {
+    position: relative;
+    text-align: center;
+    margin: 2rem 0;
+  }
+  
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--color-border);
+  }
+  
+  .divider span {
+    background: white;
+    padding: 0 1rem;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Validation styles */
+  .is-valid {
+    border-color: var(--color-success) !important;
+  }
+  
+  .is-invalid {
+    border-color: var(--color-danger) !important;
+  }
+  
+  .validation-feedback {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+  
+  .valid-feedback {
+    color: var(--color-success);
+  }
+  
+  .invalid-feedback {
+    color: var(--color-danger);
+  }
+  
+  /* Loading spinner */
+  .btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.8;
+  }
+  
+  .btn-loading .btn-text {
+    visibility: hidden;
+  }
+  
+  .btn-loading .spinner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+  
+  /* Disabled button styling */
+  .btn-primary:disabled,
+  .btn-primary.disabled,
+  button[type="submit"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  
+  .btn-primary {
+    transition: opacity 0.3s ease, background-color 0.3s ease;
+  }
+  
+  /* Email icon specific styling */
+  .email-icon {
+    color: var(--color-accent);
+  }
+  
+  @media (max-width: 576px) {
+    .login-card {
+      padding: 1.5rem;
+    }
+    
+    .social-btn {
+      max-width: 100%;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="login-card">
+          <div class="text-center mb-4">
+            <i class="bi bi-envelope fs-1 email-icon mb-3" style="font-size: 3rem !important;"></i>
+            <h2 class="fw-bold mb-2">Welcome Back</h2>
+            <p class="text-muted">Sign in with your email address</p>
+          </div>
+        
+          
+          <form method="POST" id="loginForm" novalidate>
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input type="email" 
+                       name="email" 
+                       class="form-control" 
+                       id="email" 
+                       placeholder="your@email.com"
+                       required 
+                       autofocus>
+              </div>
+              <div class="validation-feedback" id="emailFeedback"></div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input type="password" 
+                       name="password" 
+                       class="form-control" 
+                       id="password" 
+                       placeholder="••••••••"
+                       required
+                       minlength="8">
+                <button class="btn btn-outline-secondary toggle-password" type="button">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+              <div class="validation-feedback" id="passwordFeedback"></div>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="remember_me" id="remember_me">
+                <label class="form-check-label small" for="remember_me">
+                  Remember me for 2 weeks
+                </label>
+              </div>
+              <a href="{% url 'password_reset_request' %}" class="small text-primary text-decoration-none">
+                Forgot password?
+              </a>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 mb-3" id="submitBtn">
+              <span class="btn-text"><i class="bi bi-box-arrow-in-right me-2"></i> Sign In</span>
+              <span class="spinner" style="display: none;"></span>
+            </button>
+            
+            <div class="divider">
+              <span>Or continue with</span>
+            </div>
+            
+            {% load socialaccount %}
+            <div class="social-login">
+                <a href="{% provider_login_url 'google' %}" class="social-btn google">
+                    <i class="bi bi-google"></i>
+                    <span>Continue with Google</span>
+                </a>
+            </div>
+            
+            <div class="text-center mt-4">
+              <p class="mb-2 text-muted">
+                Don't have an account? 
+                <a href="{% url 'register' %}" class="text-primary fw-semibold">Create one now</a>
+              </p>
+              <p class="small text-muted mb-0">
+                By signing in, you agree to our 
+                <a href="{% url 'terms_of_service' %}" class="text-primary">Terms of Service</a> and 
+                <a href="{% url 'privacy_policy' %}" class="text-primary">Privacy Policy</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const submitBtn = document.getElementById('submitBtn');
+    const loginForm = document.getElementById('loginForm');
+    const emailFeedback = document.getElementById('emailFeedback');
+    const passwordFeedback = document.getElementById('passwordFeedback');
+    
+    // Password toggle
+    const toggleBtn = document.querySelector('.toggle-password');
+    if (toggleBtn && passwordInput) {
+      toggleBtn.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          icon.className = 'bi bi-eye-slash';
+        } else {
+          passwordInput.type = 'password';
+          icon.className = 'bi bi-eye';
+        }
+      });
+    }
+    
+    // Auto-focus email field
+    if (emailInput) {
+      emailInput.focus();
+    }
+    
+    // Email validation function
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+    
+    // Update validation UI for email
+    function validateEmail() {
+      const email = emailInput.value.trim();
+      const isValid = isValidEmail(email);
+      
+      if (email === '') {
+        emailInput.classList.remove('is-valid', 'is-invalid');
+        emailFeedback.innerHTML = '';
+        return false;
+      } else if (isValid) {
+        emailInput.classList.add('is-valid');
+        emailInput.classList.remove('is-invalid');
+        emailFeedback.innerHTML = '<span class="valid-feedback"><i class="bi bi-check-circle-fill me-1"></i>Valid email address</span>';
+        return true;
+      } else {
+        emailInput.classList.add('is-invalid');
+        emailInput.classList.remove('is-valid');
+        emailFeedback.innerHTML = '<span class="invalid-feedback"><i class="bi bi-exclamation-triangle-fill me-1"></i>Please enter a valid email address</span>';
+        return false;
+      }
+    }
+    
+    // Validate password
+    function validatePassword() {
+      const password = passwordInput.value;
+      const isValid = password.length >= 8;
+      
+      if (password === '') {
+        passwordInput.classList.remove('is-valid', 'is-invalid');
+        passwordFeedback.innerHTML = '';
+        return false;
+      } else if (isValid) {
+        passwordInput.classList.add('is-valid');
+        passwordInput.classList.remove('is-invalid');
+        passwordFeedback.innerHTML = '<span class="valid-feedback"><i class="bi bi-check-circle-fill me-1"></i>Strong password</span>';
+        return true;
+      } else {
+        passwordInput.classList.add('is-invalid');
+        passwordInput.classList.remove('is-valid');
+        passwordFeedback.innerHTML = '<span class="invalid-feedback"><i class="bi bi-exclamation-triangle-fill me-1"></i>Password must be at least 8 characters</span>';
+        return false;
+      }
+    }
+    
+    // Check if form is valid and update button state
+    function updateButtonState() {
+      const isEmailValid = validateEmail();
+      const isPasswordValid = validatePassword();
+      
+      submitBtn.disabled = !(isEmailValid && isPasswordValid);
+    }
+    
+    // Add input event listeners
+    if (emailInput) {
+      emailInput.addEventListener('input', updateButtonState);
+    }
+    
+    if (passwordInput) {
+      passwordInput.addEventListener('input', updateButtonState);
+    }
+    
+    // Initial button state (disabled)
+    submitBtn.disabled = true;
+    
+    // Form submission with loading spinner
+    loginForm.addEventListener('submit', function(e) {
+      // Final validation check before submission
+      const isEmailValid = validateEmail();
+      const isPasswordValid = validatePassword();
+      
+      if (!isEmailValid || !isPasswordValid) {
+        e.preventDefault();
+        return false;
+      }
+      
+      // Show loading spinner
+      submitBtn.classList.add('btn-loading');
+      submitBtn.disabled = true;
+      
+      const btnText = submitBtn.querySelector('.btn-text');
+      const spinner = submitBtn.querySelector('.spinner');
+      
+      btnText.style.visibility = 'hidden';
+      spinner.style.display = 'block';
+      
+      return true;
+    });
+    
+    // If there are any server-side errors, re-enable button
+    {% if messages %}
+    submitBtn.classList.remove('btn-loading');
+    submitBtn.disabled = false;
+    const btnText = submitBtn.querySelector('.btn-text');
+    const spinner = submitBtn.querySelector('.spinner');
+    if (btnText) btnText.style.visibility = 'visible';
+    if (spinner) spinner.style.display = 'none';
+    {% endif %}
+  });
+
+  // ========== SOCIAL LOGIN IMPLEMENTATION ==========
+  
+  // Google Login Handler
+  function handleGoogleLogin() {
+    // Show loading state
+    const googleBtn = document.querySelector('.social-btn.google');
+    const originalText = googleBtn.innerHTML;
+    googleBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Redirecting...';
+    googleBtn.disabled = true;
+    
+    // Simulate Google OAuth redirect (replace with actual implementation)
+    console.log('Initiating Google login...');
+    
+    // Method 1: Direct OAuth redirect (Most Common)
+    // window.location.href = '/accounts/google/login/';
+    
+    // Method 2: Using Google Identity Services
+    // Uncomment and configure with your Google Client ID
+    /*
+    google.accounts.id.initialize({
+      client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+      callback: handleGoogleCredentialResponse
+    });
+    google.accounts.id.prompt();
+    */
+    
+    // Method 3: Using django-allauth (Recommended)
+    window.location.href = '/accounts/google/login/';
+  }
+  
+  // Google Credential Response Handler (for Method 2)
+  function handleGoogleCredentialResponse(response) {
+    console.log('Google login response:', response);
+    
+    // Send the credential to your backend
+    fetch('/accounts/google/login/callback/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ credential: response.credential })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = data.redirect_url || '/dashboard/';
+      } else {
+        showToast('error', 'Google login failed. Please try again.');
+        resetGoogleButton();
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showToast('error', 'An error occurred. Please try again.');
+      resetGoogleButton();
+    });
+  }
+  
+  // Facebook Login Handler (if needed)
+  function handleFacebookLogin() {
+    const fbBtn = document.querySelector('.social-btn.facebook');
+    fbBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Redirecting...';
+    fbBtn.disabled = true;
+    
+    // Redirect to Facebook OAuth
+    window.location.href = '/accounts/facebook/login/';
+  }
+  
+  // Reset Google button after error
+  function resetGoogleButton() {
+    const googleBtn = document.querySelector('.social-btn.google');
+    googleBtn.innerHTML = '<i class="bi bi-google"></i><span>Continue with Google</span>';
+    googleBtn.disabled = false;
+  }
+  
+  // Helper function to show toast messages
+  function showToast(type, message) {
+    const toastContainer = document.querySelector('.toast-container') || createToastContainer();
+    const toastHtml = `
+      <div class="toast show align-items-center text-white bg-${type === 'error' ? 'danger' : 'success'} border-0 mb-2" role="alert">
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="bi bi-${type === 'error' ? 'exclamation-triangle' : 'check-circle'} me-2"></i>
+            ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    `;
+    toastContainer.innerHTML = toastHtml;
+    setTimeout(() => {
+      toastContainer.innerHTML = '';
+    }, 5000);
+  }
+  
+  function createToastContainer() {
+    const container = document.createElement('div');
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+    return container;
+  }
+</script>
+{% endblock %}

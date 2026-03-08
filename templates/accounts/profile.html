@@ -1,0 +1,559 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Profile Settings - MarketLens{% endblock %}
+
+{% block page_title %}Profile Settings{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active">Profile</li>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .avatar-lg {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 600;
+    border-radius: 50%;
+  }
+  
+  .upload-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid white;
+  }
+  
+  .upload-overlay:hover {
+    background-color: var(--color-primary);
+    transform: scale(1.1);
+  }
+  
+  /* Modal Styles */
+  .modal-crop {
+    max-height: 70vh;
+    overflow: hidden;
+  }
+  
+  .image-preview {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  
+  .preview-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto;
+    border: 3px solid var(--color-accent);
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .preview-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Custom file input */
+  .file-input-label {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .file-input-label:hover {
+    background-color: var(--color-accent);
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- Left Column - Profile Info -->
+  <div class="col-lg-4 mb-4">
+    <div class="card shadow-soft border-0">
+      <div class="card-body p-4 text-center">
+        <!-- Avatar with Upload -->
+        <div class="position-relative d-inline-block mb-4">
+          <div class="avatar-lg rounded-circle overflow-hidden">
+            {% if profile_picture_url %}
+            <img src="{{ profile_picture_url }}" alt="{{ user.first_name }}" class="avatar-img" id="profileAvatar">
+            {% else %}
+            <div class="avatar-placeholder" id="profileAvatar">
+              {{ user.first_name|first|default:user.username|first|upper }}
+            </div>
+            {% endif %}
+          </div>
+          <label for="profilePictureInput" class="upload-overlay" title="Change profile picture">
+            <i class="bi bi-camera"></i>
+          </label>
+        </div>
+        
+        <!-- Hidden File Input -->
+        <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+        
+        <!-- User Info -->
+        <h4 class="fw-bold mb-1">{{ user.first_name|default:user.username }} {{ user.last_name }}</h4>
+        <p class="text-muted mb-3">{{ user.email }}</p>
+        
+        <!-- Role Badge -->
+        {% if is_vendor %}
+        <span class="badge bg-primary mb-3">
+          <i class="bi bi-shop me-1"></i> Verified Vendor
+        </span>
+        {% elif is_consumer %}
+        <span class="badge bg-success mb-3">
+          <i class="bi bi-cart me-1"></i> Shopper
+        </span>
+        {% endif %}
+        
+        <!-- Account Stats -->
+        <div class="row mt-4">
+          <div class="col-6 border-end">
+            <div class="fw-bold fs-4">{{ user.date_joined|date:"Y" }}</div>
+            <small class="text-muted">Member Since</small>
+          </div>
+          <div class="col-6">
+            <div class="fw-bold fs-4">
+              {% if is_vendor %}{{ vendor_profile.products.count|default:"0" }}{% else %}0{% endif %}
+            </div>
+            <small class="text-muted">
+              {% if is_vendor %}Listings{% else %}Searches{% endif %}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Account Security -->
+    <div class="card shadow-soft border-0 mt-4">
+      <div class="card-header bg-transparent border-0 py-3">
+        <h6 class="fw-bold mb-0">Account Security</h6>
+      </div>
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div>
+            <h6 class="fw-bold mb-0">Password</h6>
+            <small class="text-muted">Last changed 3 months ago</small>
+          </div>
+          <a href="{% url 'password_change' %}" class="btn btn-sm btn-outline-primary">Change</a>
+        </div>
+        
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="fw-bold mb-0">Two-Factor Auth</h6>
+            <small class="text-muted">Coming soon</small>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="twoFactorToggle" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Right Column - Edit Form -->
+  <div class="col-lg-8 mb-4">
+    <div class="card shadow-soft border-0">
+      <div class="card-header bg-transparent border-0 py-3">
+        <h5 class="fw-bold mb-0">Edit Profile</h5>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST" id="profileForm" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          {% if messages %}
+          <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+              <label for="id_first_name" class="form-label">First Name</label>
+              <input type="text" name="first_name" class="form-control" 
+                     id="id_first_name" value="{{ form.first_name.value|default:user.first_name }}" required>
+              {% if form.first_name.errors %}
+              <div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label for="id_last_name" class="form-label">Last Name</label>
+              <input type="text" name="last_name" class="form-control" 
+                     id="id_last_name" value="{{ form.last_name.value|default:user.last_name }}" required>
+              {% if form.last_name.errors %}
+              <div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label for="id_email" class="form-label">Email Address</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input type="email" name="email" class="form-control" 
+                     id="id_email" value="{{ form.email.value|default:user.email }}" required>
+            </div>
+            <div class="form-text">We'll use this for important updates and notifications</div>
+            {% if form.email.errors %}
+            <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="mb-4">
+            <label for="id_phone_number" class="form-label">Phone Number</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-phone"></i></span>
+              <input type="tel" name="phone_number" class="form-control" 
+                     id="id_phone_number" value="{{ phone_number }}">
+            </div>
+            <div class="form-text">Used for order updates (vendors) or price alerts (shoppers)</div>
+          </div>
+          
+          <!-- Hidden profile picture field (will be populated by JS) -->
+          {{ form.profile_picture }}
+          
+          {% if is_vendor and vendor_profile %}
+          <!-- Vendor Specific Fields -->
+          <div class="mb-4">
+            <label class="form-label">KYC Status</label>
+            <div>
+              {% if vendor_profile.is_verified %}
+              <span class="badge bg-success">
+                <i class="bi bi-shield-check me-1"></i> Verified
+              </span>
+              <small class="text-muted ms-2">Verified on {{ vendor_profile.created_at|date:"M d, Y" }}</small>
+              {% else %}
+              <span class="badge bg-warning">
+                <i class="bi bi-clock me-1"></i> Pending Verification
+              </span>
+              <a href="{% url 'vendor_kyc' %}" class="btn btn-sm btn-outline-warning ms-3">
+                Complete KYC
+              </a>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+          
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Notification Preferences Link -->
+    <div class="card shadow-soft border-0 mt-4">
+      <div class="card-header bg-transparent border-0 py-3">
+        <h5 class="fw-bold mb-0">Notification Preferences</h5>
+      </div>
+      <div class="card-body p-4">
+        <p class="text-muted mb-3">Manage how you receive notifications and alerts.</p>
+        <a href="{% url 'notifications:notification_preferences' %}" class="btn btn-primary">
+          <i class="bi bi-gear me-2"></i> Manage Notifications
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Picture Preview Modal -->
+<div class="modal fade" id="profilePictureModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-image me-2 text-primary"></i>
+          Profile Picture
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-4">
+          <div class="preview-circle">
+            <img src="" alt="Preview" id="imagePreview" class="preview-image">
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-center mb-3">
+          <label for="modalFileInput" class="btn btn-outline-primary file-input-label">
+            <i class="bi bi-folder2-open me-2"></i>
+            Choose Different Image
+          </label>
+          <input type="file" id="modalFileInput" accept="image/*" style="display: none;">
+        </div>
+        
+        <div class="alert alert-info bg-light border-0 small">
+          <i class="bi bi-info-circle me-2"></i>
+          Your profile picture will be visible to other users. For best results, use a square image.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg me-2"></i>
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="confirmProfilePicture">
+          <i class="bi bi-check-lg me-2"></i>
+          Save Picture
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('profilePictureInput');
+    const modalFileInput = document.getElementById('modalFileInput');
+    const modal = new bootstrap.Modal(document.getElementById('profilePictureModal'));
+    const imagePreview = document.getElementById('imagePreview');
+    const profileAvatar = document.getElementById('profileAvatar');
+    const confirmBtn = document.getElementById('confirmProfilePicture');
+    
+    let selectedFile = null;
+    
+    // Get CSRF token
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    
+    // When user clicks the camera icon, trigger the file input
+    const uploadLabel = document.querySelector('.upload-overlay');
+    if (uploadLabel) {
+      uploadLabel.addEventListener('click', function(e) {
+        e.preventDefault();
+        fileInput.click();
+      });
+    }
+    
+    // Handle file selection from main file input
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          modal.show();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Handle file selection from modal file input
+    modalFileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Show loading state on button
+    function setLoading(button, isLoading) {
+      if (isLoading) {
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Uploading...';
+      } else {
+        button.disabled = false;
+        button.innerHTML = '<i class="bi bi-check-lg me-2"></i> Save Picture';
+      }
+    }
+    
+    // Show toast notification
+    function showToast(message, type = 'success') {
+      const toastContainer = document.querySelector('.toast-container');
+      if (toastContainer) {
+        const toastHtml = `
+          <div class="toast show align-items-center text-white bg-${type} border-0 mb-2" role="alert">
+            <div class="d-flex">
+              <div class="toast-body">
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+          </div>
+        `;
+        toastContainer.innerHTML = toastHtml;
+        setTimeout(() => {
+          toastContainer.innerHTML = '';
+        }, 4000);
+      }
+    }
+    
+    // Upload image via AJAX
+    function uploadImage(file) {
+      const formData = new FormData();
+      formData.append('profile_picture', file);
+      
+      return fetch('{% url "upload_profile_picture" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.success) {
+          throw new Error(data.error || 'Upload failed');
+        }
+        return data;
+      });
+    }
+    
+    // Confirm profile picture selection and upload
+    confirmBtn.addEventListener('click', function() {
+      if (!selectedFile) return;
+      
+      // Show loading state
+      setLoading(confirmBtn, true);
+      
+      // Upload the image
+      uploadImage(selectedFile)
+        .then(data => {
+          // Update the avatar with the new image
+          if (profileAvatar.tagName === 'IMG') {
+            // Add timestamp to bypass cache
+            profileAvatar.src = data.image_url + '?t=' + new Date().getTime();
+          } else {
+            // Replace placeholder with image
+            const img = document.createElement('img');
+            img.src = data.image_url + '?t=' + new Date().getTime();
+            img.alt = '{{ user.first_name|default:user.username }}';
+            img.className = 'avatar-img';
+            img.id = 'profileAvatar';
+            profileAvatar.parentNode.replaceChild(img, profileAvatar);
+          }
+          
+          // Close the modal
+          modal.hide();
+          
+          // Show success message
+          showToast('Profile picture updated successfully!', 'success');
+          
+          // Clear the file inputs
+          fileInput.value = '';
+          modalFileInput.value = '';
+          selectedFile = null;
+        })
+        .catch(error => {
+          console.error('Upload error:', error);
+          showToast('Failed to upload image. Please try again.', 'danger');
+        })
+        .finally(() => {
+          // Reset loading state
+          setLoading(confirmBtn, false);
+        });
+    });
+    
+    // Optional: Handle drag and drop (bonus feature)
+    const dropZone = document.querySelector('.avatar-lg');
+    if (dropZone) {
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+      });
+      
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+      });
+      
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+      });
+      
+      function highlight() {
+        dropZone.classList.add('border-primary');
+        dropZone.style.opacity = '0.8';
+      }
+      
+      function unhighlight() {
+        dropZone.classList.remove('border-primary');
+        dropZone.style.opacity = '1';
+      }
+      
+      dropZone.addEventListener('drop', handleDrop, false);
+      
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const file = dt.files[0];
+        
+        if (file && file.type.startsWith('image/')) {
+          selectedFile = file;
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            modal.show();
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

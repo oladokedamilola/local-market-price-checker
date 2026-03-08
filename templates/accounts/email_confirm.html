@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirm Email - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-soft">
+                <div class="card-body text-center p-5">
+                    {% if confirmation %}
+                        <!-- Success State -->
+                        <div class="mb-4">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                        </div>
+                        
+                        <h2 class="fw-bold mb-3">Confirm Your Email</h2>
+                        
+                        <p class="text-muted mb-4">
+                            Please confirm that <strong>{{ confirmation.email_address.email }}</strong> 
+                            is your email address.
+                        </p>
+                        
+                        <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-check-lg me-2"></i>
+                                Confirm Email
+                            </button>
+                        </form>
+                        
+                    {% else %}
+                        <!-- Error State -->
+                        <div class="mb-4">
+                            <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 4rem;"></i>
+                        </div>
+                        
+                        <h2 class="fw-bold mb-3">Invalid Confirmation Link</h2>
+                        
+                        <p class="text-muted mb-4">
+                            This email confirmation link is invalid or has expired.
+                        </p>
+                        
+                        <div class="d-grid gap-3">
+                            <a href="{% url 'resend_verification' %}" class="btn btn-primary">
+                                <i class="bi bi-arrow-repeat me-2"></i>
+                                Request New Link
+                            </a>
+                            
+                            <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Back to Login
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

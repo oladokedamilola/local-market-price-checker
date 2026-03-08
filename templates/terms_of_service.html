@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Terms of Service - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3" style="color: var(--color-primary);">Terms of Service</h1>
+                <p class="lead text-muted">Terms and conditions for using MarketLens</p>
+                <small class="text-muted">Last Updated: {{ last_updated }}</small>
+            </div>
+
+            <!-- Acceptance of Terms -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">1. Acceptance of Terms</h2>
+                </div>
+                <div class="card-body">
+                    <p>By accessing or using MarketLens, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our platform.</p>
+                </div>
+            </div>
+
+            <!-- User Accounts -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">2. User Accounts</h2>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Registration</h5>
+                    <ul>
+                        <li>You must provide accurate and complete information</li>
+                        <li>You are responsible for maintaining account security</li>
+                        <li>One person may not maintain multiple accounts</li>
+                        <li>You must be at least 18 years old to use MarketLens</li>
+                    </ul>
+
+                    <h5 class="fw-bold mb-3 mt-4">Account Types</h5>
+                    <ul>
+                        <li><strong>Consumers:</strong> Can search and compare prices</li>
+                        <li><strong>Vendors:</strong> Must complete KYC verification to list products</li>
+                        <li><strong>Admins:</strong> Platform administrators with additional privileges</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Vendor Terms -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">3. Vendor Terms</h2>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">KYC Verification</h5>
+                    <ul>
+                        <li>Vendors must complete KYC verification before listing products</li>
+                        <li>False or fraudulent documents will result in account termination</li>
+                        <li>Verification status is at admin discretion</li>
+                    </ul>
+
+                    <h5 class="fw-bold mb-3 mt-4">Product Listings</h5>
+                    <ul>
+                        <li>All product information must be accurate and truthful</li>
+                        <li>Prices must be in Nigerian Naira (₦)</li>
+                        <li>Vendors are responsible for updating prices</li>
+                        <li>Prohibited items may not be listed</li>
+                    </ul>
+
+                    <h5 class="fw-bold mb-3 mt-4">Privacy Protection</h5>
+                    <ul>
+                        <li>Vendors cannot view competitor pricing</li>
+                        <li>Vendor information is protected and not shared with competitors</li>
+                        <li>Violation of privacy policies may result in account suspension</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Consumer Terms -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">4. Consumer Terms</h2>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Prices shown are for informational purposes</li>
+                        <li>MarketLens does not guarantee price accuracy</li>
+                        <li>Consumers should verify prices directly with vendors</li>
+                        <li>Price alerts are provided as a convenience</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Prohibited Activities -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">5. Prohibited Activities</h2>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Attempting to access competitor pricing data</li>
+                        <li>Manipulating prices or engaging in price fixing</li>
+                        <li>Posting false or misleading information</li>
+                        <li>Harassing other users</li>
+                        <li>Using automated scripts or bots</li>
+                        <li>Attempting to breach platform security</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Intellectual Property -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">6. Intellectual Property</h2>
+                </div>
+                <div class="card-body">
+                    <p>All content on MarketLens, including logos, designs, and software, is the property of MarketLens and protected by copyright and trademark laws.</p>
+                </div>
+            </div>
+
+            <!-- Limitation of Liability -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">7. Limitation of Liability</h2>
+                </div>
+                <div class="card-body">
+                    <p>MarketLens is provided "as is" without warranties. We are not liable for:</p>
+                    <ul>
+                        <li>Price inaccuracies</li>
+                        <li>Vendor-customer transactions</li>
+                        <li>Service interruptions</li>
+                        <li>Data loss or breaches</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Termination -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">8. Termination</h2>
+                </div>
+                <div class="card-body">
+                    <p>We reserve the right to suspend or terminate accounts that violate these terms or for any reason at our discretion.</p>
+                </div>
+            </div>
+
+            <!-- Changes to Terms -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">9. Changes to Terms</h2>
+                </div>
+                <div class="card-body">
+                    <p>We may update these terms periodically. Continued use of MarketLens after changes constitutes acceptance of new terms.</p>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">10. Contact Information</h2>
+                </div>
+                <div class="card-body">
+                    <p>For questions about these terms:</p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-envelope me-2"></i> legal@marketlens.com</li>
+                        <li><i class="bi bi-building me-2"></i> Alimosho Local Government, Lagos, Nigeria</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}KYC Rejected - MarketLens{% endblock %}
+
+{% block extra_head %}
+<style>
+  .rejected-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+  
+  .status-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+  }
+  
+  .rejected-icon {
+    width: 100px;
+    height: 100px;
+    background: rgba(230, 57, 70, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--color-danger);
+    font-size: 3rem;
+  }
+  
+  .reason-box {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin: 1.5rem 0;
+    text-align: left;
+  }
+  
+  .reason-box h6 {
+    color: #721c24;
+    margin-bottom: 0.75rem;
+  }
+  
+  .reason-box p {
+    margin-bottom: 0;
+    font-size: 0.95rem;
+  }
+  
+  .requirements-list {
+    text-align: left;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: var(--radius);
+  }
+  
+  .requirements-list h6 {
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+  }
+  
+  .requirements-list ul {
+    margin-bottom: 0;
+    padding-left: 1.2rem;
+  }
+  
+  .requirements-list li {
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+  
+  .requirements-list li:last-child {
+    margin-bottom: 0;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .support-contact {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+  
+  @media (max-width: 576px) {
+    .status-card {
+      padding: 1.5rem;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}KYC Verification Status{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'vendor_kyc' %}">KYC Verification</a></li>
+<li class="breadcrumb-item active" aria-current="page">Rejected</li>
+{% endblock %}
+
+{% block content %}
+<div class="rejected-container">
+  <div class="status-card">
+    <!-- Icon -->
+    <div class="rejected-icon">
+      <i class="bi bi-x-circle"></i>
+    </div>
+    
+    <h2 class="fw-bold mb-3">KYC Not Approved</h2>
+    <p class="text-muted mb-4">
+      Unfortunately, your KYC verification was not approved at this time.
+    </p>
+    
+    {% if rejection_reason %}
+    <!-- Rejection Reason -->
+    <div class="reason-box">
+      <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Reason for rejection:</h6>
+      <p>{{ rejection_reason }}</p>
+    </div>
+    {% else %}
+    <div class="reason-box">
+      <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Common reasons for rejection:</h6>
+      <ul class="mb-0">
+        <li>Document is blurry or unclear</li>
+        <li>Document is expired</li>
+        <li>Document doesn't match provided information</li>
+        <li>Incomplete document (missing corners or information)</li>
+      </ul>
+    </div>
+    {% endif %}
+    
+    <!-- Document Requirements -->
+    <div class="requirements-list">
+      <h6 class="fw-bold"><i class="bi bi-check-circle me-2"></i>Document Requirements:</h6>
+      <ul>
+        <li>Clear, well-lit image (no blur or glare)</li>
+        <li>All four corners of the document visible</li>
+        <li>Document must be valid and not expired</li>
+        <li>All text must be readable</li>
+        <li>Name must match your account information</li>
+        <li>Accepted formats: JPG, PNG, PDF (max 5MB)</li>
+      </ul>
+    </div>
+    
+    <!-- Next Steps -->
+    <div class="alert alert-warning bg-light border-0 text-start">
+      <h6 class="fw-bold mb-2"><i class="bi bi-arrow-right-circle me-2"></i>Next Steps:</h6>
+      <ol class="small mb-0">
+        <li class="mb-1">Review the rejection reason and document requirements above</li>
+        <li class="mb-1">Prepare a new, clear copy of your identification document</li>
+        <li class="mb-1">Contact support if you need clarification</li>
+        <li class="mb-0">Submit a new KYC application with corrected documents</li>
+      </ol>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="{% url 'vendor_kyc' %}" class="btn btn-primary">
+        <i class="bi bi-arrow-repeat me-2"></i>Submit New Application
+      </a>
+      <a href="mailto:support@marketlens.com?subject=KYC%20Rejection%20Question" class="btn btn-outline-secondary">
+        <i class="bi bi-envelope me-2"></i>Contact Support
+      </a>
+    </div>
+    
+    <!-- Support Contact -->
+    <div class="support-contact">
+      <p class="small text-muted mb-0">
+        <i class="bi bi-question-circle me-1"></i>
+        Need help? Email us at <a href="mailto:support@marketlens.com">support@marketlens.com</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

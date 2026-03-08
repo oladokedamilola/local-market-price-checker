@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}How to Use MarketLens - Your Guide to Transparent Pricing{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3" style="color: var(--color-primary);">How to Use MarketLens</h1>
+                <p class="lead text-muted">Your complete guide to finding the best prices across Alimosho markets</p>
+            </div>
+
+            <!-- For Shoppers Section -->
+            <div class="card border-0 shadow-soft mb-5">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-person text-primary me-2"></i>
+                        For Shoppers
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <span class="badge bg-primary rounded-circle p-3" style="width: 50px; height: 50px;">1</span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="fw-bold">Create an Account</h5>
+                                    <p class="text-muted">Sign up as a shopper in under 2 minutes. No verification needed, just access to transparent pricing.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <span class="badge bg-primary rounded-circle p-3" style="width: 50px; height: 50px;">2</span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="fw-bold">Search Products</h5>
+                                    <p class="text-muted">Use the search bar to find any product. Filter by market, category, or price range.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <span class="badge bg-primary rounded-circle p-3" style="width: 50px; height: 50px;">3</span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="fw-bold">Compare Prices</h5>
+                                    <p class="text-muted">Add up to 4 products to comparison and see side-by-side price analysis.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <span class="badge bg-primary rounded-circle p-3" style="width: 50px; height: 50px;">4</span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="fw-bold">Set Price Alerts</h5>
+                                    <p class="text-muted">Get notified when prices drop on your favorite products.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- For Vendors Section -->
+            <div class="card border-0 shadow-soft mb-5">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-shop text-success me-2"></i>
+                        For Vendors
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <span class="badge bg-success rounded-circle p-3" style="width: 50px; height: 50px;">1</span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="fw-bold">Register & Submit KYC</h5>
+                                    <p class="text-muted">Sign up as a vendor and upload your identification documents for verification.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <span class="badge bg-success rounded-circle p-3" style="width: 50px; height: 50px;">2</span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="fw-bold">Get Verified</h5>
+                                    <p class="text-muted">Our team reviews your documents within 24-48 hours. You'll be notified once approved.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <span class="badge bg-success rounded-circle p-3" style="width: 50px; height: 50px;">3</span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="fw-bold">Add Products</h5>
+                                    <p class="text-muted">List your products with prices, categories, and market locations.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <span class="badge bg-success rounded-circle p-3" style="width: 50px; height: 50px;">4</span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="fw-bold">Manage Prices</h5>
+                                    <p class="text-muted">Update prices anytime. Only shoppers see your prices - competitors never will.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Features -->
+            <div class="card border-0 shadow-soft mb-5">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-star text-warning me-2"></i>
+                        Key Features
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-shield-check fs-1 text-primary mb-3"></i>
+                            <h5 class="fw-bold">Verified Vendors</h5>
+                            <p class="text-muted small">All vendors are KYC-verified for your safety</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-incognito fs-1 text-primary mb-3"></i>
+                            <h5 class="fw-bold">Vendor Privacy</h5>
+                            <p class="text-muted small">Competitors never see your prices</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="bi bi-clock-history fs-1 text-primary mb-3"></i>
+                            <h5 class="fw-bold">Real-Time Updates</h5>
+                            <p class="text-muted small">Prices update in real-time</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Tutorial (Optional) -->
+            <div class="text-center mt-5">
+                <h3 class="fw-bold mb-4">Need More Help?</h3>
+                <a href="{% url 'contact_us' %}" class="btn btn-primary btn-lg px-5">
+                    <i class="bi bi-envelope me-2"></i>Contact Support
+                </a>
+                <a href="{% url 'faq' %}" class="btn btn-outline-primary btn-lg px-5 ms-3">
+                    <i class="bi bi-question-circle me-2"></i>Visit FAQ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

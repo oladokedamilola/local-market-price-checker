@@ -1,0 +1,514 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+{% load vendor_extras %}
+{% block title %}Analytics - Vendor{% endblock %}
+
+{% block page_title %}Analytics & Insights{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Analytics</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .stat-card {
+    transition: transform 0.2s;
+  }
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+  .insight-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  .comparison-row {
+    border-left: 4px solid transparent;
+  }
+  .comparison-row.above {
+    border-left-color: #dc3545;
+  }
+  .comparison-row.below {
+    border-left-color: #28a745;
+  }
+  .comparison-row.equal {
+    border-left-color: #ffc107;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Date Range Selector -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <form method="GET" class="row align-items-end">
+          <div class="col-md-3">
+            <label for="days" class="form-label">Time Period</label>
+            <select class="form-select" id="days" name="days">
+              <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+              <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+              <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+              <option value="365" {% if days == 365 %}selected{% endif %}>Last 12 months</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-calendar-check me-2"></i>Apply
+            </button>
+          </div>
+          <div class="col-md-6 text-end">
+            <span class="text-muted">
+              <i class="bi bi-info-circle me-1"></i>
+              Data from {{ start_date }} to {{ end_date }}
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Key Statistics -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card stat-card bg-primary text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-white-50 mb-2">Total Products</h6>
+            <h2 class="mb-0">{{ total_products }}</h2>
+          </div>
+          <i class="bi bi-box fs-1 text-white-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card bg-success text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-white-50 mb-2">Categories</h6>
+            <h2 class="mb-0">{{ total_categories }}</h2>
+          </div>
+          <i class="bi bi-tags fs-1 text-white-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card bg-info text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-white-50 mb-2">Markets</h6>
+            <h2 class="mb-0">{{ total_markets }}</h2>
+          </div>
+          <i class="bi bi-geo-alt fs-1 text-white-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card bg-warning text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-white-50 mb-2">Avg Price</h6>
+            <h2 class="mb-0">₦{{ price_stats.overall_avg|floatformat:0 }}</h2>
+          </div>
+          <i class="bi bi-currency-dollar fs-1 text-white-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+  <!-- Products by Category -->
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Products by Category</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="categoryChart" height="250"></canvas>
+      </div>
+      <div class="card-footer bg-white">
+        <div class="row text-center">
+          {% for item in avg_price_per_category|slice:":3" %}
+          <div class="col-4">
+            <small class="text-muted d-block">{{ item.product__category__name|default:"Uncategorized" }}</small>
+            <strong>₦{{ item.avg_price|floatformat:0 }}</strong>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Products by Market -->
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Products by Market</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="marketChart" height="250"></canvas>
+      </div>
+      <div class="card-footer bg-white">
+        <div class="row text-center">
+          {% for item in avg_price_per_market|slice:":3" %}
+          <div class="col-4">
+            <small class="text-muted d-block">{{ item.market__name }}</small>
+            <strong>₦{{ item.avg_price|floatformat:0 }}</strong>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Price Distribution & Update Frequency -->
+<div class="row mb-4">
+  <!-- Price Distribution -->
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Price Distribution</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="priceChart" height="250"></canvas>
+      </div>
+      <div class="card-footer bg-white">
+        <div class="d-flex justify-content-between">
+          <span>Min: <strong>₦{{ price_stats.overall_min|floatformat:0 }}</strong></span>
+          <span>Max: <strong>₦{{ price_stats.overall_max|floatformat:0 }}</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Update Frequency -->
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Update Frequency</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="updateChart" height="250"></canvas>
+      </div>
+      <div class="card-footer bg-white">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>
+            <i class="bi bi-clock-history me-1"></i>
+            Products needing update: 
+            <a href="{% url 'stale_products' %}" class="fw-bold {% if stale_products_count > 0 %}text-danger{% endif %}">
+              {{ stale_products_count }}
+            </a>
+          </span>
+          <a href="{% url 'bulk_price_update' %}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil-square me-2"></i>Bulk Update
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Market Competition Insights -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Market Competition Insights</h5>
+        <div>
+          <span class="badge bg-success me-2">Below Market Avg</span>
+          <span class="badge bg-warning me-2">At Market Avg</span>
+          <span class="badge bg-danger">Above Market Avg</span>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        {% if market_comparison %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th>Product</th>
+                <th>Market</th>
+                <th>Your Price</th>
+                <th>Market Avg</th>
+                <th>Competitors</th>
+                <th>Price Position</th>
+                <th>Potential Savings</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in market_comparison %}
+              <tr class="comparison-row {{ item.price_position }}">
+                <td>
+                  <div class="fw-bold">{{ item.product }}</div>
+                </td>
+                <td>{{ item.market }}</td>
+                <td class="fw-bold">₦{{ item.your_price|floatformat:2 }}</td>
+                <td>₦{{ item.avg_price|floatformat:2 }}</td>
+                <td>
+                  <span class="badge bg-secondary">{{ item.competitors }}</span>
+                </td>
+                <td>
+                  {% if item.price_position == 'below' %}
+                  <span class="badge bg-success">Below Avg</span>
+                  {% elif item.price_position == 'above' %}
+                  <span class="badge bg-danger">Above Avg</span>
+                  {% else %}
+                  <span class="badge bg-warning">At Avg</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.savings_potential > 0 %}
+                  <span class="text-danger">+₦{{ item.savings_potential|floatformat:2 }}</span>
+                  {% elif item.savings_potential < 0 %}
+                  <span class="text-success">-₦{{ item.savings_potential|floatformat:2|cut:"-" }}</span>
+                  {% else %}
+                  <span class="text-muted">-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'update_product' product_id=item.product_id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="bi bi-bar-chart fs-1 text-muted mb-3 d-block"></i>
+          <p class="text-muted">No competitor data available for your products yet.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Top Products & Recent Updates -->
+<div class="row">
+  <!-- Top 5 Products by Price -->
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Top 5 Highest Priced Products</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          {% for product in top_products %}
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-bold">{{ product.product.name }}</div>
+              <small class="text-muted">{{ product.market.name }}</small>
+            </div>
+            <span class="fw-bold text-primary">₦{{ product.price|floatformat:2 }}</span>
+          </div>
+          {% empty %}
+          <div class="list-group-item text-center py-4">
+            <p class="text-muted mb-0">No products found</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Recent Updates -->
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Recent Price Updates</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          {% for product in recent_updates %}
+          <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold">{{ product.product.name }}</div>
+                <small class="text-muted">{{ product.market.name }}</small>
+              </div>
+              <div class="text-end">
+                <span class="fw-bold text-success">₦{{ product.price|floatformat:2 }}</span>
+                <small class="text-muted d-block">{{ product.last_updated|timesince }} ago</small>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="list-group-item text-center py-4">
+            <p class="text-muted mb-0">No recent updates</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Insights Footer -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card bg-light">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3"><i class="bi bi-lightbulb me-2"></i>Key Insights</h6>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="d-flex">
+              <i class="bi bi-{% if unique_products_count > 0 %}check-circle text-success{% else %}exclamation-circle text-warning{% endif %} me-2"></i>
+              <div>
+                <strong>Unique Products:</strong> You have {{ unique_products_count }} product{% if unique_products_count != 1 %}s{% endif %} with no competitors
+                {% if unique_products_count > 0 %}
+                <span class="badge bg-success ms-2">Opportunity!</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex">
+              <i class="bi bi-{% if products_with_competitors > 0 %}graph-up{% else %}check-circle{% endif %} me-2"></i>
+              <div>
+                <strong>Competitive Market:</strong> {{ products_with_competitors }} product{% if products_with_competitors != 1 %}s{% endif %} have competitors
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex">
+              <i class="bi bi-{% if stale_products_count > 0 %}exclamation-triangle text-warning{% else %}check-circle text-success{% endif %} me-2"></i>
+              <div>
+                <strong>Update Needed:</strong> {{ stale_products_count }} product{% if stale_products_count != 1 %}s{% endif %} haven't been updated in 30+ days
+                {% if stale_products_count > 0 %}
+                <a href="{% url 'stale_products' %}" class="small">Review</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js Scripts -->
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Category Chart
+  new Chart(document.getElementById('categoryChart'), {
+    type: 'doughnut',
+    data: {
+      labels: {{ categories_labels|safe }},
+      datasets: [{
+        data: {{ categories_counts|safe }},
+        backgroundColor: [
+          '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#5a5c69'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+
+  // Market Chart
+  new Chart(document.getElementById('marketChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ markets_labels|safe }},
+      datasets: [{
+        label: 'Number of Products',
+        data: {{ markets_counts|safe }},
+        backgroundColor: '#4e73df'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    }
+  });
+
+  // Price Distribution Chart
+  new Chart(document.getElementById('priceChart'), {
+    type: 'bar',
+    data: {
+      labels: [{% for item in price_distribution %}'{{ item.label }}',{% endfor %}],
+      datasets: [{
+        label: 'Products',
+        data: [{% for item in price_distribution %}{{ item.count }},{% endfor %}],
+        backgroundColor: '#1cc88a'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    }
+  });
+
+  // Update Frequency Chart
+  const updateData = {{ update_data|safe }};
+  new Chart(document.getElementById('updateChart'), {
+    type: 'line',
+    data: {
+      labels: updateData.map(item => item.date),
+      datasets: [{
+        label: 'Updates',
+        data: updateData.map(item => item.count),
+        borderColor: '#36b9cc',
+        backgroundColor: 'rgba(54, 185, 204, 0.1)',
+        tension: 0.1,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}
+{% endblock %}

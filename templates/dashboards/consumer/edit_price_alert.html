@@ -1,0 +1,97 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Edit Price Alert - MarketLens{% endblock %}
+
+{% block page_title %}Edit Price Alert{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'consumer_price_alerts' %}">Price Alerts</a></li>
+<li class="breadcrumb-item active" aria-current="page">Edit</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card shadow-soft border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Edit Price Alert</h5>
+            </div>
+            <div class="card-body p-4">
+                <!-- Product Summary -->
+                <div class="bg-light p-3 rounded mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white rounded p-2">
+                            {% if alert.product.product.image %}
+                            <img src="{{ alert.product.product.image.url }}" alt="{{ alert.product.product.name }}" 
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                            {% else %}
+                            <i class="bi bi-box fs-2 text-muted"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">{{ alert.product.product.name }}</h6>
+                            <p class="small text-muted mb-0">
+                                {{ alert.product.market.name }} • {{ alert.product.vendor.user.get_full_name|default:alert.product.vendor.user.username }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-6 text-center">
+                            <span class="text-muted d-block small">Current Price</span>
+                            <span class="fw-bold text-primary">₦{{ alert.product.price }}</span>
+                        </div>
+                        <div class="col-6 text-center">
+                            <span class="text-muted d-block small">Target Price</span>
+                            <span class="fw-bold text-success">₦{{ alert.target_price }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Target Price (₦)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₦</span>
+                            <input type="number" name="target_price" class="form-control form-control-lg" 
+                                   value="{{ alert.target_price }}" min="1" step="0.01" required>
+                        </div>
+                        <small class="text-muted">We'll notify you when price drops to or below this amount</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Notification Frequency</label>
+                        <select name="frequency" class="form-select">
+                            <option value="instant" {% if alert.frequency == 'instant' %}selected{% endif %}>
+                                Instant (as soon as price drops)
+                            </option>
+                            <option value="daily" {% if alert.frequency == 'daily' %}selected{% endif %}>
+                                Daily Digest
+                            </option>
+                            <option value="weekly" {% if alert.frequency == 'weekly' %}selected{% endif %}>
+                                Weekly Digest
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Notes (Optional)</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Add personal notes...">{{ alert.notes }}</textarea>
+                    </div>
+                    
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-check-circle me-2"></i> Update Alert
+                        </button>
+                        <a href="{% url 'consumer_price_alerts' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

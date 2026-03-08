@@ -1,0 +1,724 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}KYC Verification - MarketLens{% endblock %}
+
+{% block extra_head %}
+<style>
+  .kyc-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .kyc-step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .step-number {
+    width: 40px;
+    height: 40px;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-right: 1rem;
+    flex-shrink: 0;
+  }
+  
+  .step-content h5 {
+    margin: 0;
+    color: var(--color-primary);
+  }
+  
+  .step-content p {
+    margin: 0.25rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+  
+  .document-preview {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .document-preview:hover {
+    border-color: var(--color-accent);
+    background: rgba(77, 168, 218, 0.05);
+  }
+  
+  .document-preview.has-image {
+    border-style: solid;
+  }
+  
+  .document-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: var(--radius);
+    display: none;
+  }
+  
+  .pdf-info {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: var(--radius);
+    margin-top: 1rem;
+  }
+  
+  .upload-instructions {
+    background: #f8f9fa;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .upload-instructions ul {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+  
+  .upload-instructions li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .kyc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--color-success);
+    border-radius: 50px;
+    font-size: 0.9rem;
+  }
+  
+  .kyc-badge.pending {
+    background: rgba(244, 162, 97, 0.1);
+    color: var(--color-warning);
+  }
+  
+  /* Success Modal Styles */
+  .success-checkmark {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .check-icon {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    border-radius: 50%;
+    box-sizing: content-box;
+    border: 4px solid #4caf50;
+  }
+  
+  .check-icon::before {
+    top: 3px;
+    left: -2px;
+    width: 30px;
+    transform-origin: 100% 50%;
+    border-radius: 100px 0 0 100px;
+  }
+  
+  .check-icon::after {
+    top: 0;
+    left: 30px;
+    width: 60px;
+    transform-origin: 0 50%;
+    border-radius: 0 100px 100px 0;
+    animation: rotate-circle 4.25s ease-in;
+  }
+  
+  .check-icon::before, .check-icon::after {
+    content: '';
+    height: 100px;
+    position: absolute;
+    background: #FFFFFF;
+    transform: rotate(-45deg);
+  }
+  
+  .icon-line {
+    height: 5px;
+    background-color: #4caf50;
+    display: block;
+    border-radius: 2px;
+    position: absolute;
+    z-index: 10;
+  }
+  
+  .icon-line.line-tip {
+    top: 46px;
+    left: 14px;
+    width: 25px;
+    transform: rotate(45deg);
+    animation: icon-line-tip 0.75s;
+  }
+  
+  .icon-line.line-long {
+    top: 38px;
+    right: 8px;
+    width: 47px;
+    transform: rotate(-45deg);
+    animation: icon-line-long 0.75s;
+  }
+  
+  @keyframes icon-line-tip {
+    0% { width: 0; left: 1px; top: 19px; }
+    54% { width: 0; left: 1px; top: 19px; }
+    70% { width: 50px; left: -8px; top: 37px; }
+    84% { width: 17px; left: 21px; top: 48px; }
+    100% { width: 25px; left: 14px; top: 45px; }
+  }
+  
+  @keyframes icon-line-long {
+    0% { width: 0; right: 46px; top: 54px; }
+    65% { width: 0; right: 46px; top: 54px; }
+    84% { width: 55px; right: 0px; top: 35px; }
+    100% { width: 47px; right: 8px; top: 38px; }
+  }
+  
+  .icon-circle {
+    top: -4px;
+    left: -4px;
+    z-index: 10;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    position: absolute;
+    box-sizing: content-box;
+    border: 4px solid rgba(76, 175, 80, 0.5);
+  }
+  
+  .icon-fix {
+    top: 8px;
+    width: 5px;
+    left: 26px;
+    z-index: 1;
+    height: 85px;
+    position: absolute;
+    transform: rotate(-45deg);
+    background-color: #FFFFFF;
+  }
+  
+  @keyframes rotate-circle {
+    0% { transform: rotate(-45deg); }
+    5% { transform: rotate(-45deg); }
+    12% { transform: rotate(-405deg); }
+    100% { transform: rotate(-405deg); }
+  }
+  
+  .modal-content {
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  }
+  
+  .modal-header {
+    border-bottom: none;
+    padding: 1.5rem 1.5rem 0.5rem;
+  }
+  
+  .modal-body {
+    padding: 0.5rem 1.5rem 1.5rem;
+  }
+  
+  .modal-footer {
+    border-top: none;
+    padding: 1rem 1.5rem 1.5rem;
+  }
+  
+  .info-item {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    margin-bottom: 0.5rem;
+  }
+  
+  .info-label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin-bottom: 0.25rem;
+  }
+  
+  .info-value {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  
+  .processing-timeline {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    position: relative;
+  }
+  
+  .timeline-step {
+    text-align: center;
+    flex: 1;
+    position: relative;
+  }
+  
+  .timeline-step::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    background: #e0e0e0;
+    z-index: 1;
+  }
+  
+  .timeline-step:last-child::before {
+    display: none;
+  }
+  
+  .step-icon {
+    width: 30px;
+    height: 30px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .timeline-step.active .step-icon {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: white;
+  }
+  
+  .timeline-step.completed .step-icon {
+    border-color: var(--color-success);
+    background: var(--color-success);
+    color: white;
+  }
+  
+  .step-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .timeline-step.active .step-label {
+    color: var(--color-accent);
+  }
+  
+  .timeline-step.completed .step-label {
+    color: var(--color-success);
+  }
+  
+  @media (max-width: 768px) {
+    .kyc-step {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .step-number {
+      margin-right: 0;
+      margin-bottom: 1rem;
+    }
+    
+    .timeline-step .step-label {
+      font-size: 0.7rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}KYC Verification{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active">KYC Verification</li>
+{% endblock %}
+
+{% block content %}
+<div class="kyc-container">
+  <div class="mb-5">
+    <h3 class="fw-bold mb-3">Complete Your KYC Verification</h3>
+    <p class="text-muted">
+      To ensure marketplace integrity and build trust with shoppers, all vendors must complete KYC verification.
+      This process usually takes 24-48 hours after submission.
+    </p>
+  </div>
+  
+  <!-- Verification Steps -->
+  <div class="kyc-step">
+    <div class="step-number">1</div>
+    <div class="step-content">
+      <h5>Upload Identification Document</h5>
+      <p>We accept NIN, BVN, or Government ID Card</p>
+    </div>
+  </div>
+  
+  <div class="kyc-step">
+    <div class="step-number">2</div>
+    <div class="step-content">
+      <h5>Document Verification</h5>
+      <p>Our team verifies your document authenticity</p>
+    </div>
+  </div>
+  
+  <div class="kyc-step">
+    <div class="step-number">3</div>
+    <div class="step-content">
+      <h5>Account Activation</h5>
+      <p>Start listing your products once verified</p>
+    </div>
+  </div>
+  
+  <hr class="my-5">
+  
+  <!-- KYC Form -->
+  <form method="POST" enctype="multipart/form-data" id="kycForm">
+    {% csrf_token %}
+    
+    <div class="card shadow-soft border-0 mb-4">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-4">Business Information</h5>
+        
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.business_name.id_for_label }}" class="form-label">
+              Business/Shop Name *
+            </label>
+            {{ form.business_name }}
+            {% if form.business_name.errors %}
+            <div class="text-danger small mt-1">{{ form.business_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.market.id_for_label }}" class="form-label">
+              Market *
+            </label>
+            {{ form.market }}
+            <div class="form-text">Select your market location</div>
+            {% if form.market.errors %}
+            <div class="text-danger small mt-1">{{ form.market.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Stall Number (Optional) -->
+        <div class="mb-4">
+          <label for="{{ form.stall_number.id_for_label }}" class="form-label">
+            Stall/Shop Number (Optional)
+          </label>
+          {{ form.stall_number }}
+          <div class="form-text">Enter your stall or shop number if you have one</div>
+          {% if form.stall_number.errors %}
+          <div class="text-danger small mt-1">{{ form.stall_number.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="card shadow-soft border-0 mb-4">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-4">Identification Document</h5>
+        
+        <!-- Document Type -->
+        <div class="mb-4">
+          <label for="{{ form.kyc_type.id_for_label }}" class="form-label">
+            Select Document Type *
+          </label>
+          {{ form.kyc_type }}
+          {% if form.kyc_type.errors %}
+          <div class="text-danger small mt-1">{{ form.kyc_type.errors.0 }}</div>
+          {% endif %}
+        </div>
+        
+        <!-- Document Upload -->
+        <div class="mb-4">
+          <label class="form-label">Upload Document Image *</label>
+          
+          <div class="upload-instructions mb-3">
+            <p class="fw-semibold mb-2">Please ensure your document image:</p>
+            <ul>
+              <li>Is clear and readable</li>
+              <li>Shows all corners of the document</li>
+              <li>Is not blurry or dark</li>
+              <li>Shows your name clearly</li>
+            </ul>
+            <p class="fw-semibold mb-0 mt-2">Accepted formats: JPG, PNG, PDF (Max: 5MB)</p>
+          </div>
+          
+          <!-- File Input (hidden) -->
+          <input type="file" name="document_image" id="id_document_image" 
+                 accept="image/jpeg,image/jpg,image/png,application/pdf" 
+                 class="d-none" required>
+          
+          <!-- Preview Area -->
+          <div class="document-preview" id="documentPreview">
+            <div id="uploadPlaceholder">
+              <i class="bi bi-cloud-arrow-up fs-1 text-muted mb-3"></i>
+              <h5 class="fw-bold mb-2">Click to upload document</h5>
+              <p class="text-muted mb-0">JPG, PNG or PDF (Max: 5MB)</p>
+            </div>
+            <img src="" alt="Document Preview" class="document-image" id="documentImage">
+            <div id="pdfInfo" class="pdf-info" style="display: none;">
+              <i class="bi bi-file-earmark-pdf text-danger fs-1 mb-2"></i>
+              <p class="fw-bold mb-1" id="pdfFileName"></p>
+              <p class="text-muted small mb-0">PDF document selected</p>
+            </div>
+          </div>
+          
+          <div id="documentError" class="text-danger small mt-1"></div>
+          {% if form.document_image.errors %}
+          <div class="text-danger small mt-1">{{ form.document_image.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Terms -->
+    <div class="form-check mb-5">
+      {{ form.terms_accepted }}
+      <label class="form-check-label" for="{{ form.terms_accepted.id_for_label }}">
+        I certify that the information provided is accurate and I agree to the 
+        <a href="{% url 'kyc_terms' %}" class="text-primary">KYC Verification Terms</a>
+      </label>
+      {% if form.terms_accepted.errors %}
+      <div class="text-danger small mt-1">{{ form.terms_accepted.errors.0 }}</div>
+      {% endif %}
+    </div>
+    
+    <!-- Submit Button -->
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button type="submit" class="btn btn-primary px-5" id="submitBtn">
+        <span class="btn-text">Submit for Verification</span>
+        <span class="spinner-border spinner-border-sm d-none" id="submitSpinner"></span>
+      </button>
+    </div>
+  </form>
+  
+  <!-- Security Notice -->
+  <div class="alert alert-info mt-5">
+    <div class="d-flex">
+      <i class="bi bi-shield-check fs-4 me-3"></i>
+      <div>
+        <h6 class="alert-heading mb-2">Your Security is Our Priority</h6>
+        <p class="mb-0 small">
+          All documents are encrypted and stored securely. We only use this information for 
+          verification purposes and never share it with third parties.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="kycSuccessModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 class="modal-title w-100 fw-bold">KYC Submitted Successfully!</h5>
+      </div>
+      <div class="modal-body text-center">
+        <!-- Animated Checkmark -->
+        <div class="success-checkmark mb-4">
+          <div class="check-icon">
+            <span class="icon-line line-tip"></span>
+            <span class="icon-line line-long"></span>
+            <div class="icon-circle"></div>
+            <div class="icon-fix"></div>
+          </div>
+        </div>
+        
+        <h4 class="fw-bold mb-3">Thank You!</h4>
+        <p class="text-muted mb-4">
+          Your KYC documents have been submitted successfully and are now under review.
+        </p>
+        
+        <!-- Submission Summary - Populated from data attributes -->
+        <div class="text-start mb-4">
+          <h6 class="fw-bold mb-3">Submission Details:</h6>
+          <div class="info-item">
+            <div class="info-label">Business Name</div>
+            <div class="info-value" id="summaryBusinessName">{{ request.session.kyc_business_name|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Market Location</div>
+            <div class="info-value" id="summaryMarket">{{ request.session.kyc_market_location|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Document Type</div>
+            <div class="info-value" id="summaryDocType">{{ request.session.kyc_document_type|default:"-" }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Submitted On</div>
+            <div class="info-value" id="summaryDate">{{ request.session.kyc_submitted_date|default:"-" }}</div>
+          </div>
+        </div>
+        
+        <!-- Processing Timeline -->
+        <div class="processing-timeline mb-4">
+          <div class="timeline-step completed">
+            <div class="step-icon">
+              <i class="bi bi-check-lg"></i>
+            </div>
+            <div class="step-label">Submitted</div>
+          </div>
+          <div class="timeline-step active">
+            <div class="step-icon">
+              <i class="bi bi-hourglass"></i>
+            </div>
+            <div class="step-label">Under Review</div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-icon">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="step-label">Verified</div>
+          </div>
+        </div>
+        
+        <div class="alert alert-info bg-light border-0 small">
+          <i class="bi bi-info-circle me-2"></i>
+          Verification typically takes <strong>24-48 hours</strong>. You'll receive an email and 
+          in-app notification once your KYC is verified.
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <a href="{% url 'dashboard' %}" class="btn btn-primary px-5">
+          <i class="bi bi-house me-2"></i>Go to Dashboard
+        </a>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Stay on Page
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('id_document_image');
+    const previewArea = document.getElementById('documentPreview');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const documentImage = document.getElementById('documentImage');
+    const pdfInfo = document.getElementById('pdfInfo');
+    const pdfFileName = document.getElementById('pdfFileName');
+    const documentError = document.getElementById('documentError');
+    const form = document.getElementById('kycForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const spinner = document.getElementById('submitSpinner');
+    
+    // Handle file selection
+    previewArea.addEventListener('click', function() {
+      fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', function() {
+      const file = this.files[0];
+      
+      if (!file) return;
+      
+      // Reset displays
+      uploadPlaceholder.style.display = 'block';
+      documentImage.style.display = 'none';
+      pdfInfo.style.display = 'none';
+      
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+      if (!validTypes.includes(file.type)) {
+        documentError.textContent = 'Please upload only JPG, PNG, or PDF files';
+        return;
+      }
+      
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        documentError.textContent = 'File size must be less than 5MB';
+        return;
+      }
+      
+      // Clear any previous errors
+      documentError.textContent = '';
+      
+      // Show preview based on file type
+      if (file.type.startsWith('image/')) {
+        // Image preview
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          documentImage.src = e.target.result;
+          uploadPlaceholder.style.display = 'none';
+          documentImage.style.display = 'block';
+          pdfInfo.style.display = 'none';
+          previewArea.classList.add('has-image');
+        };
+        
+        reader.readAsDataURL(file);
+      } else if (file.type === 'application/pdf') {
+        // PDF info
+        pdfFileName.textContent = file.name;
+        uploadPlaceholder.style.display = 'none';
+        documentImage.style.display = 'none';
+        pdfInfo.style.display = 'block';
+        previewArea.classList.add('has-image');
+      }
+    });
+    
+    // Form validation and submission
+    form.addEventListener('submit', function(e) {
+      let valid = true;
+      
+      // Check document upload
+      if (!fileInput.files || fileInput.files.length === 0) {
+        documentError.textContent = 'Please upload a document';
+        valid = false;
+      }
+      
+      if (!valid) {
+        e.preventDefault();
+        return;
+      }
+      
+      // Prevent double submission
+      if (submitBtn.disabled) {
+        e.preventDefault();
+        return;
+      }
+      
+      // Disable button and show spinner
+      submitBtn.disabled = true;
+      btnText.classList.add('d-none');
+      spinner.classList.remove('d-none');
+      
+      // Let the form submit normally
+      // The modal will be shown after successful submission via Django messages and session data
+    });
+    
+    // Auto-show modal if we have a success message in Django messages
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'success' %}
+          // Show the modal automatically on page load
+          document.addEventListener('DOMContentLoaded', function() {
+            const successModal = new bootstrap.Modal(document.getElementById('kycSuccessModal'));
+            successModal.show();
+          });
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  });
+</script>
+{% endblock %}

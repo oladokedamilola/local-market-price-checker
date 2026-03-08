@@ -1,0 +1,103 @@
+market_prices/
+│
+├── manage.py
+├── db.sqlite3
+│
+├── accounts/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── signals.py
+│   ├── tests.py
+│   ├── urls.py
+│   ├── views.py
+│   └── __pycache__/
+│
+├── core/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   ├── views.py
+│   └── __pycache__/
+│
+├── market/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── __pycache__/
+│   └── management/
+│       └── commands/
+│           ├── __init__.py
+│           └── seed_market_data.py
+│
+├── vendor/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── decorators.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── migrations/
+│   └── __pycache__/
+│
+├── static/
+│   ├── css/
+│   │   └── styles.css
+│   ├── images/
+│   ├── js/
+│   └── pwa/
+│
+├── templates/
+│   ├── base.html
+│   ├── base_dashboard.html
+│   ├── home.html
+│   │
+│   ├── accounts/
+│   │   ├── login.html
+│   │   ├── profile.html
+│   │   ├── register.html
+│   │   └── vendor_kyc.html
+│   │
+│   ├── consumer/
+│   │   ├── compare.html
+│   │   ├── product_detail.html
+│   │   └── search.html
+│   │
+│   ├── dashboards/
+│   │   ├── consumer_dashboard.html
+│   │   └── vendor_dashboard.html
+│   │
+│   ├── errors/
+│   │   ├── 400.html
+│   │   ├── 403.html
+│   │   ├── 404.html
+│   │   └── 500.html
+│   │
+│   ├── market/
+│   │   └── price_search.html
+│   │
+│   └── vendor/
+│       ├── add_product.html
+│       ├── dashboard.html
+│       ├── pending_verification.html
+│       └── update_product.html
+│
+└── market_prices/           (project configuration directory)
+    ├── __init__.py
+    ├── settings.py
+    ├── urls.py
+    ├── wsgi.py
+    └── asgi.py

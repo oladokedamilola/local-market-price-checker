@@ -1,0 +1,200 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Comparison Details - MarketLens{% endblock %}
+
+{% block page_title %}Comparison: {{ comparison.name }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'my_comparisons' %}">My Comparisons</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ comparison.name|truncatechars:30 }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h2 fw-bold mb-2">{{ comparison.name }}</h1>
+            <p class="text-muted">
+                Created {{ comparison.created_at|date:"F j, Y" }} • 
+                Last updated {{ comparison.updated_at|timesince }} ago
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-outline-secondary" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i> Print
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Comparison Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th style="width: 200px;">Feature</th>
+                        {% for product in products %}
+                        <th class="text-center" style="min-width: 250px;">
+                            <div class="d-flex justify-content-between align-items-center p-2">
+                                <span>{{ product.product.name }}</span>
+                            </div>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Price Row -->
+                    <tr>
+                        <td class="fw-bold bg-light">Price</td>
+                        {% for product in products %}
+                        <td class="text-center">
+                            <span class="fw-bold {% if product.price == stats.min_price %}text-success{% elif product.price == stats.max_price %}text-danger{% endif %}">
+                                ₦{{ product.price }}
+                            </span>
+                            {% if product.price == stats.min_price %}
+                            <span class="badge bg-success ms-2">Best Price</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    
+                    <!-- Market Row -->
+                    <tr>
+                        <td class="fw-bold bg-light">Market</td>
+                        {% for product in products %}
+                        <td class="text-center">
+                            <strong>{{ product.market.name }}</strong>
+                            <br>
+                            <small class="text-muted">{{ product.market.location }}</small>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    
+                    <!-- Vendor Row -->
+                    <tr>
+                        <td class="fw-bold bg-light">Vendor</td>
+                        {% for product in products %}
+                        <td class="text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                {% if product.vendor.user.profile.profile_picture %}
+                                <img src="{{ product.vendor.user.profile.profile_picture.url }}" 
+                                     alt="{{ product.vendor.user.get_full_name }}"
+                                     class="rounded-circle me-2" 
+                                     style="width: 24px; height: 24px; object-fit: cover;">
+                                {% endif %}
+                                {{ product.vendor.user.get_full_name|default:product.vendor.user.username }}
+                            </div>
+                            <small class="text-success">
+                                <i class="bi bi-shield-check"></i> Verified
+                            </small>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    
+                    <!-- Category Row -->
+                    <tr>
+                        <td class="fw-bold bg-light">Category</td>
+                        {% for product in products %}
+                        <td class="text-center">
+                            {{ product.product.category.name|default:"Uncategorized" }}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    
+                    <!-- Unit Row -->
+                    <tr>
+                        <td class="fw-bold bg-light">Unit</td>
+                        {% for product in products %}
+                        <td class="text-center">
+                            {{ product.product.unit }}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    
+                    <!-- Last Updated Row -->
+                    <tr>
+                        <td class="fw-bold bg-light">Last Updated</td>
+                        {% for product in products %}
+                        <td class="text-center">
+                            <i class="bi bi-clock me-1"></i>
+                            {{ product.last_updated|timesince }} ago
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    
+                    <!-- Actions Row -->
+                    <tr>
+                        <td class="fw-bold bg-light">Actions</td>
+                        {% for product in products %}
+                        <td class="text-center">
+                            <a href="{% url 'consumer_product_detail' product.id %}" class="btn btn-sm btn-primary">
+                                View Details
+                            </a>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Share Section -->
+<div class="card mt-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Share This Comparison</h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="shareLink" 
+                           value="{{ request.scheme }}://{{ request.get_host }}{% url 'shared_comparison' comparison.share_uuid %}" readonly>
+                    <button class="btn btn-primary" type="button" onclick="copyShareLink()">
+                        <i class="bi bi-clipboard"></i> Copy Link
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'shared_comparison' comparison.share_uuid %}" target="_blank" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-box-arrow-up-right me-2"></i> View Public Page
+                </a>
+            </div>
+        </div>
+        <p class="text-muted small mt-2">
+            <i class="bi bi-info-circle me-1"></i>
+            Anyone with this link can view this comparison, even without logging in.
+        </p>
+    </div>
+</div>
+
+<script>
+function copyShareLink() {
+    const link = document.getElementById('shareLink');
+    link.select();
+    document.execCommand('copy');
+    
+    // Show toast notification
+    const toast = document.createElement('div');
+    toast.className = 'toast show align-items-center text-white bg-success border-0 position-fixed top-0 end-0 m-3';
+    toast.style.zIndex = '9999';
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle me-2"></i>
+                Link copied to clipboard!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

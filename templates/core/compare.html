@@ -1,0 +1,209 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Compare Products - MarketLens{% endblock %}
+
+{% block page_title %}Compare Products{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'search' %}">Search</a></li>
+<li class="breadcrumb-item active" aria-current="page">Compare</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-2">Price Comparison</h2>
+            <p class="text-muted">Comparing {{ count }} product{{ count|pluralize }}</p>
+        </div>
+        <div>
+            <a href="{% url 'clear_comparison' %}" class="btn btn-outline-danger me-2">
+                <i class="bi bi-trash me-1"></i> Clear All
+            </a>
+            <a href="{% url 'search' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Add More
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    {% if stats %}
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Lowest Price</h6>
+                    <h3 class="fw-bold text-success mb-0">₦{{ stats.min_price|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Highest Price</h6>
+                    <h3 class="fw-bold text-danger mb-0">₦{{ stats.max_price|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Average Price</h6>
+                    <h3 class="fw-bold text-primary mb-0">₦{{ stats.avg_price|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted mb-2">Price Difference</h6>
+                    <h3 class="fw-bold text-warning mb-0">₦{{ stats.price_diff|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Comparison Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th style="width: 200px;">Feature</th>
+                            {% for product in products %}
+                            <th class="text-center" style="min-width: 250px;">
+                                <div class="d-flex justify-content-between align-items-center p-2">
+                                    <span>{{ product.product.name }}</span>
+                                    <a href="{% url 'remove_from_comparison' product.id %}" 
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('Remove from comparison?')">
+                                        <i class="bi bi-x"></i>
+                                    </a>
+                                </div>
+                            </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Price Row -->
+                        <tr>
+                            <td class="fw-bold bg-light">Price</td>
+                            {% for product in products %}
+                            <td class="text-center">
+                                <span class="fw-bold {% if product.price == stats.min_price %}text-success{% elif product.price == stats.max_price %}text-danger{% endif %}">
+                                    ₦{{ product.price }}
+                                </span>
+                                {% if product.price == stats.min_price %}
+                                <span class="badge bg-success ms-2">Best Price</span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        
+                        <!-- Market Row -->
+                        <tr>
+                            <td class="fw-bold bg-light">Market</td>
+                            {% for product in products %}
+                            <td class="text-center">
+                                <strong>{{ product.market.name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ product.market.location }}</small>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        
+                        <!-- Vendor Row -->
+                        <tr>
+                            <td class="fw-bold bg-light">Vendor</td>
+                            {% for product in products %}
+                            <td class="text-center">
+                                <i class="bi bi-person-circle me-1"></i>
+                                {{ product.vendor.user.get_full_name|default:product.vendor.user.username }}
+                                <br>
+                                <small class="text-success">
+                                    <i class="bi bi-shield-check"></i> Verified
+                                </small>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        
+                        <!-- Category Row -->
+                        <tr>
+                            <td class="fw-bold bg-light">Category</td>
+                            {% for product in products %}
+                            <td class="text-center">
+                                {{ product.product.category.name|default:"Uncategorized" }}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        
+                        <!-- Unit Row -->
+                        <tr>
+                            <td class="fw-bold bg-light">Unit</td>
+                            {% for product in products %}
+                            <td class="text-center">
+                                {{ product.product.unit }}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        
+                        <!-- Last Updated Row -->
+                        <tr>
+                            <td class="fw-bold bg-light">Last Updated</td>
+                            {% for product in products %}
+                            <td class="text-center">
+                                <i class="bi bi-clock me-1"></i>
+                                {{ product.last_updated|timesince }} ago
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        
+                        <!-- Actions Row -->
+                        <tr>
+                            <td class="fw-bold bg-light">Actions</td>
+                            {% for product in products %}
+                            <td class="text-center">
+                                <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-primary">
+                                    View Details
+                                </a>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Comparison Form -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">Save This Comparison</h5>
+            <form method="POST" action="{% url 'save_comparison' %}" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-6">
+                    <input type="text" name="name" class="form-control" placeholder="Enter a name for this comparison (optional)">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-bookmark me-2"></i> Save Comparison
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table td {
+        vertical-align: middle;
+    }
+    .table th {
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}

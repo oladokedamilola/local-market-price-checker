@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 40px 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .success-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #28a745;
+        }
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            background: #28a745;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 40px;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #28a745;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .feature {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ KYC Verification Approved!</h1>
+        </div>
+        
+        <div class="content">
+            <div class="success-card">
+                <div class="checkmark">✓</div>
+                
+                <h2 style="color: #28a745; margin: 20px 0;">Congratulations {{ user.first_name|default:user.username }}!</h2>
+                
+                <p style="font-size: 18px;">Your KYC verification has been approved. You can now start selling on MarketLens!</p>
+            </div>
+            
+            <div class="features">
+                <div class="feature">
+                    <strong>📦 Add Products</strong>
+                    <p>Start listing your products</p>
+                </div>
+                <div class="feature">
+                    <strong>💰 Set Prices</strong>
+                    <p>Manage your pricing</p>
+                </div>
+                <div class="feature">
+                    <strong>📊 Track Sales</strong>
+                    <p>Monitor your performance</p>
+                </div>
+                <div class="feature">
+                    <strong>🏪 Manage Shop</strong>
+                    <p>Control your storefront</p>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{ site_url }}{% url 'vendor_dashboard' %}" class="button">
+                    Go to Vendor Dashboard
+                </a>
+                <a href="{{ site_url }}{% url 'add_product' %}" class="button" style="background-color: #4DA8DA;">
+                    Add Your First Product
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {% now "Y" %} MarketLens. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

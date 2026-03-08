@@ -1,0 +1,465 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Complete Your Registration - MarketLens{% endblock %}
+
+{% block extra_head %}
+<style>
+    .register-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+    
+    .register-card {
+        background: white;
+        border-radius: var(--radius);
+        padding: 2.5rem;
+        box-shadow: var(--shadow-soft);
+        width: 100%;
+        max-width: 500px;
+    }
+    
+    .role-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .role-option {
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        height: 100%;
+    }
+    
+    .role-option:hover {
+        border-color: var(--color-accent);
+        transform: translateY(-2px);
+    }
+    
+    .role-option.active {
+        border-color: var(--color-accent);
+        background: rgba(77, 168, 218, 0.05);
+    }
+    
+    .role-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .role-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .role-option.consumer .role-icon {
+        color: var(--color-accent);
+    }
+    
+    .role-option.vendor .role-icon {
+        color: var(--color-primary);
+    }
+    
+    .password-strength {
+        height: 4px;
+        background: #e0e0e0;
+        border-radius: 2px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .strength-bar {
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+    
+    .strength-weak { background-color: #ff4757; }
+    .strength-fair { background-color: #ffa502; }
+    .strength-good { background-color: #2ed573; }
+    .strength-strong { background-color: #1e90ff; }
+    
+    .password-requirements {
+        font-size: 0.85rem;
+        color: var(--color-muted);
+        margin-top: 0.5rem;
+    }
+    
+    .requirement {
+        margin-bottom: 0.25rem;
+    }
+    
+    .requirement.met {
+        color: var(--color-success);
+    }
+    
+    .requirement i {
+        margin-right: 0.5rem;
+    }
+    
+    .badge-google {
+        background: rgba(77, 168, 218, 0.1);
+        color: var(--color-accent);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        display: inline-block;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 576px) {
+        .register-card {
+            padding: 1.5rem;
+        }
+        
+        .role-options {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="register-card">
+                    <div class="text-center mb-4">
+                        <div class="badge-google">
+                            <i class="bi bi-google me-2"></i>
+                            Google Account Verified
+                        </div>
+                        <h2 class="fw-bold mb-2">Complete Your Registration</h2>
+                        <p class="text-muted">Choose your account type and set a password</p>
+                    </div>
+                    
+                    <div class="alert alert-success bg-light border-0 mb-4">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        <strong>{{ email }}</strong> has been verified by Google.
+                    </div>
+                    
+                    <form method="POST" id="completeProfileForm">
+                        {% csrf_token %}
+                        
+                        <!-- Role Selection -->
+                        <div class="role-options">
+                            <label class="role-option consumer">
+                                <input type="radio" name="role" value="consumer" required>
+                                <div class="role-icon">
+                                    <i class="bi bi-cart"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Shopper</h5>
+                                <p class="small text-muted mb-0">Compare prices across markets</p>
+                                <ul class="small text-start mt-3 text-muted">
+                                    <li><i class="bi bi-check-circle me-2 text-success"></i>Find best prices</li>
+                                    <li><i class="bi bi-check-circle me-2 text-success"></i>Save favorite items</li>
+                                    <li><i class="bi bi-check-circle me-2 text-success"></i>Price drop alerts</li>
+                                    <li><i class="bi bi-check-circle me-2 text-success"></i>Compare products</li>
+                                </ul>
+                            </label>
+                            
+                            <label class="role-option vendor">
+                                <input type="radio" name="role" value="vendor" required>
+                                <div class="role-icon">
+                                    <i class="bi bi-shop"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Vendor</h5>
+                                <p class="small text-muted mb-0">List and sell your products</p>
+                                <ul class="small text-start mt-3 text-muted">
+                                    <li><i class="bi bi-check-circle me-2 text-success"></i>KYC verification required</li>
+                                    <li><i class="bi bi-check-circle me-2 text-success"></i>Price privacy protection</li>
+                                    <li><i class="bi bi-check-circle me-2 text-success"></i>Business insights</li>
+                                    <li><i class="bi bi-check-circle me-2 text-success"></i>Manage inventory</li>
+                                </ul>
+                            </label>
+                        </div>
+                        
+                        <!-- Personal Information -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name *</label>
+                                <input type="text" name="first_name" class="form-control" 
+                                       id="first_name" value="{{ first_name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name *</label>
+                                <input type="text" name="last_name" class="form-control" 
+                                       id="last_name" value="{{ last_name }}" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Email (read-only) -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" 
+                                       id="email" value="{{ email }}" readonly disabled>
+                                <span class="input-group-text bg-success text-white">
+                                    <i class="bi bi-check-circle"></i>
+                                </span>
+                            </div>
+                            <div class="form-text text-success">
+                                <i class="bi bi-shield-check me-1"></i>Verified by Google
+                            </div>
+                        </div>
+                        
+                        <!-- Optional Password Section -->
+                        <div class="alert alert-info bg-light border-0 mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Important:</strong> Set a password to also sign in with email.
+                        </div>
+                        
+                        <!-- Passwords -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="password1" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <input type="password" name="password1" class="form-control" 
+                                           id="password1">
+                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password1">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength">
+                                    <div class="strength-bar" id="passwordStrengthBar"></div>
+                                </div>
+                                <div class="password-requirements" id="passwordRequirements">
+                                    <div class="requirement" data-rule="length">
+                                        <i class="bi bi-circle"></i> At least 8 characters
+                                    </div>
+                                    <div class="requirement" data-rule="uppercase">
+                                        <i class="bi bi-circle"></i> Contains uppercase letter
+                                    </div>
+                                    <div class="requirement" data-rule="lowercase">
+                                        <i class="bi bi-circle"></i> Contains lowercase letter
+                                    </div>
+                                    <div class="requirement" data-rule="number">
+                                        <i class="bi bi-circle"></i> Contains number
+                                    </div>
+                                    <div class="requirement" data-rule="special">
+                                        <i class="bi bi-circle"></i> Contains special character
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="password2" class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                    <input type="password" name="password2" class="form-control" 
+                                           id="password2">
+                                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password2">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div id="passwordMatch" class="small mt-1"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms -->
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label small" for="terms">
+                                I agree to the <a href="{% url 'terms_of_service' %}" target="_blank">Terms of Service</a> and 
+                                <a href="{% url 'privacy_policy' %}" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Complete Registration
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Role selection styling
+    const roleOptions = document.querySelectorAll('.role-option');
+    roleOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        roleOptions.forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+        const radio = this.querySelector('input[type="radio"]');
+        radio.checked = true;
+      });
+    });
+    
+    // Password toggle
+    document.querySelectorAll('.toggle-password').forEach(button => {
+      button.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        const icon = this.querySelector('i');
+        
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.className = 'bi bi-eye-slash';
+        } else {
+          input.type = 'password';
+          icon.className = 'bi bi-eye';
+        }
+      });
+    });
+    
+    // Password strength checker
+    const passwordInput = document.getElementById('password1');
+    const strengthBar = document.getElementById('passwordStrengthBar');
+    const requirements = document.querySelectorAll('.requirement');
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+          const password = this.value;
+          
+          // Reset
+          strengthBar.style.width = '0%';
+          strengthBar.className = 'strength-bar';
+          requirements.forEach(req => {
+            req.classList.remove('met');
+            req.querySelector('i').className = 'bi bi-circle';
+          });
+          
+          if (password.length === 0) return;
+          
+          // Check requirements
+          const checks = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[^A-Za-z0-9]/.test(password)
+          };
+          
+          // Update requirement indicators
+          Object.keys(checks).forEach(rule => {
+            const element = document.querySelector(`.requirement[data-rule="${rule}"]`);
+            if (element) {
+              if (checks[rule]) {
+                element.classList.add('met');
+                element.querySelector('i').className = 'bi bi-check-circle text-success';
+              }
+            }
+          });
+          
+          // Calculate strength
+          let strength = 0;
+          if (checks.length) strength += 20;
+          if (checks.uppercase) strength += 20;
+          if (checks.lowercase) strength += 20;
+          if (checks.number) strength += 20;
+          if (checks.special) strength += 20;
+          
+          // Update strength bar
+          strengthBar.style.width = strength + '%';
+          
+          if (strength < 40) {
+            strengthBar.className = 'strength-bar strength-weak';
+          } else if (strength < 60) {
+            strengthBar.className = 'strength-bar strength-fair';
+          } else if (strength < 80) {
+            strengthBar.className = 'strength-bar strength-good';
+          } else {
+            strengthBar.className = 'strength-bar strength-strong';
+          }
+        });
+    }
+    
+    // Password match checker
+    const confirmInput = document.getElementById('password2');
+    const matchIndicator = document.getElementById('passwordMatch');
+    
+    function checkPasswordMatch() {
+      const password = passwordInput ? passwordInput.value : '';
+      const confirm = confirmInput ? confirmInput.value : '';
+      
+      if (!passwordInput || !confirmInput) return;
+      
+      if (confirm.length === 0) {
+        matchIndicator.textContent = '';
+        matchIndicator.className = 'small mt-1';
+        return;
+      }
+      
+      if (password === confirm) {
+        matchIndicator.textContent = '✓ Passwords match';
+        matchIndicator.className = 'small mt-1 text-success';
+      } else {
+        matchIndicator.textContent = '✗ Passwords do not match';
+        matchIndicator.className = 'small mt-1 text-danger';
+      }
+    }
+    
+    if (passwordInput && confirmInput) {
+        passwordInput.addEventListener('input', checkPasswordMatch);
+        confirmInput.addEventListener('input', checkPasswordMatch);
+    }
+    
+    // Form validation before submit
+    const form = document.getElementById('completeProfileForm');
+    form.addEventListener('submit', function(e) {
+      const roleSelected = document.querySelector('input[name="role"]:checked');
+      if (!roleSelected) {
+        e.preventDefault();
+        alert('Please select an account type (Shopper or Vendor)');
+        return;
+      }
+      
+      // If password is provided, validate it
+      if (passwordInput && passwordInput.value.length > 0) {
+          const password = passwordInput.value;
+          const confirm = confirmInput.value;
+          
+          // Check password strength
+          const checks = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[^A-Za-z0-9]/.test(password)
+          };
+          
+          const allChecksPassed = Object.values(checks).every(check => check === true);
+          
+          if (!allChecksPassed) {
+            e.preventDefault();
+            alert('Please ensure your password meets all requirements');
+            return;
+          }
+          
+          if (password !== confirm) {
+            e.preventDefault();
+            alert('Passwords do not match');
+            return;
+          }
+      }
+      
+      const termsChecked = document.getElementById('terms').checked;
+      if (!termsChecked) {
+        e.preventDefault();
+        alert('Please agree to the Terms of Service and Privacy Policy');
+        return;
+      }
+    });
+  });
+</script>
+{% endblock %}

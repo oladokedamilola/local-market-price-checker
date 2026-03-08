@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vendor Guidelines - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3" style="color: var(--color-primary);">Vendor Guidelines</h1>
+                <p class="lead text-muted">Best practices and rules for selling on MarketLens</p>
+            </div>
+
+            <!-- Code of Conduct -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        Code of Conduct
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Maintain accurate and up-to-date pricing information
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Respond to customer inquiries promptly and professionally
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Honor the prices listed on the platform
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Maintain product availability and quality standards
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Respect customer privacy and data protection
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Prohibited Practices -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                        Prohibited Practices
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                            Manipulating prices or engaging in price fixing
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                            Listing counterfeit or unauthorized products
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                            Sharing competitor pricing information
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                            Using fake reviews or ratings
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                            Harassing or discriminating against customers
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Account Management -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-person-circle text-primary me-2"></i>
+                        Account Management
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">KYC Requirements</h5>
+                    <p>All vendors must complete KYC verification with one of the following:</p>
+                    <ul>
+                        <li>National Identification Number (NIN)</li>
+                        <li>Bank Verification Number (BVN)</li>
+                        <li>Government Issued ID Card</li>
+                    </ul>
+                    
+                    <h5 class="fw-bold mb-3 mt-4">Business Information</h5>
+                    <p>Keep your business information up to date:</p>
+                    <ul>
+                        <li>Business name and description</li>
+                        <li>Market location and stall number</li>
+                        <li>Contact information</li>
+                        <li>Operating hours</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Pricing Guidelines -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-currency-exchange text-warning me-2"></i>
+                        Pricing Guidelines
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Remember: Competitors cannot see your prices. This protects your pricing strategy.
+                    </div>
+                    
+                    <h5 class="fw-bold mb-3">Price Updates</h5>
+                    <ul>
+                        <li>Update prices at least weekly to maintain accuracy</li>
+                        <li>Use bulk update tools for multiple products</li>
+                        <li>Set price alerts for market changes</li>
+                    </ul>
+                    
+                    <h5 class="fw-bold mb-3 mt-4">Best Practices</h5>
+                    <ul>
+                        <li>Price competitively to attract more customers</li>
+                        <li>Consider bundle pricing for multiple items</li>
+                        <li>Update prices during market fluctuations</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Product Listing Standards -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-box text-success me-2"></i>
+                        Product Listing Standards
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Product Information</h5>
+                    <ul>
+                        <li>Use clear, accurate product names</li>
+                        <li>Specify the correct unit (kg, basket, piece, etc.)</li>
+                        <li>Add product descriptions for clarity</li>
+                        <li>Upload high-quality product images when possible</li>
+                    </ul>
+                    
+                    <h5 class="fw-bold mb-3 mt-4">Categories</h5>
+                    <ul>
+                        <li>Select the most appropriate category for your products</li>
+                        <li>Request new categories if needed (admin will review)</li>
+                        <li>Don't list products in incorrect categories</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Contact Support -->
+            <div class="text-center mt-5">
+                <p class="text-muted">Have questions about these guidelines?</p>
+                <a href="{% url 'contact_us' %}" class="btn btn-primary">
+                    <i class="bi bi-envelope me-2"></i>Contact Vendor Support
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

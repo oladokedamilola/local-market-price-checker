@@ -1,0 +1,204 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Review Vendor KYC - MarketLens Admin{% endblock %}
+
+{% block page_title %}Review KYC Application{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_vendor_verification' %}">Vendor Verification</a></li>
+<li class="breadcrumb-item active" aria-current="page">Review</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h3 class="fw-bold mb-0">Review Vendor Application</h3>
+      </div>
+      <div class="card-body">
+        <!-- Vendor Information -->
+        <div class="mb-4">
+          <h5 class="fw-bold mb-3">Vendor Information</h5>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Full Name</label>
+              <p class="fw-bold">{{ kyc.vendor.user.get_full_name|default:"Not provided" }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Username</label>
+              <p class="fw-bold">{{ kyc.vendor.user.username }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Email</label>
+              <p class="fw-bold">{{ kyc.vendor.user.email }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Joined</label>
+              <p class="fw-bold">{{ kyc.vendor.user.date_joined|date:"M d, Y" }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <!-- KYC Information -->
+        <div class="mb-4">
+          <h5 class="fw-bold mb-3">KYC Information</h5>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">ID Type</label>
+              <p class="fw-bold">{{ kyc.get_id_type_display }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label text-muted">Submitted On</label>
+              <p class="fw-bold">{{ kyc.submitted_at|date:"M d, Y H:i" }}</p>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label text-muted">ID Document</label>
+            <div class="border rounded p-3 bg-light">
+              <a href="{{ kyc.id_document.url }}" target="_blank" class="btn btn-primary">
+                <i class="bi bi-file-earmark-pdf me-2"></i> View Document
+              </a>
+              <p class="text-muted small mt-2">Opens in a new tab</p>
+            </div>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <!-- Decision Form -->
+        <form method="POST" id="verificationForm">
+          {% csrf_token %}
+          
+          <div class="mb-4">
+            <h5 class="fw-bold mb-3">Make Decision</h5>
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="form-check p-3 border rounded">
+                  <input class="form-check-input" type="radio" name="action" id="approve" value="approve" required>
+                  <label class="form-check-label fw-bold" for="approve">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    Approve Verification
+                  </label>
+                  <p class="text-muted small ms-4 mb-0">Vendor will be verified and can start listing products</p>
+                </div>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <div class="form-check p-3 border rounded">
+                  <input class="form-check-input" type="radio" name="action" id="reject" value="reject" required>
+                  <label class="form-check-label fw-bold" for="reject">
+                    <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                    Reject Verification
+                  </label>
+                  <p class="text-muted small ms-4 mb-0">Vendor will be notified and can resubmit</p>
+                </div>
+              </div>
+            </div>
+            
+            <div id="rejectionReason" style="display: none;" class="mt-3">
+              <label for="reason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+              <textarea name="rejection_reason" id="reason" rows="3" class="form-control" placeholder="Please provide a reason for rejection..."></textarea>
+            </div>
+          </div>
+          
+          <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-primary btn-lg flex-grow-1" id="submitBtn">
+              <span class="btn-text">Submit Decision</span>
+              <span class="spinner" style="display: none;"></span>
+            </button>
+            <a href="{% url 'admin_vendor_verification' %}" class="btn btn-outline-secondary btn-lg">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const approveRadio = document.getElementById('approve');
+  const rejectRadio = document.getElementById('reject');
+  const rejectionDiv = document.getElementById('rejectionReason');
+  const reasonInput = document.getElementById('reason');
+  const submitBtn = document.getElementById('submitBtn');
+  const form = document.getElementById('verificationForm');
+  
+  // Toggle rejection reason field
+  function toggleRejectionReason() {
+    if (rejectRadio.checked) {
+      rejectionDiv.style.display = 'block';
+      reasonInput.required = true;
+    } else {
+      rejectionDiv.style.display = 'none';
+      reasonInput.required = false;
+    }
+  }
+  
+  approveRadio.addEventListener('change', toggleRejectionReason);
+  rejectRadio.addEventListener('change', toggleRejectionReason);
+  
+  // Form submission with loading spinner
+  form.addEventListener('submit', function(e) {
+    if (!approveRadio.checked && !rejectRadio.checked) {
+      e.preventDefault();
+      alert('Please select Approve or Reject');
+      return;
+    }
+    
+    if (rejectRadio.checked && !reasonInput.value.trim()) {
+      e.preventDefault();
+      alert('Please provide a rejection reason');
+      return;
+    }
+    
+    // Show loading spinner
+    submitBtn.classList.add('btn-loading');
+    submitBtn.disabled = true;
+    
+    const btnText = submitBtn.querySelector('.btn-text');
+    const spinner = submitBtn.querySelector('.spinner');
+    
+    btnText.style.visibility = 'hidden';
+    spinner.style.display = 'block';
+  });
+});
+</script>
+
+<style>
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.btn-loading .btn-text {
+  visibility: hidden;
+}
+
+.btn-loading .spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+</style>
+{% endblock %}

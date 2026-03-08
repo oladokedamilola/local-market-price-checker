@@ -1,0 +1,51 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Delete Category - MarketLens Admin{% endblock %}
+
+{% block page_title %}Delete Category{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_categories' %}">Categories</a></li>
+<li class="breadcrumb-item active" aria-current="page">Delete</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-6 mx-auto">
+    <div class="card border-danger">
+      <div class="card-header bg-danger text-white">
+        <h5 class="mb-0 fw-bold">Confirm Deletion</h5>
+      </div>
+      <div class="card-body text-center py-4">
+        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+        
+        <h4 class="fw-bold mt-3">Delete "{{ category.name }}" Category?</h4>
+        
+        <p class="text-muted mb-4">
+          This action cannot be undone. 
+          {% if product_count > 0 %}
+          <br>
+          <span class="text-danger fw-bold">
+            Warning: This category has {{ product_count }} product(s) associated with it.
+          </span>
+          {% endif %}
+        </p>
+        
+        <form method="POST">
+          {% csrf_token %}
+          <div class="d-flex gap-3 justify-content-center">
+            <button type="submit" class="btn btn-danger px-4">
+              <i class="bi bi-trash me-2"></i> Yes, Delete Category
+            </button>
+            <a href="{% url 'admin_categories' %}" class="btn btn-outline-secondary px-4">
+              <i class="bi bi-x-circle me-2"></i> Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

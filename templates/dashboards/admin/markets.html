@@ -1,0 +1,199 @@
+<!--templates\dashboards\admin\markets.html-->
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Markets - MarketLens Admin{% endblock %}
+
+{% block page_title %}Market Management{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item active" aria-current="page">Markets</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h2 fw-bold mb-2">Market Management</h1>
+    <p class="text-muted">Manage markets in Alimosho LGA</p>
+  </div>
+  <div>
+    <a href="{% url 'admin_market_create' %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle me-2"></i> Add New Market
+    </a>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" class="row g-3">
+      <div class="col-md-10">
+        <input type="text" name="search" class="form-control" placeholder="Search markets by name, location, or address..." value="{{ search }}">
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-search me-2"></i> Search
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Results Summary and Sort -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <p class="text-muted mb-0">
+    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} markets
+  </p>
+  <div class="dropdown">
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      <i class="bi bi-sort me-1"></i> Sort by
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item {% if sort == 'name' %}active{% endif %}" href="?{% if search %}search={{ search }}&{% endif %}sort=name{% if limit %}&limit={{ limit }}{% endif %}">Name</a></li>
+      <li><a class="dropdown-item {% if sort == 'newest' %}active{% endif %}" href="?{% if search %}search={{ search }}&{% endif %}sort=newest{% if limit %}&limit={{ limit }}{% endif %}">Newest</a></li>
+      <li><a class="dropdown-item {% if sort == 'oldest' %}active{% endif %}" href="?{% if search %}search={{ search }}&{% endif %}sort=oldest{% if limit %}&limit={{ limit }}{% endif %}">Oldest</a></li>
+      <li><a class="dropdown-item {% if sort == 'products' %}active{% endif %}" href="?{% if search %}search={{ search }}&{% endif %}sort=products{% if limit %}&limit={{ limit }}{% endif %}">Most Products</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Markets Grid -->
+{% if markets %}
+<div class="row g-4">
+  {% for market in markets %}
+  <div class="col-xl-4 col-lg-6">
+    <div class="card h-100">
+      <!-- Market Cover Image -->
+      <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 160px; overflow: hidden;">
+        {% if market.cover_image %}
+        <img src="{{ market.cover_image.url }}" alt="{{ market.name }}" class="w-100 h-100" style="object-fit: cover;">
+        {% else %}
+        <i class="bi bi-image" style="font-size: 3rem; color: var(--color-muted);"></i>
+        {% endif %}
+      </div>
+      
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <i class="bi bi-geo-alt fs-2" style="color: var(--color-accent);"></i>
+          <div>
+            <h5 class="fw-bold mb-1">{{ market.name }}</h5>
+            <p class="text-muted small mb-0">{{ market.location }}</p>
+          </div>
+        </div>
+        
+        <div class="row g-3 text-center mb-4">
+          <div class="col-4">
+            <div class="bg-light rounded p-2">
+              <h6 class="fw-bold mb-0">{{ market.product_count }}</h6>
+              <small class="text-muted">Products</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-light rounded p-2">
+              <h6 class="fw-bold mb-0">{{ market.vendor_count }}</h6>
+              <small class="text-muted">Vendors</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-light rounded p-2">
+              {% if market.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+        <p class="text-muted small">{{ market.description|truncatechars:100|default:"No description available." }}</p>
+        
+        {% if market.opening_hours %}
+        <div class="small text-muted mb-2">
+          <i class="bi bi-clock me-1"></i> {{ market.opening_hours }}
+        </div>
+        {% endif %}
+      </div>
+      
+      <div class="card-footer bg-white">
+        <div class="d-flex gap-2">
+          <a href="{% url 'admin_market_detail' market.id %}" class="btn btn-outline-primary flex-grow-1">
+            <i class="bi bi-eye me-2"></i> View Details
+          </a>
+          <a href="{% url 'admin_market_update' market.id %}" class="btn btn-outline-secondary" title="Edit">
+            <i class="bi bi-pencil"></i>
+          </a>
+          <a href="{% url 'admin_market_delete' market.id %}" class="btn btn-outline-danger" title="Delete">
+            <i class="bi bi-trash"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-geo-alt text-muted" style="font-size: 3rem;"></i>
+  <h3 class="fw-bold mt-3">No Markets Found</h3>
+  <p class="text-muted">{{ search|yesno:"No markets match your search criteria.,Markets will appear here once they are added to the system." }}</p>
+  <a href="{% url 'admin_market_create' %}" class="btn btn-primary mt-3">
+    <i class="bi bi-plus-circle me-2"></i> Add Your First Market
+  </a>
+</div>
+{% endif %}
+
+<!-- Pagination Controls -->
+{% if page_obj.paginator.num_pages > 1 %}
+<div class="d-flex justify-content-center mt-5">
+  <nav aria-label="Markets pagination">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% for i in page_obj.paginator.page_range %}
+        {% if page_obj.number == i %}
+          <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+        {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ i }}{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ i }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if limit %}&limit={{ limit }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endif %}
+
+<!-- Items Per Page Selector -->
+<div class="d-flex justify-content-end mt-3">
+  <div class="btn-group btn-group-sm" role="group" aria-label="Items per page">
+    <a href="?page=1{% if search %}&search={{ search }}{% endif %}&limit=5{% if sort %}&sort={{ sort }}{% endif %}" class="btn {% if limit == 5 %}btn-primary{% else %}btn-outline-primary{% endif %}">5</a>
+    <a href="?page=1{% if search %}&search={{ search }}{% endif %}&limit=10{% if sort %}&sort={{ sort }}{% endif %}" class="btn {% if limit == 10 %}btn-primary{% else %}btn-outline-primary{% endif %}">10</a>
+    <a href="?page=1{% if search %}&search={{ search }}{% endif %}&limit=25{% if sort %}&sort={{ sort }}{% endif %}" class="btn {% if limit == 25 %}btn-primary{% else %}btn-outline-primary{% endif %}">25</a>
+  </div>
+</div>
+{% endblock %}

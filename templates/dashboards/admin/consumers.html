@@ -1,0 +1,129 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Consumers - MarketLens Admin{% endblock %}
+
+{% block page_title %}Consumer Management{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item active" aria-current="page">Consumers</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h2 fw-bold mb-2">Consumer Management</h1>
+    <p class="text-muted">Manage all shoppers on the platform</p>
+  </div>
+  <div>
+    <span class="badge bg-success fs-6 p-2">{{ total_count }} Total Shoppers</span>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" class="row g-3">
+      <div class="col-md-10">
+        <label class="form-label">Search Consumers</label>
+        <input type="text" name="search" class="form-control" placeholder="Search by name, email, or username..." value="{{ search }}">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-search me-2"></i> Search
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Consumers Grid -->
+{% if consumers %}
+<div class="row g-4">
+  {% for consumer in consumers %}
+  <div class="col-xl-3 col-lg-4 col-md-6">
+    <div class="card h-100 consumer-card">
+      <div class="card-body text-center">
+        <!-- Profile Image with better styling -->
+        <div class="position-relative d-inline-block mb-3">
+          {% if consumer.profile_picture %}
+          <img src="{{ consumer.profile_picture }}" alt="{{ consumer.first_name|default:consumer.username }}" 
+               class="rounded-circle img-fluid border border-3" 
+               style="width: 100px; height: 100px; object-fit: cover; border-color: var(--color-accent) !important;">
+          {% else %}
+          <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+               style="width: 100px; height: 100px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent));">
+            <span class="fw-bold text-white" style="font-size: 2.5rem;">
+              {{ consumer.first_name|first|default:consumer.username|first|upper }}
+            </span>
+          </div>
+          {% endif %}
+          
+          <!-- Active Status Indicator -->
+          {% if consumer.is_active %}
+          <span class="position-absolute bottom-0 end-0 translate-middle p-1 bg-success border border-light rounded-circle" 
+                style="width: 16px; height: 16px;" title="Active"></span>
+          {% else %}
+          <span class="position-absolute bottom-0 end-0 translate-middle p-1 bg-secondary border border-light rounded-circle" 
+                style="width: 16px; height: 16px;" title="Inactive"></span>
+          {% endif %}
+        </div>
+        
+        <h5 class="fw-bold mb-1">{{ consumer.first_name|default:consumer.username }} {{ consumer.last_name }}</h5>
+        <p class="text-muted small mb-3">{{ consumer.email }}</p>
+        
+        <div class="d-flex justify-content-center gap-2 mb-3">
+          <span class="badge bg-success">Consumer</span>
+          {% if consumer.is_active %}
+          <span class="badge bg-success">Active</span>
+          {% else %}
+          <span class="badge bg-danger">Inactive</span>
+          {% endif %}
+        </div>
+        
+        <div class="text-start small mb-3">
+          <p class="mb-2">
+            <i class="bi bi-calendar me-2"></i> 
+            Joined: {{ consumer.date_joined|date:"M d, Y" }}
+          </p>
+          <p class="mb-2">
+            <i class="bi bi-clock me-2"></i> 
+            Last Login: {{ consumer.last_login|timesince|default:"Never" }} ago
+          </p>
+        </div>
+        
+        <div class="d-grid gap-2">
+          <a href="{% url 'admin_user_detail' consumer.id %}" class="btn btn-outline-primary">
+            <i class="bi bi-eye me-2"></i> View Profile
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+  <h3 class="fw-bold mt-3">No Consumers Found</h3>
+  <p class="text-muted">There are no consumers matching your search criteria.</p>
+</div>
+{% endif %}
+
+<style>
+  .consumer-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--color-border);
+  }
+  
+  .consumer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .position-relative .position-absolute {
+    transform: translate(25%, 25%);
+  }
+</style>
+{% endblock %}

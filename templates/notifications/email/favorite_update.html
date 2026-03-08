@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 40px 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .product-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .price-change {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #4DA8DA;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⭐ Favorite Product Update</h1>
+        </div>
+        
+        <div class="content">
+            <h2>Hello {{ user.first_name|default:user.username }}!</h2>
+            
+            <p>One of your favorite products has been updated:</p>
+            
+            <div class="product-card">
+                <h3 style="margin-top: 0;">{{ related_object.product.product.name }}</h3>
+                
+                <div class="price-change">
+                    <div>
+                        <div style="color: #6c757d;">Previous Price</div>
+                        <div style="text-decoration: line-through;">₦{{ related_object.product.price|add:100 }}</div>
+                    </div>
+                    <div>
+                        <div style="color: #6c757d;">New Price</div>
+                        <div style="color: #28a745; font-size: 24px; font-weight: 700;">₦{{ related_object.product.price }}</div>
+                    </div>
+                </div>
+                
+                <p>
+                    <strong>Market:</strong> {{ related_object.product.market.name }}<br>
+                    <strong>Vendor:</strong> {{ related_object.product.vendor.user.get_full_name|default:related_object.product.vendor.user.username }}
+                </p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{ site_url }}{% url 'product_detail' related_object.product.id %}" class="button">
+                    View Product
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {% now "Y" %} MarketLens. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

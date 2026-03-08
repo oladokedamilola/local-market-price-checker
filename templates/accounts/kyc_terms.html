@@ -1,0 +1,732 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}KYC Verification Terms - MarketLens{% endblock %}
+
+{% block extra_head %}
+<style>
+  .terms-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+  
+  .terms-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .terms-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+  }
+  
+  .terms-header p {
+    color: var(--color-muted);
+    font-size: 1.1rem;
+  }
+  
+  .last-updated {
+    display: inline-block;
+    background: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    margin-top: 1rem;
+  }
+  
+  .terms-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .terms-section {
+    margin-bottom: 2.5rem;
+  }
+  
+  .terms-section:last-child {
+    margin-bottom: 0;
+  }
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-border);
+  }
+  
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(77, 168, 218, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    font-size: 1.2rem;
+  }
+  
+  .section-title h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0;
+  }
+  
+  .highlight-box {
+    background: #f8f9fa;
+    border-left: 4px solid var(--color-accent);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin: 1.5rem 0;
+  }
+  
+  .highlight-box p:last-child {
+    margin-bottom: 0;
+  }
+  
+  .terms-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .terms-list li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .terms-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .list-icon {
+    color: var(--color-accent);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+  
+  .badge-required {
+    background: var(--color-danger);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    margin-left: 0.5rem;
+    text-transform: uppercase;
+  }
+  
+  .badge-optional {
+    background: var(--color-muted);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    margin-left: 0.5rem;
+    text-transform: uppercase;
+  }
+  
+  .document-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  
+  .document-card {
+    background: #f8f9fa;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+  
+  .document-card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .document-icon {
+    font-size: 2rem;
+    color: var(--color-accent);
+    margin-bottom: 1rem;
+  }
+  
+  .document-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .document-card p {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin: 0;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  
+  .info-item {
+    background: #f8f9fa;
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+  
+  .info-label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+  
+  .info-value {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  
+  .timeline-steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    position: relative;
+  }
+  
+  .timeline-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e0e0e0;
+    z-index: 1;
+  }
+  
+  .timeline-step {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    background: white;
+    padding: 0 0.5rem;
+  }
+  
+  .step-circle {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+  
+  .timeline-step.active .step-circle {
+    background: var(--color-accent);
+    color: white;
+  }
+  
+  .step-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  .step-time {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+  
+  .terms-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+  
+  .btn-agree {
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+  }
+  
+  .btn-agree:hover {
+    background: #3b94c7;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .btn-agree:active {
+    transform: translateY(0);
+  }
+  
+  .security-badges {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .security-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+  
+  .security-badge i {
+    color: var(--color-success);
+    font-size: 1.2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .terms-container {
+      padding: 1rem;
+    }
+    
+    .terms-card {
+      padding: 1.5rem;
+    }
+    
+    .timeline-steps {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .timeline-steps::before {
+      display: none;
+    }
+    
+    .timeline-step {
+      display: flex;
+      align-items: center;
+      text-align: left;
+      gap: 1rem;
+    }
+    
+    .step-circle {
+      margin: 0;
+    }
+    
+    .document-types {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="terms-container">
+  <!-- Header -->
+  <div class="terms-header">
+    <h1>KYC Verification Terms</h1>
+    <p>Please read these terms carefully before submitting your KYC documents</p>
+    <div class="last-updated">
+      <i class="bi bi-clock me-2"></i>Last Updated: March 7, 2025
+    </div>
+  </div>
+
+  <!-- Main Terms Card -->
+  <div class="terms-card">
+    <!-- Section 1: Purpose -->
+    <div class="terms-section">
+      <div class="section-title">
+        <div class="section-icon">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <h2>1. Purpose of KYC Verification</h2>
+      </div>
+      
+      <div class="highlight-box">
+        <p class="fw-bold mb-2">Why we need your information:</p>
+        <p class="mb-0">
+          KYC (Know Your Customer) verification helps us maintain marketplace integrity, 
+          prevent fraud, and build trust between vendors and shoppers. By verifying your identity, 
+          you're showing customers that you're a legitimate business owner.
+        </p>
+      </div>
+      
+      <ul class="terms-list">
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>Verify your identity</strong> - Confirm you are a real person and legitimate business owner
+          </div>
+        </li>
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>Prevent fraudulent activities</strong> - Protect shoppers from scams and fake vendors
+          </div>
+        </li>
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>Build trust</strong> - Display a verified badge on your vendor profile
+          </div>
+        </li>
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>Comply with regulations</strong> - Meet legal requirements for online marketplaces
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Section 2: Accepted Documents -->
+    <div class="terms-section">
+      <div class="section-title">
+        <div class="section-icon">
+          <i class="bi bi-file-earmark-text"></i>
+        </div>
+        <h2>2. Accepted Documents</h2>
+      </div>
+      
+      <p class="mb-4">We accept the following government-issued identification documents:</p>
+      
+      <div class="document-types">
+        <div class="document-card">
+          <div class="document-icon">
+            <i class="bi bi-card-heading"></i>
+          </div>
+          <h4>National Identification Number (NIN)</h4>
+          <p>Nigerian National ID Card</p>
+        </div>
+        
+        <div class="document-card">
+          <div class="document-icon">
+            <i class="bi bi-bank"></i>
+          </div>
+          <h4>Bank Verification Number (BVN)</h4>
+          <p>Central Bank of Nigeria</p>
+        </div>
+        
+        <div class="document-card">
+          <div class="document-icon">
+            <i class="bi bi-passport"></i>
+          </div>
+          <h4>Government Issued ID</h4>
+          <p>Driver's License, Voter's Card, International Passport</p>
+        </div>
+      </div>
+      
+      <div class="alert alert-info bg-light border-0 mt-3">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Note:</strong> All documents must be valid and not expired. We only accept clear, 
+        legible copies where all information is visible.
+      </div>
+    </div>
+
+    <!-- Section 3: Document Requirements -->
+    <div class="terms-section">
+      <div class="section-title">
+        <div class="section-icon">
+          <i class="bi bi-camera"></i>
+        </div>
+        <h2>3. Document Requirements</h2>
+      </div>
+      
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <div class="info-item">
+            <div class="info-label">File Format</div>
+            <div class="info-value">JPG, PNG, PDF</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="info-item">
+            <div class="info-label">Maximum File Size</div>
+            <div class="info-value">5MB per document</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="info-item">
+            <div class="info-label">Image Quality</div>
+            <div class="info-value">Clear, well-lit, no blur</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="info-item">
+            <div class="info-label">Document Condition</div>
+            <div class="info-value">Valid, not expired</div>
+          </div>
+        </div>
+      </div>
+      
+      <ul class="terms-list">
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>All four corners</strong> of the document must be visible
+          </div>
+        </li>
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>No glare or reflections</strong> that obscure important information
+          </div>
+        </li>
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>Text must be readable</strong> - name, document number, and expiration date
+          </div>
+        </li>
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>No alterations or edits</strong> to the document image
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Section 4: Verification Process -->
+    <div class="terms-section">
+      <div class="section-title">
+        <div class="section-icon">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+        <h2>4. Verification Process</h2>
+      </div>
+      
+      <div class="timeline-steps">
+        <div class="timeline-step">
+          <div class="step-circle">1</div>
+          <div>
+            <div class="step-label">Submit Documents</div>
+            <div class="step-time">Immediate</div>
+          </div>
+        </div>
+        <div class="timeline-step active">
+          <div class="step-circle">2</div>
+          <div>
+            <div class="step-label">Under Review</div>
+            <div class="step-time">24-48 hours</div>
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="step-circle">3</div>
+          <div>
+            <div class="step-label">Verification Complete</div>
+            <div class="step-time">Notification sent</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="highlight-box">
+        <p class="fw-bold mb-2">What happens after submission:</p>
+        <ol class="mb-0">
+          <li class="mb-2">Your documents are encrypted and securely stored</li>
+          <li class="mb-2">Our verification team reviews your documents (24-48 hours)</li>
+          <li class="mb-2">You receive an email and in-app notification with the result</li>
+          <li class="mb-0">If approved, your vendor account is activated and you can start listing products</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Section 5: Privacy & Data Protection -->
+    <div class="terms-section">
+      <div class="section-title">
+        <div class="section-icon">
+          <i class="bi bi-shield-lock"></i>
+        </div>
+        <h2>5. Privacy & Data Protection</h2>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Encryption</div>
+          <div class="info-value">256-bit AES encryption</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Data Retention</div>
+          <div class="info-value">Securely stored for compliance</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Access</div>
+          <div class="info-value">Only authorized staff</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Sharing</div>
+          <div class="info-value">Never shared with third parties</div>
+        </div>
+      </div>
+      
+      <p class="mb-3">
+        We take your privacy seriously. Here's how we protect your information:
+      </p>
+      
+      <ul class="terms-list">
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>Encryption</strong> - All documents are encrypted before storage
+          </div>
+        </li>
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>Limited access</strong> - Only authorized personnel can view your documents
+          </div>
+        </li>
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>No sharing</strong> - We never share your documents with third parties
+          </div>
+        </li>
+        <li>
+          <i class="bi bi-check-circle-fill list-icon"></i>
+          <div>
+            <strong>Secure deletion</strong> - Documents are permanently deleted when no longer needed
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Section 6: Verification Outcomes -->
+    <div class="terms-section">
+      <div class="section-title">
+        <div class="section-icon">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+        <h2>6. Verification Outcomes</h2>
+      </div>
+      
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card h-100 border-0 bg-light">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-check-circle-fill text-success fs-2 me-3"></i>
+                <h5 class="fw-bold mb-0">Approved</h5>
+              </div>
+              <ul class="small mb-0">
+                <li class="mb-2">✓ Verified badge on your profile</li>
+                <li class="mb-2">✓ Can start listing products</li>
+                <li class="mb-2">✓ Access to all vendor features</li>
+                <li class="mb-0">✓ Increased customer trust</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="card h-100 border-0 bg-light">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-x-circle-fill text-danger fs-2 me-3"></i>
+                <h5 class="fw-bold mb-0">Rejected</h5>
+              </div>
+              <ul class="small mb-0">
+                <li class="mb-2">✗ You'll receive the reason for rejection</li>
+                <li class="mb-2">✗ Can resubmit with corrected documents</li>
+                <li class="mb-2">✗ Previous documents are deleted</li>
+                <li class="mb-0">✗ Support available to help</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 7: Terms Agreement -->
+    <div class="terms-section">
+      <div class="section-title">
+        <div class="section-icon">
+          <i class="bi bi-file-check"></i>
+        </div>
+        <h2>7. Terms Agreement</h2>
+      </div>
+      
+      <div class="highlight-box">
+        <p class="fw-bold mb-3">By submitting your KYC documents, you agree that:</p>
+        <ol class="mb-0">
+          <li class="mb-2">All information provided is accurate and truthful</li>
+          <li class="mb-2">The documents belong to you and are not fraudulent</li>
+          <li class="mb-2">You authorize us to verify the information with relevant authorities</li>
+          <li class="mb-2">We may store your documents for compliance purposes</li>
+          <li class="mb-2">Providing false information may result in permanent account suspension</li>
+          <li class="mb-0">You have read and understood these terms</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Agreement Button -->
+  <div class="terms-footer">
+    <button class="btn-agree" onclick="window.close()" id="agreeButton">
+      <i class="bi bi-check-circle me-2"></i>I Agree to These Terms
+    </button>
+    
+    <p class="text-muted small mb-4">
+      By clicking "I Agree", you confirm that you have read, understood, and agree to be bound by these KYC Verification Terms.
+    </p>
+    
+    <div class="security-badges">
+      <div class="security-badge">
+        <i class="bi bi-shield-check"></i>
+        <span>256-bit Encryption</span>
+      </div>
+      <div class="security-badge">
+        <i class="bi bi-lock"></i>
+        <span>Secure Storage</span>
+      </div>
+      <div class="security-badge">
+        <i class="bi bi-eye-slash"></i>
+        <span>Privacy Protected</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const agreeButton = document.getElementById('agreeButton');
+    
+    // If this page was opened in a modal/popup, we can close it
+    if (window.opener) {
+      agreeButton.addEventListener('click', function() {
+        window.close();
+      });
+    } else {
+      // If opened as a regular page, provide a back button
+      agreeButton.innerHTML = '<i class="bi bi-arrow-left me-2"></i>Go Back';
+      agreeButton.onclick = function() {
+        window.history.back();
+      };
+    }
+  });
+</script>
+{% endblock %}

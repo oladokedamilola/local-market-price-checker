@@ -1,0 +1,110 @@
+{% load account %}{% load static %}{% user_display user as user_display %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #1E2A38, #2C3E50);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 40px 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #4DA8DA;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        .button:hover {
+            background-color: #3b94c7;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .info-box {
+            background: white;
+            border-left: 4px solid #4DA8DA;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .site-name {
+            color: #4DA8DA;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Account Already Exists</h1>
+        </div>
+        
+        <div class="content">
+            <p>Hello,</p>
+            
+            <p>You are receiving this email because you or someone else tried to sign up for a <span class="site-name">MarketLens</span> account using this email address:</p>
+            
+            <div class="info-box">
+                <p style="font-size: 18px; font-weight: 600; margin: 0;">{{ email }}</p>
+            </div>
+            
+            <p>However, an account using this email address already exists in our system.</p>
+            
+            <p>If you've forgotten your password, you can reset it using the link below:</p>
+            
+            <div style="text-align: center;">
+                <a href="{{ password_reset_url }}" class="button">
+                    Reset Your Password
+                </a>
+            </div>
+            
+            <p style="margin-top: 30px;">If this wasn't you, you can safely ignore this email — no action is needed.</p>
+            
+            <hr style="border: none; border-top: 1px solid #dee2e6; margin: 30px 0;">
+            
+            <p style="font-size: 14px; color: #6c757d;">
+                Need help? Contact our support team at 
+                <a href="mailto:support@marketlens.com" style="color: #4DA8DA;">support@marketlens.com</a>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {% now "Y" %} MarketLens. All rights reserved.</p>
+            <p>Alimosho Local Government • Lagos, Nigeria</p>
+        </div>
+    </div>
+</body>
+</html>

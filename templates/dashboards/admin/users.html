@@ -1,0 +1,172 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}User Management - MarketLens Admin{% endblock %}
+
+{% block page_title %}User Management{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item active" aria-current="page">Users</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h2 fw-bold mb-2">User Management</h1>
+    <p class="text-muted">Manage all users on the platform</p>
+  </div>
+  <div>
+    <span class="badge bg-primary fs-6 p-2">{{ total_count }} Total Users</span>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">User Role</label>
+        <select name="role" class="form-select">
+          <option value="all" {% if current_role == 'all' %}selected{% endif %}>All Users</option>
+          <option value="vendors" {% if current_role == 'vendors' %}selected{% endif %}>Vendors</option>
+          <option value="consumers" {% if current_role == 'consumers' %}selected{% endif %}>Consumers</option>
+          <option value="admins" {% if current_role == 'admins' %}selected{% endif %}>Admins</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Search</label>
+        <input type="text" name="search" class="form-control" placeholder="Search by name, email, username..." value="{{ search }}">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-search me-2"></i> Apply Filters
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Users Table -->
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>KYC</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <!-- User Avatar with Profile Picture -->
+                <div class="me-3 position-relative">
+                  {% if user.profile_picture %}
+                  <img src="{{ user.profile_picture }}" alt="{{ user.first_name|default:user.username }}" 
+                       class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">
+                  {% elif user.vendor_profile and user.vendor_profile.user.profile.profile_picture %}
+                  <img src="{{ user.vendor_profile.user.profile.profile_picture.url }}" 
+                       alt="{{ user.first_name|default:user.username }}" 
+                       class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">
+                  {% elif user.consumer_profile and user.consumer_profile.user.profile.profile_picture %}
+                  <img src="{{ user.consumer_profile.user.profile.profile_picture.url }}" 
+                       alt="{{ user.first_name|default:user.username }}" 
+                       class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">
+                  {% else %}
+                  <div class="rounded-circle d-flex align-items-center justify-content-center bg-light" 
+                       style="width: 48px; height: 48px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent));">
+                    <span class="fw-bold text-white">
+                      {{ user.first_name|first|default:user.username|first|upper }}
+                    </span>
+                  </div>
+                  {% endif %}
+                  
+                  <!-- Online/Active Status Indicator -->
+                  {% if user.is_active %}
+                  <span class="position-absolute bottom-0 end-0 translate-middle p-1 bg-success border border-light rounded-circle" style="width: 12px; height: 12px;"></span>
+                  {% else %}
+                  <span class="position-absolute bottom-0 end-0 translate-middle p-1 bg-secondary border border-light rounded-circle" style="width: 12px; height: 12px;"></span>
+                  {% endif %}
+                </div>
+                
+                <div>
+                  <strong>{{ user.first_name|default:user.username }} {{ user.last_name }}</strong>
+                  <br>
+                  <small class="text-muted">{{ user.email }}</small>
+                  {% if user.business_name %}
+                  <br>
+                  <small class="text-muted"><i class="bi bi-shop me-1"></i>{{ user.business_name }}</small>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if user.is_staff %}
+              <span class="badge bg-danger">{{ user.role_display }}</span>
+              {% elif 'VENDOR' in user.groups %}
+              <span class="badge bg-primary">{{ user.role_display }}</span>
+              {% elif 'CONSUMER' in user.groups %}
+              <span class="badge bg-success">{{ user.role_display }}</span>
+              {% elif not user.is_active %}
+              <span class="badge bg-secondary">{{ user.role_display }}</span>
+              {% else %}
+              <span class="badge bg-secondary">{{ user.role_display }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if user.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+            </td>
+            <td><small>{{ user.date_joined|date:"M d, Y" }}</small></td>
+            <td>
+              {% if 'VENDOR' in user.groups %}
+                {% if user.kyc_status %}
+                  {% if user.kyc_status.is_approved %}
+                  <span class="badge bg-success">Verified</span>
+                  {% else %}
+                  <span class="badge bg-warning">Pending</span>
+                  {% endif %}
+                {% else %}
+                <span class="badge bg-secondary">Not Submitted</span>
+                {% endif %}
+              {% else %}
+              <span class="badge bg-secondary">N/A</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'admin_user_detail' user.id %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-eye me-1"></i> View
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4">
+              <i class="bi bi-people fs-1 text-muted d-block mb-3"></i>
+              <p class="text-muted">No users found matching your criteria.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<style>
+  .position-relative .position-absolute {
+    transform: translate(25%, 25%);
+  }
+</style>
+{% endblock %}

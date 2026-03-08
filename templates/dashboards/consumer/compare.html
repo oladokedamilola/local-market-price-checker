@@ -1,0 +1,635 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Compare Products - MarketLens{% endblock %}
+
+{% block extra_head %}
+<style>
+  .compare-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 0;
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+  }
+  
+  .product-column {
+    background: white;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    height: 100%;
+    position: relative;
+  }
+  
+  .product-column.featured {
+    border: 2px solid var(--color-accent);
+    box-shadow: 0 0 20px rgba(77, 168, 218, 0.1);
+    transform: scale(1.02);
+  }
+  
+  .remove-product {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--color-danger);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .product-image-compare {
+    width: 100%;
+    height: 150px;
+    background: #f8f9fa;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    color: var(--color-muted);
+  }
+  
+  .price-big {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin: 1rem 0;
+  }
+  
+  .price-difference {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+  }
+  
+  .price-difference.cheapest {
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--color-success);
+  }
+  
+  .price-difference.expensive {
+    background: rgba(230, 57, 70, 0.1);
+    color: var(--color-danger);
+  }
+  
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .spec-row:last-child {
+    border-bottom: none;
+  }
+  
+  .spec-label {
+    color: var(--color-muted);
+    font-weight: 500;
+  }
+  
+  .spec-value {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  
+  .winner-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-success);
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 1;
+  }
+  
+  .compare-table {
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .table-header {
+    background: var(--color-primary);
+    color: white;
+    padding: 1rem;
+  }
+  
+  .table-cell {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .table-cell.highlight {
+    background: rgba(77, 168, 218, 0.05);
+  }
+  
+  @media (max-width: 768px) {
+    .compare-table {
+      overflow-x: auto;
+    }
+    
+    .price-big {
+      font-size: 1.5rem;
+    }
+    
+    .product-column {
+      margin-bottom: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}Compare Products{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'search' %}">Search</a></li>
+<li class="breadcrumb-item active">Compare</li>
+{% endblock %}
+
+{% block content %}
+<div class="compare-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="fw-bold mb-3">Compare Products</h1>
+        <p class="lead mb-0 opacity-75">
+          Side-by-side comparison to help you make the best buying decision
+        </p>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <a href="{% url 'search' %}" class="btn btn-light">
+          <i class="bi bi-plus-circle me-2"></i> Add More Products
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Comparison Cards View -->
+  <div class="row mb-5 d-none d-lg-flex">
+    <!-- Product 1 -->
+    <div class="col">
+      <div class="product-column featured">
+        <span class="winner-badge">Best Value</span>
+        <button class="remove-product" data-product="1">
+          <i class="bi bi-x"></i>
+        </button>
+        <div class="product-image-compare">
+          <i class="bi bi-basket fs-1"></i>
+        </div>
+        <h4 class="fw-bold mb-2">Rice (10kg) - Royal Stallion</h4>
+        <div class="price-big">₦38,500</div>
+        <div class="price-difference cheapest">
+          <i class="bi bi-check-circle me-1"></i> ₦700 cheaper than average
+        </div>
+        
+        <div class="specifications mt-4">
+          <div class="spec-row">
+            <span class="spec-label">Vendor</span>
+            <span class="spec-value">Quality Foods Store</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Market</span>
+            <span class="spec-value">Ikotun Market</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Rating</span>
+            <span class="spec-value">
+              <i class="bi bi-star-fill text-warning"></i> 4.8/5
+            </span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Stock</span>
+            <span class="spec-value text-success">In Stock</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Delivery</span>
+            <span class="spec-value">Available</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Last Updated</span>
+            <span class="spec-value">2 hours ago</span>
+          </div>
+        </div>
+        
+        <div class="d-grid gap-2 mt-4">
+          <a href="{% url 'product_detail' 1 %}" class="btn btn-primary">
+            View Details
+          </a>
+          <button class="btn btn-outline-success">
+            <i class="bi bi-cart me-2"></i> Add to Cart
+          </button>
+          <button class="btn btn-link text-primary p-0">
+            <i class="bi bi-star me-1"></i> Save for later
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Product 2 -->
+    <div class="col">
+      <div class="product-column">
+        <button class="remove-product" data-product="2">
+          <i class="bi bi-x"></i>
+        </button>
+        <div class="product-image-compare">
+          <i class="bi bi-basket fs-1"></i>
+        </div>
+        <h4 class="fw-bold mb-2">Rice (10kg) - Mama Gold</h4>
+        <div class="price-big">₦37,800</div>
+        <div class="price-difference cheapest">
+          <i class="bi bi-check-circle me-1"></i> ₦1,400 cheaper than average
+        </div>
+        
+        <div class="specifications mt-4">
+          <div class="spec-row">
+            <span class="spec-label">Vendor</span>
+            <span class="spec-value">Fresh Farm Mart</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Market</span>
+            <span class="spec-value">Egbeda Market</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Rating</span>
+            <span class="spec-value">
+              <i class="bi bi-star-fill text-warning"></i> 4.6/5
+            </span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Stock</span>
+            <span class="spec-value text-success">In Stock</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Delivery</span>
+            <span class="spec-value">Not Available</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Last Updated</span>
+            <span class="spec-value">5 hours ago</span>
+          </div>
+        </div>
+        
+        <div class="d-grid gap-2 mt-4">
+          <a href="{% url 'product_detail' 2 %}" class="btn btn-primary">
+            View Details
+          </a>
+          <button class="btn btn-outline-success">
+            <i class="bi bi-cart me-2"></i> Add to Cart
+          </button>
+          <button class="btn btn-link text-primary p-0">
+            <i class="bi bi-star me-1"></i> Save for later
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Product 3 -->
+    <div class="col">
+      <div class="product-column">
+        <button class="remove-product" data-product="3">
+          <i class="bi bi-x"></i>
+        </button>
+        <div class="product-image-compare">
+          <i class="bi bi-basket fs-1"></i>
+        </div>
+        <h4 class="fw-bold mb-2">Rice (10kg) - Rice Master</h4>
+        <div class="price-big">₦39,200</div>
+        <div class="price-difference expensive">
+          <i class="bi bi-exclamation-circle me-1"></i> ₦700 more expensive than average
+        </div>
+        
+        <div class="specifications mt-4">
+          <div class="spec-row">
+            <span class="spec-label">Vendor</span>
+            <span class="spec-value">Premium Foods</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Market</span>
+            <span class="spec-value">Igando Market</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Rating</span>
+            <span class="spec-value">
+              <i class="bi bi-star-fill text-warning"></i> 4.9/5
+            </span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Stock</span>
+            <span class="spec-value text-warning">Low Stock</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Delivery</span>
+            <span class="spec-value">Available</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Last Updated</span>
+            <span class="spec-value">1 day ago</span>
+          </div>
+        </div>
+        
+        <div class="d-grid gap-2 mt-4">
+          <a href="{% url 'product_detail' 3 %}" class="btn btn-primary">
+            View Details
+          </a>
+          <button class="btn btn-outline-success">
+            <i class="bi bi-cart me-2"></i> Add to Cart
+          </button>
+          <button class="btn btn-link text-primary p-0">
+            <i class="bi bi-star me-1"></i> Save for later
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Comparison Table (Mobile & Desktop) -->
+  <div class="compare-table mb-5">
+    <div class="table-header">
+      <h5 class="fw-bold mb-0">Detailed Comparison</h5>
+    </div>
+    
+    <div class="table-row">
+      <div class="table-cell" style="width: 200px; background: #f8f9fa;">
+        <strong>Product</strong>
+      </div>
+      <div class="table-cell highlight text-center">
+        <strong>Royal Stallion</strong>
+      </div>
+      <div class="table-cell text-center">
+        <strong>Mama Gold</strong>
+      </div>
+      <div class="table-cell text-center">
+        <strong>Rice Master</strong>
+      </div>
+    </div>
+    
+    <div class="table-row">
+      <div class="table-cell" style="background: #f8f9fa;">
+        <strong>Price</strong>
+      </div>
+      <div class="table-cell highlight text-center">
+        <div class="fw-bold text-success">₦38,500</div>
+        <small class="text-muted">Best Value</small>
+      </div>
+      <div class="table-cell text-center">
+        <div class="fw-bold">₦37,800</div>
+        <small class="text-muted">Cheapest</small>
+      </div>
+      <div class="table-cell text-center">
+        <div class="fw-bold text-danger">₦39,200</div>
+        <small class="text-muted">Most Expensive</small>
+      </div>
+    </div>
+    
+    <div class="table-row">
+      <div class="table-cell" style="background: #f8f9fa;">
+        <strong>Brand</strong>
+      </div>
+      <div class="table-cell highlight text-center">
+        Royal Stallion
+      </div>
+      <div class="table-cell text-center">
+        Mama Gold
+      </div>
+      <div class="table-cell text-center">
+        Rice Master
+      </div>
+    </div>
+    
+    <div class="table-row">
+      <div class="table-cell" style="background: #f8f9fa;">
+        <strong>Market</strong>
+      </div>
+      <div class="table-cell highlight text-center">
+        Ikotun Market
+      </div>
+      <div class="table-cell text-center">
+        Egbeda Market
+      </div>
+      <div class="table-cell text-center">
+        Igando Market
+      </div>
+    </div>
+    
+    <div class="table-row">
+      <div class="table-cell" style="background: #f8f9fa;">
+        <strong>Vendor Rating</strong>
+      </div>
+      <div class="table-cell highlight text-center">
+        <i class="bi bi-star-fill text-warning"></i> 4.8/5
+      </div>
+      <div class="table-cell text-center">
+        <i class="bi bi-star-fill text-warning"></i> 4.6/5
+      </div>
+      <div class="table-cell text-center">
+        <i class="bi bi-star-fill text-warning"></i> 4.9/5
+      </div>
+    </div>
+    
+    <div class="table-row">
+      <div class="table-cell" style="background: #f8f9fa;">
+        <strong>Stock Status</strong>
+      </div>
+      <div class="table-cell highlight text-center">
+        <span class="badge bg-success">In Stock</span>
+      </div>
+      <div class="table-cell text-center">
+        <span class="badge bg-success">In Stock</span>
+      </div>
+      <div class="table-cell text-center">
+        <span class="badge bg-warning">Low Stock</span>
+      </div>
+    </div>
+    
+    <div class="table-row">
+      <div class="table-cell" style="background: #f8f9fa;">
+        <strong>Delivery</strong>
+      </div>
+      <div class="table-cell highlight text-center">
+        <span class="badge bg-primary">Available</span>
+      </div>
+      <div class="table-cell text-center">
+        <span class="badge bg-secondary">Not Available</span>
+      </div>
+      <div class="table-cell text-center">
+        <span class="badge bg-primary">Available</span>
+      </div>
+    </div>
+    
+    <div class="table-row">
+      <div class="table-cell" style="background: #f8f9fa;">
+        <strong>Last Price Update</strong>
+      </div>
+      <div class="table-cell highlight text-center">
+        2 hours ago
+      </div>
+      <div class="table-cell text-center">
+        5 hours ago
+      </div>
+      <div class="table-cell text-center">
+        1 day ago
+      </div>
+    </div>
+    
+    <div class="table-row">
+      <div class="table-cell" style="background: #f8f9fa;">
+        <strong>Actions</strong>
+      </div>
+      <div class="table-cell highlight text-center">
+        <button class="btn btn-sm btn-primary">
+          <i class="bi bi-eye"></i> View
+        </button>
+      </div>
+      <div class="table-cell text-center">
+        <button class="btn btn-sm btn-primary">
+          <i class="bi bi-eye"></i> View
+        </button>
+      </div>
+      <div class="table-cell text-center">
+        <button class="btn btn-sm btn-primary">
+          <i class="bi bi-eye"></i> View
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Insights Section -->
+  <div class="card shadow-soft border-0 mb-5">
+    <div class="card-header bg-transparent border-0 py-3">
+      <h5 class="fw-bold mb-0">Comparison Insights</h5>
+    </div>
+    <div class="card-body p-4">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="text-center">
+            <div class="display-6 fw-bold text-success mb-2">₦1,400</div>
+            <p class="text-muted mb-0">Price difference between highest and lowest</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="text-center">
+            <div class="display-6 fw-bold text-primary mb-2">4.8/5</div>
+            <p class="text-muted mb-0">Average vendor rating across all options</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="text-center">
+            <div class="display-6 fw-bold text-warning mb-2">3</div>
+            <p class="text-muted mb-0">Different markets covered</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="alert alert-info">
+        <div class="d-flex">
+          <i class="bi bi-lightbulb fs-4 me-3"></i>
+          <div>
+            <h6 class="alert-heading mb-2">Our Recommendation</h6>
+            <p class="mb-0">
+              Based on price, vendor reputation, and availability, we recommend 
+              <strong>Mama Gold Rice at ₦37,800</strong> from Fresh Farm Mart. 
+              It offers the best value for money while maintaining good quality.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Actions -->
+  <div class="text-center">
+    <a href="{% url 'search' %}" class="btn btn-outline-primary me-3">
+      <i class="bi bi-search me-2"></i> Search More Products
+    </a>
+    <button class="btn btn-primary" id="saveComparison">
+      <i class="bi bi-download me-2"></i> Save This Comparison
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Remove product from comparison
+    const removeButtons = document.querySelectorAll('.remove-product');
+    removeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const productId = this.getAttribute('data-product');
+        if (confirm('Remove this product from comparison?')) {
+          // In real implementation, remove via AJAX
+          const column = this.closest('.product-column');
+          column.style.opacity = '0.5';
+          setTimeout(() => {
+            column.style.display = 'none';
+            updateComparison();
+          }, 300);
+        }
+      });
+    });
+    
+    function updateComparison() {
+      const visibleProducts = document.querySelectorAll('.product-column:not([style*="display: none"])');
+      
+      if (visibleProducts.length < 2) {
+        alert('Add at least 2 products to compare');
+        window.location.href = '{% url "search" %}';
+        return;
+      }
+      
+      // Update best value badge
+      visibleProducts.forEach(col => {
+        col.classList.remove('featured');
+      });
+      
+      // Find cheapest and mark as featured
+      const prices = Array.from(visibleProducts).map(col => {
+        const priceText = col.querySelector('.price-big')?.textContent;
+        return parseFloat(priceText?.replace(/[^0-9.]/g, '') || 0);
+      });
+      
+      const minPrice = Math.min(...prices);
+      const minIndex = prices.indexOf(minPrice);
+      
+      if (visibleProducts[minIndex]) {
+        visibleProducts[minIndex].classList.add('featured');
+        
+        // Add winner badge if not exists
+        if (!visibleProducts[minIndex].querySelector('.winner-badge')) {
+          const badge = document.createElement('span');
+          badge.className = 'winner-badge';
+          badge.textContent = 'Best Value';
+          visibleProducts[minIndex].prepend(badge);
+        }
+      }
+    }
+    
+    // Save comparison
+    const saveComparisonBtn = document.getElementById('saveComparison');
+    if (saveComparisonBtn) {
+      saveComparisonBtn.addEventListener('click', function() {
+        alert('Comparison saved! You can access it from your saved items.');
+      });
+    }
+    
+    // Mobile view switcher (if implemented)
+    updateComparison();
+  });
+</script>
+{% endblock %}

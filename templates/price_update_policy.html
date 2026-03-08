@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Price Update Policy - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3" style="color: var(--color-primary);">Price Update Policy</h1>
+                <p class="lead text-muted">How prices are managed on MarketLens</p>
+            </div>
+
+            <!-- Overview -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-info-circle text-primary me-2"></i>
+                        Overview
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <p>MarketLens is committed to providing accurate, real-time pricing information to help consumers make informed decisions. This policy outlines how prices are updated, verified, and maintained on our platform.</p>
+                </div>
+            </div>
+
+            <!-- For Vendors -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-shop text-success me-2"></i>
+                        For Vendors
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Price Updates</h5>
+                    <ul>
+                        <li>Vendors can update their prices at any time through their dashboard</li>
+                        <li>Price changes take effect immediately upon saving</li>
+                        <li>Bulk price updates are available for multiple products</li>
+                        <li>Price history is maintained for transparency</li>
+                    </ul>
+
+                    <h5 class="fw-bold mb-3 mt-4">Update Frequency</h5>
+                    <p>We recommend vendors update their prices:</p>
+                    <ul>
+                        <li>Daily for fresh produce and perishable items</li>
+                        <li>Weekly for stable commodities</li>
+                        <li>Immediately when market prices change significantly</li>
+                    </ul>
+
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Note:</strong> Outdated prices (not updated for 30+ days) may be flagged as "stale" and could affect your vendor ranking.
+                    </div>
+                </div>
+            </div>
+
+            <!-- For Consumers -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-person text-primary me-2"></i>
+                        For Consumers
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Price Accuracy</h5>
+                    <ul>
+                        <li>Prices shown are as provided by verified vendors</li>
+                        <li>Last updated timestamp indicates when price was last confirmed</li>
+                        <li>We encourage reporting outdated or incorrect prices</li>
+                    </ul>
+
+                    <h5 class="fw-bold mb-3 mt-4">Price Alerts</h5>
+                    <ul>
+                        <li>Set target prices for products you're interested in</li>
+                        <li>Receive notifications when prices drop to your target</li>
+                        <li>Choose instant, daily, or weekly alert frequency</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Price Verification -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-shield-check text-info me-2"></i>
+                        Price Verification
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">How We Verify Prices</h5>
+                    <ul>
+                        <li>Automated checks for unusual price fluctuations</li>
+                        <li>Regular sampling and spot checks by our team</li>
+                        <li>User reports and feedback system</li>
+                        <li>Cross-referencing with market averages</li>
+                    </ul>
+
+                    <h5 class="fw-bold mb-3 mt-4">Reporting Incorrect Prices</h5>
+                    <p>If you notice an incorrect price:</p>
+                    <ol>
+                        <li>Click the "Report" button on the product page</li>
+                        <li>Select the issue type (wrong price, outdated, etc.)</li>
+                        <li>Provide the correct price if known</li>
+                        <li>Our team will investigate within 24 hours</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Price History -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-graph-up text-warning me-2"></i>
+                        Price History
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <p>MarketLens maintains price history for all products to help users:</p>
+                    <ul>
+                        <li>Track price trends over time</li>
+                        <li>Identify seasonal price patterns</li>
+                        <li>Make informed purchasing decisions</li>
+                        <li>Verify fair pricing</li>
+                    </ul>
+                    <p class="mt-3">Price history is visible on each product's detail page and can be filtered by time periods (week, month, year).</p>
+                </div>
+            </div>
+
+            <!-- Enforcement -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 fw-bold mb-0">
+                        <i class="bi bi-gavel text-danger me-2"></i>
+                        Policy Enforcement
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <p>Vendors who consistently provide inaccurate pricing may face:</p>
+                    <ul>
+                        <li>Warning notifications</li>
+                        <li>Temporary suspension of price update privileges</li>
+                        <li>Reduced visibility in search results</li>
+                        <li>Account suspension for repeated violations</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Last Updated -->
+            <div class="text-center mt-4">
+                <small class="text-muted">Last updated: March 1, 2025</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

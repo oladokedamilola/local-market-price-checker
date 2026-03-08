@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Account Inactive - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-soft">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-shield-exclamation text-warning" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h2 class="fw-bold mb-3">Account Not Activated</h2>
+                    
+                    <p class="text-muted mb-4">
+                        Your account hasn't been activated yet. Please check your email for the verification link.
+                    </p>
+                    
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'resend_verification' %}" class="btn btn-primary">
+                            <i class="bi bi-arrow-repeat me-2"></i>
+                            Resend Verification Email
+                        </a>
+                        
+                        <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Back to Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

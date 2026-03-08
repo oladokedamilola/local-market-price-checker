@@ -1,0 +1,68 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Request New Category - Vendor{% endblock %}
+
+{% block page_title %}Request New Category{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'add_product' %}">Add Product</a></li>
+<li class="breadcrumb-item active" aria-current="page">Request Category</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">Request New Category</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          <strong>Note:</strong> Category requests will be reviewed by admin before being added to the system.
+        </div>
+        
+        <form method="POST">
+          {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          <div class="mb-3">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Category Name <span class="text-danger">*</span></label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted">e.g., Fresh Vegetables, Dairy Products, Spices</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Why do you need this category? (Optional)</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted">This will help admin understand your request better</small>
+          </div>
+          
+          <div class="d-flex gap-3">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-send me-2"></i> Submit Request
+            </button>
+            <a href="{% url 'add_product' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-2"></i> Back to Add Product
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

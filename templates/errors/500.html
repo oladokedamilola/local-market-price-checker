@@ -1,0 +1,115 @@
+<!--templates/errors/500/html-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Server Error | MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 text-center">
+            <!-- Error Illustration -->
+            <div class="error-illustration mb-4">
+                <div class="position-relative" style="height: 200px;">
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="bi bi-tools" style="font-size: 8rem; color: var(--color-muted); opacity: 0.2;"></i>
+                    </div>
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="bi bi-exclamation-triangle" style="font-size: 5rem; color: var(--color-warning);"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Content -->
+            <h1 class="display-4 fw-bold mb-3" style="color: var(--color-warning);">500</h1>
+            <h2 class="h3 mb-4">Market Maintenance</h2>
+            <p class="lead text-muted mb-4">
+                Our market stalls are temporarily closed for maintenance. 
+                Our team is working hard to fix the issue and get things back to normal.
+            </p>
+            
+            <!-- Status Info -->
+            <div class="card border-warning border-2 shadow-soft mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-clock-history fs-3 text-warning me-3"></i>
+                        <div>
+                            <h5 class="card-title mb-0">Service Status</h5>
+                            <small class="text-muted">Last updated: Just now</small>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        We're experiencing technical difficulties. Please try again in a few minutes.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- What to do -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-soft">
+                        <div class="card-body text-center">
+                            <i class="bi bi-arrow-clockwise fs-1 text-primary mb-3"></i>
+                            <h6>Refresh</h6>
+                            <small class="text-muted">Try refreshing the page</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-soft">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clock fs-1 text-primary mb-3"></i>
+                            <h6>Wait</h6>
+                            <small class="text-muted">Try again in 5-10 minutes</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-soft">
+                        <div class="card-body text-center">
+                            <i class="bi bi-envelope fs-1 text-primary mb-3"></i>
+                            <h6>Report</h6>
+                            <small class="text-muted">Let us know if it persists</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <button onclick="window.location.reload()" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Refresh Page
+                </button>
+                <a href="{% url 'home' %}" class="btn btn-outline-primary btn-lg px-4">
+                    <i class="bi bi-house me-2"></i>Go Home
+                </a>
+                <a href="mailto:support@marketlens.com?subject=500%20Error%20Report" class="btn btn-outline-warning btn-lg px-4">
+                    <i class="bi bi-bug me-2"></i>Report Issue
+                </a>
+            </div>
+            
+            <!-- Status Page Link -->
+            <div class="mt-5 pt-4 border-top">
+                <p class="text-muted">
+                    Follow our 
+                    <a href="#" class="text-decoration-none">status page</a> 
+                    for updates on service availability.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-illustration {
+        animation: wobble 2s ease-in-out infinite;
+    }
+    
+    @keyframes wobble {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-5deg); }
+        75% { transform: rotate(5deg); }
+    }
+</style>
+{% endblock %}

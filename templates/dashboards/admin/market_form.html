@@ -1,0 +1,289 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - MarketLens Admin{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Admin</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_markets' %}">Markets</a></li>
+<li class="breadcrumb-item active" aria-current="page">{% if market %}Edit{% else %}Create{% endif %}</li>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .image-preview {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 2px dashed var(--color-accent);
+    padding: 0.25rem;
+  }
+  
+  .current-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 2px solid var(--color-border);
+  }
+  
+  .upload-area {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .upload-area:hover {
+    border-color: var(--color-accent);
+    background: rgba(77, 168, 218, 0.05);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card border-0 shadow-soft">
+      <div class="card-header bg-white">
+        <h5 class="mb-0 fw-bold">{{ title }}</h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" enctype="multipart/form-data" id="marketForm">
+          {% csrf_token %}
+          
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          <!-- Basic Information -->
+          <h6 class="fw-bold mb-3">Basic Information</h6>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="{{ form.name.id_for_label }}" class="form-label">
+                Market Name <span class="text-danger">*</span>
+              </label>
+              {{ form.name }}
+              {% if form.name.errors %}
+              <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="col-md-6">
+              <label for="{{ form.location.id_for_label }}" class="form-label">
+                Location <span class="text-danger">*</span>
+              </label>
+              {{ form.location }}
+              {% if form.location.errors %}
+              <div class="text-danger small mt-1">{{ form.location.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
+            {{ form.address }}
+            {% if form.address.errors %}
+            <div class="text-danger small mt-1">{{ form.address.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <hr class="my-4">
+          
+          <!-- Contact & Hours -->
+          <h6 class="fw-bold mb-3">Contact & Operating Hours</h6>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="{{ form.opening_hours.id_for_label }}" class="form-label">Opening Hours</label>
+              {{ form.opening_hours }}
+              <div class="form-text">e.g., Mon-Sat: 8am-8pm</div>
+              {% if form.opening_hours.errors %}
+              <div class="text-danger small mt-1">{{ form.opening_hours.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="col-md-6">
+              <label for="{{ form.contact_number.id_for_label }}" class="form-label">Contact Number</label>
+              {{ form.contact_number }}
+              {% if form.contact_number.errors %}
+              <div class="text-danger small mt-1">{{ form.contact_number.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          
+          <!-- Cover Image -->
+          <h6 class="fw-bold mb-3">Cover Image</h6>
+          
+          {% if market and market.cover_image %}
+          <div class="mb-3">
+            <label class="form-label">Current Image</label>
+            <div>
+              <img src="{{ market.cover_image.url }}" alt="{{ market.name }}" class="current-image">
+            </div>
+          </div>
+          {% endif %}
+          
+          <div class="mb-3">
+            <label for="{{ form.cover_image.id_for_label }}" class="form-label">
+              {% if market %}New Cover Image (optional){% else %}Cover Image{% endif %}
+            </label>
+            
+            <!-- Custom upload area -->
+            <div class="upload-area" id="uploadArea">
+              <i class="bi bi-cloud-arrow-up fs-1 text-muted mb-2"></i>
+              <p class="mb-1">Click to upload or drag and drop</p>
+              <p class="small text-muted mb-0">JPG, PNG (Max: 5MB)</p>
+            </div>
+            
+            <!-- Hidden file input -->
+            <input type="file" name="cover_image" accept="image/*" id="id_cover_image" class="d-none">
+            
+            <!-- Image Preview -->
+            <div id="imagePreviewContainer" style="display: none;" class="mt-3">
+              <p class="small text-muted mb-2">Preview:</p>
+              <img src="" alt="Preview" id="imagePreview" class="image-preview">
+            </div>
+            
+            {% if form.cover_image.errors %}
+            <div class="text-danger small mt-1">{{ form.cover_image.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <hr class="my-4">
+          
+          <!-- Status -->
+          <div class="mb-4">
+            <div class="form-check form-switch">
+              {{ form.is_active }}
+              <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                <strong>Active Market</strong>
+                <span class="text-muted d-block small">Inactive markets won't appear in vendor selection</span>
+              </label>
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          
+          <!-- Form Actions -->
+          <div class="d-flex gap-3 justify-content-end">
+            <a href="{% url 'admin_markets' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-x-circle me-2"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <i class="bi bi-check-circle me-2"></i>
+              {% if market %}Update{% else %}Create{% endif %} Market
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('id_cover_image');
+    const uploadArea = document.getElementById('uploadArea');
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const form = document.getElementById('marketForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Handle click on upload area
+    uploadArea.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      imageInput.click();
+    });
+    
+    // Handle drag and drop
+    uploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.style.borderColor = 'var(--color-accent)';
+      this.style.background = 'rgba(77, 168, 218, 0.05)';
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.style.borderColor = 'var(--color-border)';
+      this.style.background = 'transparent';
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.style.borderColor = 'var(--color-border)';
+      this.style.background = 'transparent';
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        imageInput.files = files;
+        handleImageSelect(files[0]);
+      }
+    });
+    
+    // Handle file selection
+    imageInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        handleImageSelect(file);
+      } else {
+        previewContainer.style.display = 'none';
+      }
+    });
+    
+    function handleImageSelect(file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file (JPG, PNG, etc.).');
+        imageInput.value = '';
+        return;
+      }
+      
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must be less than 5MB.');
+        imageInput.value = '';
+        return;
+      }
+      
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imagePreview.src = e.target.result;
+        previewContainer.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,223 @@
+<!--templates/errors/400/html-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bad Request | MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 text-center">
+            <!-- Error Illustration -->
+            <div class="error-illustration mb-4">
+                <div class="position-relative" style="height: 200px;">
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="bi bi-file-earmark-x" style="font-size: 8rem; color: var(--color-muted); opacity: 0.2;"></i>
+                    </div>
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="bi bi-exclamation-circle" style="font-size: 5rem; color: var(--color-warning);"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Content -->
+            <h1 class="display-4 fw-bold mb-3" style="color: var(--color-warning);">400</h1>
+            <h2 class="h3 mb-4">Invalid Request</h2>
+            <p class="lead text-muted mb-4">
+                It seems there was an issue with your request. 
+                Please check the details and try again.
+            </p>
+            
+            <!-- Common Issues -->
+            <div class="card border-warning border-2 shadow-soft mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                        Common Issues & Solutions
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="border-start border-warning border-3 ps-3">
+                                <h6 class="fw-bold">Form Issues</h6>
+                                <ul class="list-unstyled small mb-0">
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        Required fields missing
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        Invalid data format
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        File size too large
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border-start border-warning border-3 ps-3">
+                                <h6 class="fw-bold">Browser Issues</h6>
+                                <ul class="list-unstyled small mb-0">
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        Outdated browser cache
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        Cookies disabled
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        JavaScript errors
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Troubleshooting Steps -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-wrench me-2"></i>
+                        Quick Troubleshooting
+                    </h5>
+                    <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
+                        <button onclick="window.location.reload()" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Refresh Page
+                        </button>
+                        <button onclick="clearBrowserCache()" class="btn btn-outline-secondary">
+                            <i class="bi bi-trash me-2"></i>Clear Cache
+                        </button>
+                        <a href="{% url 'home' %}" class="btn btn-outline-success">
+                            <i class="bi bi-house me-2"></i>Start Fresh
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Information (for debugging) -->
+            {% if request.GET.error %}
+            <div class="alert alert-info text-start mb-4">
+                <h6 class="alert-heading">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Error Details
+                </h6>
+                <small class="mb-0">
+                    {{ request.GET.error|safe }}
+                </small>
+            </div>
+            {% endif %}
+            
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-house me-2"></i>Back to Home
+                </a>
+                
+                <button onclick="window.history.back()" class="btn btn-outline-primary btn-lg px-4">
+                    <i class="bi bi-arrow-left me-2"></i>Go Back
+                </button>
+                
+                {% if request.path != '/contact/' %}
+                <a href="#" class="btn btn-outline-secondary btn-lg px-4" data-bs-toggle="modal" data-bs-target="#contactModal">
+                    <i class="bi bi-envelope me-2"></i>Contact Support
+                </a>
+                {% endif %}
+            </div>
+            
+            <!-- Browser Info -->
+            <div class="mt-5 pt-4 border-top">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="text-center">
+                            <i class="bi bi-browser-chrome fs-1 text-muted mb-2"></i>
+                            <h6>Browser Issue?</h6>
+                            <small class="text-muted">
+                                Try using Chrome, Firefox, or Edge
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-center">
+                            <i class="bi bi-wifi-off fs-1 text-muted mb-2"></i>
+                            <h6>Connection Issue?</h6>
+                            <small class="text-muted">
+                                Check your internet connection
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Contact Support</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Having trouble? Our support team is here to help.</p>
+                <div class="mb-3">
+                    <label class="form-label">Describe the issue</label>
+                    <textarea class="form-control" rows="3" placeholder="What were you trying to do when the error occurred?"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Your email</label>
+                    <input type="email" class="form-control" placeholder="you@example.com">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Send Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function clearBrowserCache() {
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                for (let name of names) caches.delete(name);
+            });
+        }
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Show success message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3';
+        alertDiv.innerHTML = `
+            <i class="bi bi-check-circle me-2"></i>
+            Cache cleared successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
+    }
+</script>
+
+<style>
+    .error-illustration {
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+</style>
+{% endblock %}

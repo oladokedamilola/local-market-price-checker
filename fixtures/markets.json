@@ -1,0 +1,162 @@
+[
+  {
+    "model": "market.market",
+    "pk": 1,
+    "fields": {
+      "name": "Ikotun Market",
+      "slug": "ikotun-market",
+      "location": "Ikotun, Alimosho LGA",
+      "description": "One of the largest markets in Alimosho, offering fresh produce, meats, and household items. Busy daily market with hundreds of vendors.",
+      "address": "Ikotun Road, opposite Ikotun Bus Stop, Alimosho, Lagos",
+      "opening_hours": "Mon-Sun: 6am - 8pm",
+      "contact_number": "+234 803 123 4567",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.market",
+    "pk": 2,
+    "fields": {
+      "name": "Egbeda Market",
+      "slug": "egbeda-market",
+      "location": "Egbeda, Alimosho LGA",
+      "description": "Popular market serving Egbeda and surrounding areas. Known for fresh foodstuffs, vegetables, and affordable prices.",
+      "address": "Egbeda Road, by Eggua Bus Stop, Alimosho, Lagos",
+      "opening_hours": "Mon-Sun: 7am - 7pm",
+      "contact_number": "+234 803 234 5678",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.market",
+    "pk": 3,
+    "fields": {
+      "name": "Igando Market",
+      "slug": "igando-market",
+      "location": "Igando, Alimosho LGA",
+      "description": "Vibrant market in Igando area. Features fresh produce, fish, meat, and general merchandise.",
+      "address": "Igando Road, opposite Igando Local Government, Alimosho, Lagos",
+      "opening_hours": "Mon-Sun: 6:30am - 7:30pm",
+      "contact_number": "+234 803 345 6789",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.market",
+    "pk": 4,
+    "fields": {
+      "name": "LASU Market",
+      "slug": "lasu-market",
+      "location": "LASU Main Road, Ojo, Alimosho LGA",
+      "description": "Market serving Lagos State University community. Affordable prices for students and residents.",
+      "address": "LASU Main Road, opposite LASU Main Gate, Ojo, Lagos",
+      "opening_hours": "Mon-Sat: 8am - 8pm, Sun: 10am - 4pm",
+      "contact_number": "+234 803 456 7890",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.market",
+    "pk": 5,
+    "fields": {
+      "name": "Iyana Ipaja Market",
+      "slug": "iyana-ipaja-market",
+      "location": "Iyana Ipaja, Alimosho LGA",
+      "description": "Major market at Iyana Ipaja bus stop. Busy trading center with all types of goods.",
+      "address": "Iyana Ipaja Bus Stop, Abeokuta Expressway, Alimosho, Lagos",
+      "opening_hours": "Mon-Sun: 5am - 9pm",
+      "contact_number": "+234 803 567 8901",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.market",
+    "pk": 6,
+    "fields": {
+      "name": "Shasha Market",
+      "slug": "shasha-market",
+      "location": "Shasha, Alimosho LGA",
+      "description": "Community market in Shasha area. Known for fresh vegetables and local foodstuffs.",
+      "address": "Shasha Road, by Heritage Bank, Alimosho, Lagos",
+      "opening_hours": "Mon-Sat: 7am - 7pm",
+      "contact_number": "+234 803 678 9012",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.market",
+    "pk": 7,
+    "fields": {
+      "name": "Baruwa Market",
+      "slug": "baruwa-market",
+      "location": "Baruwa, Ipaja, Alimosho LGA",
+      "description": "Growing market serving Baruwa and surrounding communities. Good for fresh produce and meats.",
+      "address": "Baruwa Road, opposite Baruwa Health Centre, Ipaja, Lagos",
+      "opening_hours": "Mon-Sun: 7am - 7pm",
+      "contact_number": "+234 803 789 0123",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.market",
+    "pk": 8,
+    "fields": {
+      "name": "Meiran Market",
+      "slug": "meiran-market",
+      "location": "Meiran, Alimosho LGA",
+      "description": "Neighborhood market in Meiran area. Offers variety of food items and household goods.",
+      "address": "Meiran Road, by Meiran Bus Stop, Alimosho, Lagos",
+      "opening_hours": "Mon-Sat: 8am - 6pm",
+      "contact_number": "+234 803 890 1234",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.market",
+    "pk": 9,
+    "fields": {
+      "name": "Oke Odo Market",
+      "slug": "oke-odo-market",
+      "location": "Oke Odo, Alimosho LGA",
+      "description": "Large market known for foodstuffs, textiles, and general merchandise. Popular among traders.",
+      "address": "Oke Odo Road, by Oke Odo Bus Stop, Alimosho, Lagos",
+      "opening_hours": "Mon-Sun: 6am - 8pm",
+      "contact_number": "+234 803 901 2345",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "market.market",
+    "pk": 10,
+    "fields": {
+      "name": "Alimosho Central Market",
+      "slug": "alimosho-central-market",
+      "location": "Alimosho LGA Headquarters",
+      "description": "Central market serving the entire Alimosho LGA. Comprehensive selection of goods from fresh produce to electronics.",
+      "address": "Alimosho Local Government Secretariat Road, Alimosho, Lagos",
+      "opening_hours": "Mon-Sun: 6am - 8pm",
+      "contact_number": "+234 803 012 3456",
+      "is_active": true,
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z"
+    }
+  }
+]

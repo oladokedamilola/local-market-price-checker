@@ -1,0 +1,981 @@
+<!-- templates/home.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MarketLens - Transparent Market Pricing for Alimosho{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Hero Carousel */
+  .hero-carousel {
+    margin-top: 0; /* Removed negative margin */
+  }
+  
+  .carousel-item {
+    height: 100vh;
+    min-height: 700px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  
+  .carousel-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 100%);
+    z-index: 1;
+  }
+  
+  .carousel-caption {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    bottom: auto;
+    left: 10%;
+    right: auto;
+    max-width: 700px;
+    text-align: left;
+    z-index: 2;
+    padding: 2rem;
+  }
+  
+  .carousel-badge {
+    display: inline-block;
+    background: var(--color-accent);
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .carousel-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+  }
+  
+  .carousel-title span {
+    color: #7BC8FF;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+  }
+  
+  .carousel-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    color: rgba(255,255,255,0.95);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    font-weight: 400;
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    z-index: 3;
+    opacity: 0.8;
+  }
+  
+  .carousel-indicators {
+    bottom: 2rem;
+    z-index: 3;
+  }
+  
+  .carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin: 0 6px;
+    background-color: rgba(255,255,255,0.5);
+  }
+  
+  .carousel-indicators .active {
+    background-color: #7BC8FF;
+  }
+  
+  /* Problem Solution Section */
+  .problem-solution-section {
+    padding: 5rem 0;
+    background: white;
+  }
+  
+  .problem-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .problem-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--color-danger);
+  }
+  
+  .problem-card.solution::before {
+    background: var(--color-success);
+  }
+  
+  .problem-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(230, 57, 70, 0.1);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    color: var(--color-danger);
+  }
+  
+  .solution .problem-icon {
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--color-success);
+  }
+  
+  .problem-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary);
+  }
+  
+  .problem-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .problem-list li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .problem-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .problem-list i {
+    font-size: 1.2rem;
+    color: var(--color-danger);
+  }
+  
+  .solution .problem-list i {
+    color: var(--color-success);
+  }
+  
+  /* Stats Section */
+  .stats-section {
+    background: linear-gradient(135deg, var(--color-primary), #1a2533);
+    color: white;
+    padding: 4rem 0;
+  }
+  
+  .stat-card {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .stat-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--color-accent);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  /* How It Works - Dual Path */
+  .dual-path-section {
+    padding: 5rem 0;
+    background: var(--color-bg);
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .section-subtitle {
+    color: var(--color-muted);
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    font-size: 1.1rem;
+  }
+  
+  .path-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+  
+  .path-tab {
+    padding: 1rem 2.5rem;
+    border: 2px solid var(--color-border);
+    background: white;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .path-tab.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+  }
+  
+  .path-tab[data-path="shopper"]:hover {
+    border-color: var(--color-accent);
+  }
+  
+  .path-tab[data-path="vendor"]:hover {
+    border-color: var(--color-primary);
+  }
+  
+  .path-content {
+    display: none;
+    animation: fadeIn 0.5s ease;
+  }
+  
+  .path-content.active {
+    display: block;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .path-step {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    align-items: flex-start;
+  }
+  
+  .path-step-number {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+  
+  .vendor-path .path-step-number {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  .path-step-content h4 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .path-step-content p {
+    color: var(--color-muted);
+    margin: 0;
+  }
+  
+  /* Feature Grid */
+  .feature-grid-section {
+    padding: 5rem 0;
+    background: white;
+  }
+  
+  .feature-item {
+    text-align: center;
+    padding: 2rem;
+    border-radius: var(--radius);
+    transition: transform 0.3s ease;
+  }
+  
+  .feature-item:hover {
+    transform: translateY(-5px);
+  }
+  
+  .feature-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.5rem;
+    background: rgba(77, 168, 218, 0.1);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--color-accent);
+  }
+  
+  .feature-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .feature-description {
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+  
+  /* Market Coverage */
+  .market-coverage-section {
+    padding: 5rem 0;
+    background: var(--color-bg);
+  }
+  
+  .coverage-map {
+    background: white;
+    border-radius: var(--radius);
+    padding: 3rem;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .coverage-map::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(77,168,218,0.05) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  
+  .coverage-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .coverage-stat-item {
+    text-align: center;
+  }
+  
+  .coverage-stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  
+  .coverage-stat-label {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .coverage-description {
+    text-align: center;
+    max-width: 800px;
+    margin: 2rem auto 0;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+    position: relative;
+    z-index: 1;
+  }
+  
+  .coverage-description h4 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+  }
+  
+  .coverage-description p {
+    color: var(--color-muted);
+    margin-bottom: 2rem;
+  }
+  
+  .coverage-badge-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .coverage-badge {
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .coverage-badge i {
+    color: var(--color-accent);
+    margin-right: 0.5rem;
+  }
+  
+  /* CTA Section */
+  .cta-full-section {
+    background: linear-gradient(135deg, var(--color-primary), #1a2533);
+    color: white;
+    padding: 5rem 0;
+    width: 100%;
+  }
+  
+  .cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 0 1rem;
+  }
+  
+  .cta-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  
+  .cta-text {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 2.5rem;
+  }
+  
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  /* Responsive */
+  @media (max-width: 992px) {
+    .carousel-title {
+      font-size: 2.8rem;
+    }
+    
+    .carousel-caption {
+      max-width: 550px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .carousel-item {
+      height: 100vh;
+    }
+    
+    .carousel-caption {
+      left: 5%;
+      right: 5%;
+      text-align: center;
+    }
+    
+    .carousel-title {
+      font-size: 2.2rem;
+    }
+    
+    .carousel-subtitle {
+      font-size: 1.1rem;
+    }
+    
+    .problem-title {
+      font-size: 1.8rem;
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+    }
+    
+    .coverage-stats {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .carousel-title {
+      font-size: 1.8rem;
+    }
+    
+    .path-tabs {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .path-tab {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Carousel -->
+<div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  
+  <div class="carousel-inner">
+    <!-- Slide 1: Market Intelligence (Default) -->
+    <div class="carousel-item active" style="background-image: url('{% static 'images/hero-market-intelligence.png' %}');">
+      <div class="carousel-caption">
+        <span class="carousel-badge">Market Intelligence</span>
+        <h1 class="carousel-title">Know The <span>Fair Price</span><br>Before You Shop</h1>
+        <p class="carousel-subtitle">
+          Real-time price comparison across Alimosho markets. Make informed decisions 
+          with transparent pricing data from verified vendors.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          {% if not user.is_authenticated %}
+          <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4 py-3">
+            <i class="bi bi-search me-2"></i> Compare Prices
+          </a>
+          {% else %}
+          <a href="{% url 'search' %}" class="btn btn-primary btn-lg px-4 py-3">
+            <i class="bi bi-search me-2"></i> Start Comparing
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 2: Vendor Privacy -->
+    <div class="carousel-item" style="background-image: url('{% static 'images/hero-vendor-privacy.png' %}');">
+      <div class="carousel-caption">
+        <span class="carousel-badge">Vendor Privacy</span>
+        <h1 class="carousel-title">Your <span>Pricing Strategy</span><br>Stays Private</h1>
+        <p class="carousel-subtitle">
+          Unlike other platforms, competitors never see your prices. List your products 
+          with confidence, reach more customers, and grow your business securely.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          {% if not user.is_authenticated %}
+          <a href="{% url 'register' %}?role=vendor" class="btn btn-primary btn-lg px-4 py-3">
+            <i class="bi bi-shop me-2"></i> Become a Vendor
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 3: Verified Trust -->
+    <div class="carousel-item" style="background-image: url('{% static 'images/hero-smart-shopping.png' %}');">
+      <div class="carousel-caption">
+        <span class="carousel-badge">Verified Trust</span>
+        <h1 class="carousel-title">Every Vendor Is<br><span>KYC Verified</span></h1>
+        <p class="carousel-subtitle">
+          Shop with confidence knowing every vendor on our platform has been 
+          identity-verified. No anonymous sellers, just real businesses serving Alimosho.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          {% if not user.is_authenticated %}
+          <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4 py-3">
+            <i class="bi bi-person-plus me-2"></i> Join Now
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+<!-- Problem & Solution Section -->
+<section class="problem-solution-section">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Problem Column -->
+      <div class="col-lg-6">
+        <div class="problem-card">
+          <div class="problem-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h2 class="problem-title">The Problem</h2>
+          <ul class="problem-list">
+            <li>
+              <i class="bi bi-x-circle"></i>
+              <span>Shoppers don't know if they're paying fair prices</span>
+            </li>
+            <li>
+              <i class="bi bi-x-circle"></i>
+              <span>Vendors fear competitors copying their pricing strategy</span>
+            </li>
+            <li>
+              <i class="bi bi-x-circle"></i>
+              <span>No central source for market price information in Alimosho</span>
+            </li>
+            <li>
+              <i class="bi bi-x-circle"></i>
+              <span>Unverified sellers create trust issues</span>
+            </li>
+            <li>
+              <i class="bi bi-x-circle"></i>
+              <span>Time wasted visiting multiple markets to compare prices</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Solution Column -->
+      <div class="col-lg-6">
+        <div class="problem-card solution">
+          <div class="problem-icon">
+            <i class="bi bi-check-circle"></i>
+          </div>
+          <h2 class="problem-title">MarketLens Solution</h2>
+          <ul class="problem-list">
+            <li>
+              <i class="bi bi-check-circle"></i>
+              <span>Real-time price comparison across all markets</span>
+            </li>
+            <li>
+              <i class="bi bi-check-circle"></i>
+              <span>Complete vendor privacy - competitors can't see your prices</span>
+            </li>
+            <li>
+              <i class="bi bi-check-circle"></i>
+              <span>First dedicated price platform for Alimosho markets</span>
+            </li>
+            <li>
+              <i class="bi bi-check-circle"></i>
+              <span>All vendors KYC-verified for authenticity</span>
+            </li>
+            <li>
+              <i class="bi bi-check-circle"></i>
+              <span>Compare from home before you visit the market</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3 col-6">
+        <div class="stat-card">
+          <span class="stat-number" data-count="5000">0</span>
+          <span class="stat-label">Active Users</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-card">
+          <span class="stat-number" data-count="250">0</span>
+          <span class="stat-label">Verified Vendors</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-card">
+          <span class="stat-number" data-count="1500">0</span>
+          <span class="stat-label">Products Tracked</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-card">
+          <span class="stat-number" data-count="10+">0</span>
+          <span class="stat-label">Markets</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Dual Path Section (How It Works) -->
+<section class="dual-path-section">
+  <div class="container">
+    <h2 class="section-title">How MarketLens Works</h2>
+    <p class="section-subtitle">
+      Two different experiences, one platform
+    </p>
+    
+    <div class="path-tabs">
+      <button class="path-tab active" data-path="shopper">I'm a Shopper</button>
+      <button class="path-tab" data-path="vendor">I'm a Vendor</button>
+    </div>
+    
+    <!-- Shopper Path -->
+    <div class="path-content active" id="shopper-path">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="path-step">
+            <div class="path-step-number">1</div>
+            <div class="path-step-content">
+              <h4>Create Your Account</h4>
+              <p>Sign up as a shopper in under 2 minutes. No verification needed, just access to transparent pricing.</p>
+            </div>
+          </div>
+          
+          <div class="path-step">
+            <div class="path-step-number">2</div>
+            <div class="path-step-content">
+              <h4>Search Any Product</h4>
+              <p>Search for tomatoes, rice, beef, or any household item. See prices from all verified vendors instantly.</p>
+            </div>
+          </div>
+          
+          <div class="path-step">
+            <div class="path-step-number">3</div>
+            <div class="path-step-content">
+              <h4>Compare & Decide</h4>
+              <p>View prices side-by-side, filter by market location, and make informed shopping decisions.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Vendor Path -->
+    <div class="path-content vendor-path" id="vendor-path">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="path-step">
+            <div class="path-step-number">1</div>
+            <div class="path-step-content">
+              <h4>Register & Submit KYC</h4>
+              <p>Sign up and upload your government-issued ID (NIN/BVN) for verification. Your data is secure.</p>
+            </div>
+          </div>
+          
+          <div class="path-step">
+            <div class="path-step-number">2</div>
+            <div class="path-step-content">
+              <h4>Get Verified by Admin</h4>
+              <p>Our team reviews your documents within 24-48 hours. You'll be notified once approved.</p>
+            </div>
+          </div>
+          
+          <div class="path-step">
+            <div class="path-step-number">3</div>
+            <div class="path-step-content">
+              <h4>List Your Products Privately</h4>
+              <p>Add your products and prices. Only shoppers see them - competitors never will.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Feature Grid -->
+<section class="feature-grid-section">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h3 class="feature-title">Verified Vendors Only</h3>
+          <p class="feature-description">Every vendor is KYC-verified. No anonymous sellers, just real businesses.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="bi bi-incognito"></i>
+          </div>
+          <h3 class="feature-title">Vendor Privacy</h3>
+          <p class="feature-description">Competitors never see your prices. Your pricing strategy stays yours.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <h3 class="feature-title">Real-Time Updates</h3>
+          <p class="feature-description">Vendors update prices in real-time. You always see current market rates.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="bi bi-geo-alt"></i>
+          </div>
+          <h3 class="feature-title">Local Focus</h3>
+          <p class="feature-description">Built specifically for Alimosho markets. Find prices near you.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Market Coverage -->
+<section class="market-coverage-section">
+  <div class="container">
+    <div class="coverage-map">
+      <div class="coverage-stats">
+        <div class="coverage-stat-item">
+          <span class="coverage-stat-value">8+</span>
+          <span class="coverage-stat-label">Major Markets</span>
+        </div>
+        <div class="coverage-stat-item">
+          <span class="coverage-stat-value">15+</span>
+          <span class="coverage-stat-label">Product Categories</span>
+        </div>
+        <div class="coverage-stat-item">
+          <span class="coverage-stat-value">24/7</span>
+          <span class="coverage-stat-label">Price Updates</span>
+        </div>
+      </div>
+      
+      <div class="coverage-description">
+        <h4>Expanding Across Alimosho</h4>
+        <p>
+          We're actively onboarding vendors from every market in Alimosho Local Government. 
+          From Ikotun to Egbeda, Igando to LASU - if you shop there, we're covering it.
+        </p>
+        <div class="coverage-badge-container">
+          <span class="coverage-badge"><i class="bi bi-check-circle"></i> Fresh Produce</span>
+          <span class="coverage-badge"><i class="bi bi-check-circle"></i> Grains & Rice</span>
+          <span class="coverage-badge"><i class="bi bi-check-circle"></i> Meat & Fish</span>
+          <span class="coverage-badge"><i class="bi bi-check-circle"></i> Household</span>
+          <span class="coverage-badge"><i class="bi bi-check-circle"></i> Provisions</span>
+          <span class="coverage-badge"><i class="bi bi-check-circle"></i> Vegetables</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-full-section">
+  <div class="cta-content">
+    <h2 class="cta-title">Ready to Transform How You Shop or Sell?</h2>
+    <p class="cta-text">
+      Join the first dedicated market price platform for Alimosho residents. 
+      Whether you're comparing prices or listing products, MarketLens is free forever.
+    </p>
+    <div class="cta-buttons">
+      {% if not user.is_authenticated %}
+      <a href="{% url 'register' %}" class="btn btn-light btn-lg px-5 py-3">
+        <i class="bi bi-person-plus me-2"></i> Create Free Account
+      </a>
+      <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-5 py-3">
+        <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Path tabs toggle
+  const pathTabs = document.querySelectorAll('.path-tab');
+  const pathContents = document.querySelectorAll('.path-content');
+  
+  pathTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active class from all tabs and contents
+      pathTabs.forEach(t => t.classList.remove('active'));
+      pathContents.forEach(c => c.classList.remove('active'));
+      
+      // Add active class to clicked tab
+      tab.classList.add('active');
+      
+      // Show corresponding content
+      const path = tab.getAttribute('data-path');
+      document.getElementById(`${path}-path`).classList.add('active');
+    });
+  });
+  
+  // Animate stats
+  function animateStats() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+      const target = parseInt(stat.getAttribute('data-count'));
+      const duration = 2000;
+      const increment = target / (duration / 16);
+      let current = 0;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          stat.textContent = target.toLocaleString();
+          clearInterval(timer);
+        } else {
+          stat.textContent = Math.floor(current).toLocaleString();
+        }
+      }, 16);
+    });
+  }
+  
+  // Intersection Observer for stats
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateStats();
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  
+  const statsSection = document.querySelector('.stats-section');
+  if (statsSection) observer.observe(statsSection);
+  
+  // Auto-play carousel with 7 second interval
+  const carousel = new bootstrap.Carousel(document.getElementById('heroCarousel'), {
+    interval: 7000,
+    wrap: true
+  });
+</script>
+{% endblock %}

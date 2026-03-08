@@ -1,0 +1,141 @@
+<!--templates\notifications\email\price_alert_instant.html-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #1E2A38, #2C3E50);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 40px 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .price-badge {
+            background: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            font-size: 32px;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        .price-comparison {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+        }
+        .old-price {
+            text-decoration: line-through;
+            color: #dc3545;
+            font-size: 24px;
+        }
+        .new-price {
+            color: #28a745;
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .savings-badge {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #4DA8DA;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        .product-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Price Drop Alert!</h1>
+        </div>
+        
+        <div class="content">
+            <h2 style="margin-top: 0;">Hello {{ user.first_name|default:user.username }}!</h2>
+            
+            <p>Great news! The price for <strong>{{ alert.product.product.name }}</strong> has dropped below your target price.</p>
+            
+            <div class="product-details">
+                <h3 style="margin-top: 0;">{{ alert.product.product.name }}</h3>
+                
+                <div class="price-comparison">
+                    <div>
+                        <div style="color: #6c757d; font-size: 14px;">Target Price</div>
+                        <div class="old-price">₦{{ alert.target_price|floatformat:0 }}</div>
+                    </div>
+                    <div>
+                        <div style="color: #6c757d; font-size: 14px;">Current Price</div>
+                        <div class="new-price">₦{{ alert.product.price|floatformat:0 }}</div>
+                    </div>
+                </div>
+                
+                <div class="savings-badge">
+                    ✨ You save ₦{{ savings|floatformat:0 }}!
+                </div>
+                
+                <p style="margin: 15px 0;">
+                    <strong>Vendor:</strong> {{ alert.product.vendor.user.get_full_name|default:alert.product.vendor.user.username }}<br>
+                    <strong>Market:</strong> {{ alert.product.market.name }}<br>
+                    <strong>Unit:</strong> {{ alert.product.product.unit }}
+                </p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{ site_url }}{% url 'product_detail' alert.product.id %}" class="button">
+                    View Product
+                </a>
+            </div>
+            
+            <p style="font-size: 14px; color: #6c757d; margin-top: 30px;">
+                This alert was triggered {{ alert.last_triggered|timesince }} ago.<br>
+                You can manage your alerts in your <a href="{{ site_url }}{% url 'consumer_price_alerts' %}">dashboard</a>.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

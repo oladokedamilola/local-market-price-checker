@@ -1,0 +1,18 @@
+Hello,
+
+You are receiving this email because you or someone else tried to sign up for a MarketLens account using this email address:
+
+{{ email }}
+
+However, an account using this email address already exists in our system.
+
+If you've forgotten your password, you can reset it here:
+{{ password_reset_url }}
+
+If this wasn't you, you can safely ignore this email — no action is needed.
+
+Need help? Contact our support team at support@marketlens.com
+
+---
+MarketLens
+Alimosho Local Government • Lagos, Nigeria

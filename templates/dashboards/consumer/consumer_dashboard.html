@@ -1,0 +1,346 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Consumer Dashboard - MarketLens{% endblock %}
+
+{% block page_title %}Consumer Dashboard{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Consumer</li>
+{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 fw-bold mb-2">Welcome back, {{ request.user.first_name|default:request.user.username }}!</h1>
+        <p class="text-muted">Find the best prices across Alimosho markets</p>
+    </div>
+    <div>
+        <span class="badge bg-success fs-6 p-2"><i class="bi bi-check-circle me-1"></i> Verified Shopper</span>
+    </div>
+</div>
+
+<!-- Quick Search -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form action="{% url 'search' %}" method="GET" class="row g-3">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" 
+                           name="q" 
+                           class="form-control form-control-lg" 
+                           placeholder="Search for tomatoes, rice, beef, yam..."
+                           autocomplete="off">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-search me-2"></i> Search Products
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="stat-label text-muted">Markets</span>
+                    <h3 class="stat-value">{{ stats.total_markets }}</h3>
+                </div>
+                <div class="stat-icon primary">
+                    <i class="bi bi-geo-alt"></i>
+                </div>
+            </div>
+            <p class="text-muted small mt-2">Across Alimosho LGA</p>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="stat-label text-muted">Products</span>
+                    <h3 class="stat-value">{{ stats.total_products }}</h3>
+                </div>
+                <div class="stat-icon success">
+                    <i class="bi bi-box"></i>
+                </div>
+            </div>
+            <p class="text-muted small mt-2">{{ stats.total_listings }} active listings</p>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="stat-label text-muted">Vendors</span>
+                    <h3 class="stat-value">{{ stats.total_vendors }}</h3>
+                </div>
+                <div class="stat-icon warning">
+                    <i class="bi bi-shop"></i>
+                </div>
+            </div>
+            <p class="text-muted small mt-2">All KYC verified</p>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="stat-label text-muted">Categories</span>
+                    <h3 class="stat-value">{{ categories|length }}</h3>
+                </div>
+                <div class="stat-icon danger">
+                    <i class="bi bi-tags"></i>
+                </div>
+            </div>
+            <p class="text-muted small mt-2">Shop by category</p>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Section -->
+{% if categories %}
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">Shop by Category</h4>
+        <a href="{% url 'search' %}" class="btn btn-sm btn-outline-primary">View All</a>
+    </div>
+    <div class="row g-3">
+        {% for category in categories %}
+        <div class="col-md-3 col-6">
+            <a href="{% url 'consumer_category_detail' category.slug %}" class="text-decoration-none">
+                <div class="card text-center h-100 category-card">
+                    <div class="card-body">
+                        <i class="bi {% if category.icon %}{{ category.icon }}{% else %}bi-tag{% endif %} fs-1 text-primary mb-2"></i>
+                        <h6 class="fw-bold mb-1">{{ category.name }}</h6>
+                        <small class="text-muted">{{ category.product_count }} items</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Featured Products -->
+{% if featured_products %}
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">Featured Products</h4>
+        <a href="{% url 'search' %}?sort=recently_updated" class="btn btn-sm btn-outline-primary">View All</a>
+    </div>
+    <div class="row g-4">
+        {% for item in featured_products %}
+        <div class="col-xl-4 col-md-6">
+            <div class="card h-100 product-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title fw-bold mb-0">{{ item.product.name }}</h5>
+                        <span class="badge bg-primary">₦{{ item.price }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center text-muted small mb-2">
+                            <i class="bi bi-shop me-2"></i>
+                            <span>{{ item.vendor.user.get_full_name|default:item.vendor.user.username }}</span>
+                        </div>
+                        <div class="d-flex align-items-center text-muted small">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <span>{{ item.market.name }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="bi bi-clock me-1"></i> {{ item.last_updated|timesince }} ago
+                        </small>
+                        <a href="{% url 'consumer_product_detail' item.id %}" class="btn btn-sm btn-outline-primary">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Markets Grid -->
+<div class="row g-4 mb-5">
+    <!-- Nearby Markets -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-geo-alt text-primary me-2"></i>Markets Near You</h5>
+                <a href="{% url 'search' %}" class="btn btn-sm btn-link">View All</a>
+            </div>
+            <div class="card-body">
+                {% if nearby_markets %}
+                <div class="list-group list-group-flush">
+                    {% for market in nearby_markets %}
+                    <a href="{% url 'consumer_market_detail' market.id %}" class="list-group-item list-group-item-action px-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ market.name }}</h6>
+                                <small class="text-muted">
+                                    <i class="bi bi-pin-map me-1"></i> {{ market.location }}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-info">{{ market.product_count }} products</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">No markets available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Popular Products -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-star text-warning me-2"></i>Popular Products</h5>
+                <a href="{% url 'search' %}" class="btn btn-sm btn-link">View All</a>
+            </div>
+            <div class="card-body">
+                {% if popular_products %}
+                <div class="list-group list-group-flush">
+                    {% for product in popular_products %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ product.name }}</h6>
+                                <small class="text-muted">{{ product.vendor_count }} vendors • ₦{{ product.min_price|floatformat:0 }} - ₦{{ product.max_price|floatformat:0 }}</small>
+                            </div>
+                            <a href="{% url 'search' %}?q={{ product.name }}" class="btn btn-sm btn-outline-primary">
+                                Compare
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">No popular products yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Price Changes -->
+{% if recent_price_changes %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-arrow-repeat text-success me-2"></i>Recent Price Updates</h5>
+                <a href="{% url 'search' %}?sort=recently_updated" class="btn btn-sm btn-link">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Market</th>
+                                <th>Price</th>
+                                <th>Updated</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recent_price_changes %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-box me-2 text-primary"></i>
+                                        <strong>{{ item.product.name }}</strong>
+                                    </div>
+                                </td>
+                                <td>{{ item.market.name }}</td>
+                                <td><span class="fw-bold text-primary">₦{{ item.price }}</span></td>
+                                <td><small>{{ item.last_updated|timesince }} ago</small></td>
+                                <td>
+                                    <a href="{% url 'consumer_product_detail' item.id %}" class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Recently Viewed -->
+{% if recently_viewed %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2"></i>Recently Viewed</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for item in recently_viewed %}
+                    <div class="col-md-3">
+                        <a href="{% url 'consumer_product_detail' item.id %}" class="text-decoration-none">
+                            <div class="d-flex align-items-center p-2 border rounded">
+                                <i class="bi bi-box me-2 text-primary"></i>
+                                <div class="small">
+                                    <strong>{{ item.product.name|truncatechars:20 }}</strong>
+                                    <br>
+                                    <span class="text-muted">₦{{ item.price }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .category-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid var(--color-border);
+    }
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-soft);
+        border-color: var(--color-accent);
+    }
+    .product-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid var(--color-border);
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-soft);
+        border-color: var(--color-accent);
+    }
+</style>
+{% endblock %}

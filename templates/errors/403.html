@@ -1,0 +1,172 @@
+<!--templates/errors/403/html-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Access Denied | MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 text-center">
+            <!-- Error Illustration -->
+            <div class="error-illustration mb-4">
+                <div class="position-relative" style="height: 200px;">
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="bi bi-shield-lock" style="font-size: 8rem; color: var(--color-muted); opacity: 0.2;"></i>
+                    </div>
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <i class="bi bi-person-x" style="font-size: 5rem; color: var(--color-danger);"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Content -->
+            <h1 class="display-4 fw-bold mb-3" style="color: var(--color-danger);">403</h1>
+            <h2 class="h3 mb-4">Access Restricted</h2>
+            <p class="lead text-muted mb-4">
+                This market stall is for authorized personnel only. 
+                You don't have permission to access this area of the marketplace.
+            </p>
+            
+            <!-- Role Information -->
+            <div class="card border-danger border-2 shadow-soft mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-shield-exclamation text-danger me-2"></i>
+                        Access Requirements
+                    </h5>
+                    
+                    {% if user.is_authenticated %}
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-person-check me-2"></i>
+                            <strong>Logged in as:</strong> {{ user.username }}
+                            <br>
+                            <strong>Role:</strong> 
+                            {% if user.is_staff %}
+                                Admin
+                            {% elif user.groups.filter.name == 'VENDOR' %}
+                                Vendor
+                            {% elif user.groups.filter.name == 'CONSUMER' %}
+                                Consumer
+                            {% else %}
+                                Basic User
+                            {% endif %}
+                        </div>
+                        
+                        <p class="mb-0">
+                            You're logged in, but your account doesn't have the required 
+                            permissions to access this resource.
+                        </p>
+                    {% else %}
+                        <div class="alert alert-warning mb-3">
+                            <i class="bi bi-person-x me-2"></i>
+                            You need to be logged in to access this page.
+                        </div>
+                        
+                        <p class="mb-0">
+                            This page requires authentication. Please sign in with an 
+                            account that has the necessary permissions.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Permission Guide -->
+            <div class="card border-0 shadow-soft mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-key me-2"></i>
+                        Available Market Areas
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold mb-2">For Everyone</h6>
+                                <ul class="list-unstyled small">
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        Home Page
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        About/FAQ
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        Login/Register
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <h6 class="fw-bold mb-2">Logged In Users</h6>
+                                <ul class="list-unstyled small">
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        Price Search
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        Profile Dashboard
+                                    </li>
+                                    <li>
+                                        <i class="bi bi-check-circle text-success me-1"></i>
+                                        Saved Items
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-house me-2"></i>Back to Home
+                </a>
+                
+                {% if not user.is_authenticated %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-success btn-lg px-4">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Login to Continue
+                </a>
+                {% else %}
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-primary btn-lg px-4">
+                    <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+                </a>
+                {% endif %}
+                
+                {% if user.is_staff %}
+                <a href="/admin/" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-shield-check me-2"></i>Admin Panel
+                </a>
+                {% endif %}
+            </div>
+            
+            <!-- Support Contact -->
+            <div class="mt-5 pt-4 border-top">
+                <p class="text-muted">
+                    Need access to this area? 
+                    <a href="mailto:support@marketlens.com" class="text-decoration-none">
+                        Contact support
+                    </a>
+                    to request permission.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-illustration {
+        animation: shake 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+</style>
+{% endblock %}

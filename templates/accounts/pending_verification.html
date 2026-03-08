@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pending Verification - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-soft">
+                <div class="card-body text-center p-5">
+                    <!-- Icon -->
+                    <div class="mb-4">
+                        <i class="bi bi-envelope-check text-primary" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h2 class="fw-bold mb-3">Check Your Email</h2>
+                    
+                    <!-- Email Display -->
+                    <div class="alert alert-info bg-light border-0 mb-4">
+                        <i class="bi bi-envelope me-2"></i>
+                        <strong>{{ email }}</strong>
+                    </div>
+                    
+                    <!-- Message -->
+                    <div class="mb-4">
+                        <p class="lead text-muted">
+                            We've sent a verification link to your email address.
+                        </p>
+                        <p class="text-muted">
+                            Click the link to activate your MarketLens account.
+                        </p>
+                    </div>
+                    
+                    <!-- Next Steps -->
+                    <div class="bg-light p-4 rounded-3 mb-4 text-start">
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-lightbulb text-warning me-2"></i>
+                            Next Steps:
+                        </h6>
+                        <ol class="mb-0">
+                            <li class="mb-2">Check your inbox for the verification email</li>
+                            <li class="mb-2">Click the verification link in the email</li>
+                            <li>You'll be automatically logged in to your account</li>
+                        </ol>
+                    </div>
+                    
+                    <!-- Resend Form -->
+                    <div class="mb-3">
+                        <form method="POST" action="{% url 'resend_verification' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="email" value="{{ email }}">
+                            <button type="submit" class="btn btn-outline-primary btn-lg w-100">
+                                <i class="bi bi-arrow-repeat me-2"></i>
+                                Resend Verification Email
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Alternative Actions -->
+                    <div class="mt-4">
+                        <p class="small mb-2">
+                            <a href="{% url 'login' %}" class="text-primary text-decoration-none">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>
+                                Back to Login
+                            </a>
+                        </p>
+                        <p class="small">
+                            <a href="{% url 'contact_us' %}" class="text-muted text-decoration-none">
+                                <i class="bi bi-question-circle me-1"></i>
+                                Need help? Contact Support
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

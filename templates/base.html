@@ -1,0 +1,893 @@
+<!--templates/base.html-->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}MarketLens - Transparent Market Pricing{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="MarketLens helps residents of Alimosho access transparent market prices. Compare prices, find vendors, and shop smarter.">
+  <meta name="keywords" content="market prices, Alimosho, price comparison, shopping, vendors">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="{% static 'pwa/manifest.json' %}">
+  <meta name="theme-color" content="#1E2A38">
+  <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+  <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  
+  <!-- Google Fonts (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="icon" href="{% static 'images/fav.png' %}" type = "image/x-icon">
+  
+  <!-- Dark mode preference -->
+  <script>
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (prefersDarkScheme.matches) {
+      document.documentElement.setAttribute('data-bs-theme', 'dark');
+    }
+  </script>
+  
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+  <!-- Preloader -->
+  <div id="preloader" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center" style="z-index:9999;">
+    <div class="text-center">
+      <div class="spinner-grow text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <h5 class="fw-bold text-primary mb-2">MarketLens</h5>
+      <small class="text-muted">Loading your market intelligence...</small>
+    </div>
+  </div>
+
+  <!-- PWA Install Prompt (Mobile Only) -->
+  <div id="pwaInstallPrompt" class="position-fixed bottom-0 start-0 w-100 p-3" style="z-index: 9998; display: none;">
+    <div class="card shadow-lg border-0" style="background: var(--color-primary); border-radius: 15px;">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center mb-3">
+          <div class="bg-white bg-opacity-10 rounded-circle p-3 me-3">
+            <i class="bi bi-search-heart fs-3" style="color: white;"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold text-white mb-1">Install MarketLens</h5>
+            <p class="text-white-50 small mb-0">Get faster access and offline support</p>
+          </div>
+          <button type="button" class="btn-close btn-close-white ms-auto" id="closePwaPrompt" aria-label="Close"></button>
+        </div>
+        
+        <div class="row g-2 mb-3">
+          <div class="col-4 text-center">
+            <i class="bi bi-lightning-charge text-white fs-4"></i>
+            <p class="text-white-50 small mb-0">Lightning Fast</p>
+          </div>
+          <div class="col-4 text-center">
+            <i class="bi bi-wifi-off text-white fs-4"></i>
+            <p class="text-white-50 small mb-0">Works Offline</p>
+          </div>
+          <div class="col-4 text-center">
+            <i class="bi bi-house text-white fs-4"></i>
+            <p class="text-white-50 small mb-0">Home Screen</p>
+          </div>
+        </div>
+        
+        <button id="installPwaBtn" class="btn btn-light w-100 py-2 fw-bold">
+          <i class="bi bi-download me-2"></i> Install App
+        </button>
+        <p class="text-white-50 small text-center mt-2 mb-0">
+          <i class="bi bi-info-circle me-1"></i> No app store required
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookie Consent Popup -->
+  <div id="cookieConsent" class="position-fixed bottom-0 start-0 w-100 p-3" style="z-index: 9997; display: none;">
+    <div class="card shadow-lg border-0" style="background: white; border-radius: 15px; border-left: 4px solid var(--color-accent);">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-start gap-3">
+          <div class="flex-shrink-0">
+            <i class="bi bi-cookie fs-1" style="color: var(--color-accent);"></i>
+          </div>
+          <div class="flex-grow-1">
+            <h5 class="fw-bold mb-2" style="color: var(--color-primary);">🍪 Cookie Consent</h5>
+            <p class="text-muted small mb-3">
+              We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. 
+              By clicking "Accept All", you consent to our use of cookies. 
+              <a href="{% url 'cookie_policy' %}" class="text-decoration-none" style="color: var(--color-accent);">Learn more</a>
+            </p>
+            
+            <div class="d-flex flex-wrap gap-2">
+              <button id="acceptAllCookies" class="btn btn-primary btn-sm px-4">
+                <i class="bi bi-check-circle me-2"></i>Accept All
+              </button>
+              <button id="rejectNonEssential" class="btn btn-outline-secondary btn-sm px-4">
+                <i class="bi bi-slash-circle me-2"></i>Essential Only
+              </button>
+              <button id="cookieSettingsBtn" class="btn btn-link btn-sm text-decoration-none">
+                Cookie Settings
+              </button>
+            </div>
+            
+            <!-- Detailed Settings (Initially Hidden) -->
+            <div id="cookieSettings" class="mt-3 pt-3 border-top" style="display: none;">
+              <h6 class="fw-bold mb-3">Cookie Preferences</h6>
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="essentialCookies" checked disabled>
+                <label class="form-check-label" for="essentialCookies">
+                  <strong>Essential Cookies</strong> 
+                  <span class="text-muted small d-block">Required for basic site functionality (cannot be disabled)</span>
+                </label>
+              </div>
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="preferenceCookies" checked>
+                <label class="form-check-label" for="preferenceCookies">
+                  <strong>Preference Cookies</strong>
+                  <span class="text-muted small d-block">Remember your settings and preferences</span>
+                </label>
+              </div>
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="analyticsCookies" checked>
+                <label class="form-check-label" for="analyticsCookies">
+                  <strong>Analytics Cookies</strong>
+                  <span class="text-muted small d-block">Help us understand how visitors use our site</span>
+                </label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="marketingCookies">
+                <label class="form-check-label" for="marketingCookies">
+                  <strong>Marketing Cookies</strong>
+                  <span class="text-muted small d-block">Used for targeted advertising</span>
+                </label>
+              </div>
+              <button id="saveCookiePreferences" class="btn btn-primary btn-sm">
+                Save Preferences
+              </button>
+            </div>
+          </div>
+          <button type="button" class="btn-close" id="closeCookieConsent" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container for Flash Messages -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+    {% for message in messages %}
+    <div class="toast show align-items-center text-white bg-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% elif message.tags == 'error' %}x-circle{% else %}info-circle{% endif %} me-2"></i>
+          {{ message }}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Navbar -->
+  {% block navbar %}
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm" style="background-color: var(--color-primary);">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
+        <i class="bi bi-search-heart fs-4"></i>
+        <span>MarketLens</span>
+      </a>
+
+      <!-- Mobile Menu Button -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" 
+              aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+          {% if user.is_authenticated %}
+            <!-- Main Navigation for Authenticated Users -->
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-1" href="{% url 'dashboard' %}">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            
+            {% if not user.groups.filter.name == 'VENDOR' %}
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-1" href="{% url 'search' %}">
+                <i class="bi bi-search"></i>
+                <span>Search Prices</span>
+              </a>
+            </li>
+            {% endif %}
+            
+            <!-- Notification Bell -->
+            <li class="nav-item dropdown">
+              <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-bell fs-5"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" 
+                      style="font-size: 0.6rem; display: {% if unread_notifications_count > 0 %}inline-block{% else %}none{% endif %};"
+                      id="unreadNotificationsBadge">
+                  {{ unread_notifications_count }}
+                </span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-end dropdown-menu-lg p-0" aria-labelledby="notificationDropdown" style="width: 350px;">
+                <div class="dropdown-header d-flex justify-content-between align-items-center bg-light py-2 px-3">
+                  <h6 class="mb-0 fw-bold">Notifications</h6>
+                  <a href="{% url 'notifications:notification_center' %}" class="small text-primary">View All</a>
+                </div>
+                <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
+                  {% for notification in recent_notifications %}
+                  <a href="{% if notification.action_url %}{{ notification.action_url }}{% else %}{% url 'notifications:notification_center' %}{% endif %}" 
+                     class="dropdown-item notification-item {% if not notification.is_read %}unread{% endif %} py-2 px-3" 
+                     data-id="{{ notification.id }}"
+                     onclick="if({{ notification.id }}) markNotificationRead({{ notification.id }})">
+                    <div class="d-flex align-items-start gap-2">
+                      <i class="bi {{ notification.get_icon_class }} {{ notification.get_color_class }} mt-1"></i>
+                      <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <small class="fw-bold">{{ notification.title|truncatechars:30 }}</small>
+                          <small class="text-muted ms-2">{{ notification.created_at|timesince }} ago</small>
+                        </div>
+                        <small class="text-muted d-block">{{ notification.message|truncatechars:50 }}</small>
+                      </div>
+                      {% if not notification.is_read %}
+                      <span class="badge bg-primary rounded-circle p-1" style="width: 8px; height: 8px;"></span>
+                      {% endif %}
+                    </div>
+                  </a>
+                  {% empty %}
+                  <div class="text-center py-4">
+                    <i class="bi bi-bell-slash text-muted" style="font-size: 2rem;"></i>
+                    <p class="small text-muted mb-0 mt-2">No new notifications</p>
+                  </div>
+                  {% endfor %}
+                </div>
+                <div class="dropdown-footer text-center p-2 border-top">
+                  <button class="btn btn-sm btn-link text-primary" id="markAllReadBtn" onclick="markAllNotificationsRead()">
+                    Mark all as read
+                  </button>
+                </div>
+              </div>
+            </li>
+            
+            <!-- User Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" 
+                 id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle"></i>
+                <span>{{ user.first_name|default:user.username|truncatechars:15 }}</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end shadow-soft" aria-labelledby="userDropdown">
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'profile' %}">
+                    <i class="bi bi-person"></i>
+                    <span>Profile</span>
+                  </a>
+                </li>
+                
+                {% if user.groups.filter.name == 'VENDOR' %}
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'vendor_dashboard' %}">
+                    <i class="bi bi-shop"></i>
+                    <span>Vendor Panel</span>
+                  </a>
+                </li>
+                {% endif %}
+                
+                {% if user.is_staff %}
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'admin_dashboard' %}">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Admin Dashboard</span>
+                  </a>
+                </li>
+                {% endif %}
+                
+                <li><hr class="dropdown-divider"></li>
+                
+                <!-- Theme Toggle -->
+                <li>
+                  <button class="dropdown-item d-flex align-items-center gap-2" id="themeToggle">
+                    <i class="bi bi-moon-stars"></i>
+                    <span>Dark Mode</span>
+                  </button>
+                </li>
+                
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            
+          {% else %}
+            <!-- Navigation for Unauthenticated Users -->
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-1" href="/">
+                <i class="bi bi-house"></i>
+                <span>Home</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-1" href="{% url 'login' %}">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Login</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-1" href="{% url 'register' %}">
+                <i class="bi bi-person-plus"></i>
+                <span>Register</span>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+  {% endblock %}
+
+  <!-- Main Content -->
+  <main class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  {% block footer %}
+  <footer class="footer mt-auto">
+    <div class="container py-5">
+      <div class="row gy-4">
+        <!-- Brand Column -->
+        <div class="col-lg-4">
+          <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white mb-3" href="/">
+            <i class="bi bi-search-heart fs-4"></i>
+            <span>MarketLens</span>
+          </a>
+          <p class="small text-muted mb-4">
+            Empowering Alimosho residents with transparent market pricing. 
+            Compare prices, connect with verified vendors, and make informed shopping decisions.
+          </p>
+          <div class="d-flex gap-3">
+            <a href="#" class="text-muted fs-5" aria-label="Twitter">
+              <i class="bi bi-twitter"></i>
+            </a>
+            <a href="#" class="text-muted fs-5" aria-label="Facebook">
+              <i class="bi bi-facebook"></i>
+            </a>
+            <a href="#" class="text-muted fs-5" aria-label="Instagram">
+              <i class="bi bi-instagram"></i>
+            </a>
+            <a href="#" class="text-muted fs-5" aria-label="WhatsApp">
+              <i class="bi bi-whatsapp"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="col-lg-2 col-md-4">
+          <h6 class="fw-bold text-white mb-3">Quick Links</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2">
+              <a href="/" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Home
+              </a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="mb-2">
+              <a href="{% url 'dashboard' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Dashboard
+              </a>
+            </li>
+            {% endif %}
+            <li class="mb-2">
+              <a href="{% url 'login' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Login
+              </a>
+            </li>
+            <li class="mb-2">
+              <a href="{% url 'register' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Register
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div class="col-lg-3 col-md-4">
+          <h6 class="fw-bold text-white mb-3">Resources</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2">
+              <a href="{% url 'how_to_use' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                How to Use MarketLens
+              </a>
+            </li>
+            <li class="mb-2">
+              <a href="{% url 'vendor_guidelines' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Vendor Guidelines
+              </a>
+            </li>
+            <li class="mb-2">
+              <a href="{% url 'price_update_policy' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Price Update Policy
+              </a>
+            </li>
+            <li class="mb-2">
+              <a href="{% url 'faq' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                FAQ
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Legal -->
+        <div class="col-lg-3 col-md-4">
+          <h6 class="fw-bold text-white mb-3">Legal</h6>
+          <ul class="list-unstyled small">
+            <li class="mb-2">
+              <a href="{% url 'privacy_policy' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Privacy Policy
+              </a>
+            </li>
+            <li class="mb-2">
+              <a href="{% url 'terms_of_service' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Terms of Service
+              </a>
+            </li>
+            <li class="mb-2">
+              <a href="{% url 'cookie_policy' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Cookie Policy
+              </a>
+            </li>
+            <li class="mb-2">
+              <a href="{% url 'contact_us' %}" class="text-muted text-decoration-none d-flex align-items-center gap-1">
+                <i class="bi bi-chevron-right"></i>
+                Contact Us
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="border-secondary my-4">
+
+      <div class="row align-items-center">
+        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+          <div class="small text-muted">
+            &copy; {% now "Y" %} MarketLens. All rights reserved.
+          </div>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <div class="small text-muted">
+            Alimosho Local Government • Lagos, Nigeria
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  {% endblock %}
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <style>
+    /* Additional styles for notifications and popups */
+    .notification-item.unread {
+      background-color: rgba(77, 168, 218, 0.05);
+    }
+    .notification-item:hover {
+      background-color: #f8f9fa;
+    }
+    .notification-badge {
+      transform: translate(50%, -50%);
+    }
+    #pwaInstallPrompt, #cookieConsent {
+      animation: slideUp 0.5s ease-out;
+    }
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .form-check-input:checked {
+      background-color: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+    .form-check-input:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 0.2rem rgba(77, 168, 218, 0.25);
+    }
+  </style>
+
+  <script>
+    // ========== NOTIFICATION HANDLING ==========
+    function markNotificationRead(notificationId) {
+      fetch(`/notifications/api/mark-read/${notificationId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          updateUnreadCount(data.unread_count);
+          const notificationItem = document.querySelector(`[data-id="${notificationId}"]`);
+          if (notificationItem) {
+            notificationItem.classList.remove('unread');
+            const badge = notificationItem.querySelector('.badge');
+            if (badge) badge.remove();
+          }
+        }
+      })
+      .catch(error => console.error('Error:', error));
+    }
+
+    function markAllNotificationsRead() {
+      fetch('{% url "notifications:api_mark_all_read" %}', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          updateUnreadCount(0);
+          document.querySelectorAll('.notification-item').forEach(item => {
+            item.classList.remove('unread');
+            const badge = item.querySelector('.badge');
+            if (badge) badge.remove();
+          });
+        }
+      })
+      .catch(error => console.error('Error:', error));
+    }
+
+    function updateUnreadCount(count) {
+      const badge = document.getElementById('unreadNotificationsBadge');
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    // Auto-refresh notifications every 60 seconds
+    {% if user.is_authenticated %}
+    setInterval(function() {
+      fetch('{% url "notifications:api_notifications" %}?limit=5')
+        .then(response => response.json())
+        .then(data => {
+          updateUnreadCount(data.unread_count);
+        })
+        .catch(error => console.error('Error fetching notifications:', error));
+    }, 60000);
+    {% endif %}
+
+    // ========== PWA INSTALLATION ==========
+    let deferredPrompt;
+    const pwaPrompt = document.getElementById('pwaInstallPrompt');
+    const installBtn = document.getElementById('installPwaBtn');
+    const closeBtn = document.getElementById('closePwaPrompt');
+    
+    function isMobileOrTablet() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+             (window.innerWidth <= 1024);
+    }
+    
+    function isAppInstalled() {
+      return window.matchMedia('(display-mode: standalone)').matches || 
+             window.navigator.standalone === true;
+    }
+    
+    function shouldShowPrompt() {
+      if (isAppInstalled()) {
+        console.log('App already installed');
+        return false;
+      }
+      
+      if (!isMobileOrTablet()) {
+        console.log('Not a mobile or tablet device');
+        return false;
+      }
+      
+      const dismissed = localStorage.getItem('pwaPromptDismissed');
+      if (dismissed) {
+        const dismissedTime = parseInt(dismissed);
+        const now = Date.now();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        
+        if (now - dismissedTime < sevenDays) {
+          console.log('Prompt dismissed recently');
+          return false;
+        }
+      }
+      
+      return true;
+    }
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      if (shouldShowPrompt()) {
+        setTimeout(() => {
+          pwaPrompt.style.display = 'block';
+        }, 3000);
+      }
+    });
+    
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) {
+          console.log('No installation prompt available');
+          return;
+        }
+        
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to install prompt: ${outcome}`);
+        
+        pwaPrompt.style.display = 'none';
+        deferredPrompt = null;
+      });
+    }
+    
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        pwaPrompt.style.display = 'none';
+        localStorage.setItem('pwaPromptDismissed', Date.now().toString());
+      });
+    }
+    
+    window.addEventListener('appinstalled', () => {
+      console.log('MarketLens was installed successfully!');
+      pwaPrompt.style.display = 'none';
+      localStorage.removeItem('pwaPromptDismissed');
+    });
+    
+    if (isAppInstalled()) {
+      console.log('Running as PWA');
+    }
+
+    // ========== COOKIE CONSENT ==========
+    const cookieConsent = document.getElementById('cookieConsent');
+    const acceptAllBtn = document.getElementById('acceptAllCookies');
+    const rejectNonEssentialBtn = document.getElementById('rejectNonEssential');
+    const closeCookieBtn = document.getElementById('closeCookieConsent');
+    const cookieSettingsBtn = document.getElementById('cookieSettingsBtn');
+    const cookieSettings = document.getElementById('cookieSettings');
+    const savePrefsBtn = document.getElementById('saveCookiePreferences');
+
+    // Cookie preference checkboxes
+    const prefCookies = document.getElementById('preferenceCookies');
+    const analyticsCookies = document.getElementById('analyticsCookies');
+    const marketingCookies = document.getElementById('marketingCookies');
+
+    function getCookieConsent() {
+      return localStorage.getItem('cookieConsent');
+    }
+
+    function showCookieConsent() {
+      if (!getCookieConsent()) {
+        setTimeout(() => {
+          cookieConsent.style.display = 'block';
+        }, 1000);
+      }
+    }
+
+    function saveConsent(choice, preferences = null) {
+      const consentData = {
+        choice: choice,
+        timestamp: new Date().toISOString(),
+        preferences: preferences || {
+          essential: true,
+          preference: choice === 'accepted' ? true : false,
+          analytics: choice === 'accepted' ? true : false,
+          marketing: choice === 'accepted' ? true : false
+        }
+      };
+      localStorage.setItem('cookieConsent', JSON.stringify(consentData));
+      cookieConsent.style.display = 'none';
+      
+      // Optional: Send consent to server
+      fetch('/api/cookie-consent/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(consentData)
+      }).catch(error => console.error('Error sending consent:', error));
+    }
+
+    // Toggle cookie settings panel
+    if (cookieSettingsBtn) {
+      cookieSettingsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (cookieSettings.style.display === 'none') {
+          cookieSettings.style.display = 'block';
+          const saved = getCookieConsent();
+          if (saved) {
+            const data = JSON.parse(saved);
+            prefCookies.checked = data.preferences.preference;
+            analyticsCookies.checked = data.preferences.analytics;
+            marketingCookies.checked = data.preferences.marketing;
+          }
+        } else {
+          cookieSettings.style.display = 'none';
+        }
+      });
+    }
+
+    // Accept all cookies
+    if (acceptAllBtn) {
+      acceptAllBtn.addEventListener('click', () => {
+        saveConsent('accepted');
+      });
+    }
+
+    // Reject non-essential cookies
+    if (rejectNonEssentialBtn) {
+      rejectNonEssentialBtn.addEventListener('click', () => {
+        saveConsent('rejected', {
+          essential: true,
+          preference: false,
+          analytics: false,
+          marketing: false
+        });
+      });
+    }
+
+    // Save custom preferences
+    if (savePrefsBtn) {
+      savePrefsBtn.addEventListener('click', () => {
+        const preferences = {
+          essential: true,
+          preference: prefCookies.checked,
+          analytics: analyticsCookies.checked,
+          marketing: marketingCookies.checked
+        };
+        saveConsent('custom', preferences);
+        cookieSettings.style.display = 'none';
+      });
+    }
+
+    // Close cookie consent
+    if (closeCookieBtn) {
+      closeCookieBtn.addEventListener('click', () => {
+        cookieConsent.style.display = 'none';
+      });
+    }
+
+    // Show cookie consent on page load
+    document.addEventListener('DOMContentLoaded', showCookieConsent);
+
+    // ========== GENERAL ==========
+    // Preloader
+    window.addEventListener('load', () => {
+      const preloader = document.getElementById('preloader');
+      if (preloader) {
+        preloader.style.opacity = '0';
+        preloader.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => {
+          preloader.style.display = 'none';
+        }, 300);
+      }
+    });
+
+    // Auto-hide toasts after 5 seconds
+    document.addEventListener('DOMContentLoaded', () => {
+      const toasts = document.querySelectorAll('.toast');
+      toasts.forEach(toast => {
+        const bsToast = new bootstrap.Toast(toast, { delay: 5000 });
+        bsToast.show();
+      });
+    });
+
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        html.setAttribute('data-bs-theme', newTheme);
+        
+        const icon = themeToggle.querySelector('i');
+        const text = themeToggle.querySelector('span');
+        
+        if (newTheme === 'dark') {
+          icon.className = 'bi bi-sun';
+          text.textContent = 'Light Mode';
+        } else {
+          icon.className = 'bi bi-moon-stars';
+          text.textContent = 'Dark Mode';
+        }
+        
+        localStorage.setItem('theme', newTheme);
+      });
+
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        const icon = themeToggle.querySelector('i');
+        const text = themeToggle.querySelector('span');
+        
+        if (savedTheme === 'dark') {
+          icon.className = 'bi bi-sun';
+          text.textContent = 'Light Mode';
+        }
+      }
+    }
+
+    // Add active class to current nav link
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('.nav-link:not(.dropdown-toggle)');
+      
+      navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+    });
+  </script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,276 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ product.product.name }} - MarketLens{% endblock %}
+
+{% block page_title %}Product Details{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'search' %}">Search</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ product.product.name|truncatechars:30 }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Product Main Info -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5 mb-4 mb-md-0">
+                        <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="height: 250px;">
+                            {% if product.product.image %}
+                            <img src="{{ product.product.image.url }}" alt="{{ product.product.name }}" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                            {% else %}
+                            <i class="bi bi-box" style="font-size: 5rem; color: var(--color-muted);"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h2 class="fw-bold mb-0">{{ product.product.name }}</h2>
+                            {% if is_best_price %}
+                            <span class="badge bg-success">Best Price</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h1 class="text-primary fw-bold mb-2">₦{{ product.price }}</h1>
+                            <p class="text-muted small">
+                                <i class="bi bi-clock me-1"></i> Price updated {{ product.last_updated|timesince }} ago
+                            </p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-2">Product Details</h6>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-tag me-2"></i> Category: 
+                                <a href="{% url 'consumer_category_detail' product.product.category.slug %}" class="text-decoration-none">
+                                    {{ product.product.category.name|default:"Uncategorized" }}
+                                </a>
+                            </p>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-box-seam me-2"></i> Unit: {{ product.product.unit }}
+                            </p>
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-shield-check me-2"></i> Vendor Status: 
+                                <span class="badge bg-success">Verified</span>
+                            </p>
+                        </div>
+                        
+                        {% if product.product.description %}
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-2">Description</h6>
+                            <p class="text-muted">{{ product.product.description }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'consumer_add_to_comparison' product.id %}" class="btn btn-outline-primary">
+                                <i class="bi bi-plus-circle me-2"></i> Add to Compare
+                            </a>
+                            <a href="{% url 'consumer_add_favorite_product' product.id %}" class="btn btn-outline-danger">
+                                <i class="bi {% if is_favorite %}bi-heart-fill{% else %}bi-heart{% endif %} me-2"></i> 
+                                {% if is_favorite %}Favorited{% else %}Add to Favorites{% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Price Statistics -->
+        <div class="row g-4 mt-2">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted mb-2">Lowest Price</h6>
+                        <h4 class="fw-bold text-success mb-0">₦{{ price_stats.min }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted mb-2">Average Price</h6>
+                        <h4 class="fw-bold text-primary mb-0">₦{{ price_stats.avg|floatformat:0 }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted mb-2">Highest Price</h6>
+                        <h4 class="fw-bold text-danger mb-0">₦{{ price_stats.max }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Other Vendors Comparison -->
+        {% if other_vendors %}
+        <div class="card mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Compare with Other Vendors</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Vendor</th>
+                                <th>Market</th>
+                                <th>Price</th>
+                                <th>Difference</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vendor in other_vendors %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-person-circle me-2 text-primary"></i>
+                                        <div>
+                                            <strong>{{ vendor.vendor.user.get_full_name|default:vendor.vendor.user.username }}</strong>
+                                            {% if vendor.price < product.price %}
+                                            <span class="badge bg-success ms-2">Lower Price</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ vendor.market.name }}</td>
+                                <td><span class="fw-bold">₦{{ vendor.price }}</span></td>
+                                <td>
+                                    {% if vendor.price < product.price %}
+                                    <span class="text-success">-₦{{ product.price|add:vendor.price|cut:'-' }}</span>
+                                    {% elif vendor.price > product.price %}
+                                    <span class="text-danger">+₦{{ vendor.price|add:product.price|cut:'-' }}</span>
+                                    {% else %}
+                                    <span class="text-muted">Same</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'consumer_product_detail' vendor.id %}" class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4 mb-4">
+        <!-- Vendor Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Vendor Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    {% if product.vendor.user.profile.profile_picture %}
+                    <img src="{{ product.vendor.user.profile.profile_picture.url }}" 
+                         alt="{{ product.vendor.user.get_full_name }}"
+                         class="rounded-circle me-3" 
+                         style="width: 50px; height: 50px; object-fit: cover;">
+                    {% else %}
+                    <i class="bi bi-person-circle fs-1 me-3" style="color: var(--color-accent);"></i>
+                    {% endif %}
+                    <div>
+                        <h6 class="fw-bold mb-1">{{ product.vendor.user.get_full_name|default:product.vendor.user.username }}</h6>
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-star-fill text-warning me-1"></i> Verified Vendor
+                        </p>
+                    </div>
+                </div>
+                <hr>
+                <div class="small">
+                    <p class="mb-2"><i class="bi bi-calendar me-2"></i> Member since: {{ product.vendor.user.date_joined|date:"M Y" }}</p>
+                    <p class="mb-0"><i class="bi bi-shield-check me-2 text-success"></i> KYC Verified</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Market Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Market Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    {% if product.market.cover_image %}
+                    <img src="{{ product.market.cover_image.url }}" alt="{{ product.market.name }}"
+                         class="rounded me-3" 
+                         style="width: 50px; height: 50px; object-fit: cover;">
+                    {% else %}
+                    <i class="bi bi-geo-alt fs-1 me-3" style="color: var(--color-accent);"></i>
+                    {% endif %}
+                    <div>
+                        <h6 class="fw-bold mb-1">{{ product.market.name }}</h6>
+                        <p class="text-muted small mb-0">{{ product.market.location }}</p>
+                    </div>
+                </div>
+                
+                {% if product.market.address %}
+                <p class="small text-muted mb-2">
+                    <i class="bi bi-pin-map me-2"></i> {{ product.market.address }}
+                </p>
+                {% endif %}
+                
+                {% if product.market.opening_hours %}
+                <p class="small text-muted mb-2">
+                    <i class="bi bi-clock me-2"></i> {{ product.market.opening_hours }}
+                </p>
+                {% endif %}
+                
+                <a href="{% url 'consumer_market_detail' product.market.id %}" class="btn btn-outline-primary btn-sm w-100">
+                    View Market Details
+                </a>
+            </div>
+        </div>
+        
+        <!-- Price Alert Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Price Alert</h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-3">Get notified when this product price drops.</p>
+                <a href="{% url 'consumer_create_price_alert' product.id %}" class="btn btn-outline-warning w-100">
+                    <i class="bi bi-bell me-2"></i> Set Price Alert
+                </a>
+            </div>
+        </div>
+        
+        <!-- Similar Products -->
+        {% if similar_products %}
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Similar Products</h5>
+            </div>
+            <div class="card-body">
+                {% for item in similar_products %}
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                    <div>
+                        <h6 class="fw-bold mb-1">{{ item.product.name }}</h6>
+                        <small class="text-muted">
+                            ₦{{ item.price }} • {{ item.market.name }}
+                        </small>
+                    </div>
+                    <a href="{% url 'consumer_product_detail' item.id %}" class="btn btn-sm btn-outline-primary">
+                        View
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,517 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Bulk Price Update - MarketLens Vendor{% endblock %}
+
+{% block page_title %}Bulk Price Update{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'vendor_dashboard' %}">Vendor Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">Bulk Price Update</li>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .bulk-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .product-select-card {
+    transition: all 0.2s ease;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+  }
+  
+  .product-select-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+    border-color: var(--color-accent);
+  }
+  
+  .product-select-card.selected {
+    border-color: var(--color-accent);
+    background: rgba(77, 168, 218, 0.05);
+    box-shadow: 0 0 0 2px var(--color-accent);
+  }
+  
+  .product-checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--color-accent);
+  }
+  
+  .product-image {
+    height: 120px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  
+  .price-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--color-primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .selection-bar {
+    position: sticky;
+    top: 80px;
+    z-index: 100;
+    background: white;
+    border-bottom: 1px solid var(--color-border);
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  .price-input-group {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+  }
+  
+  .radio-card {
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 100%;
+  }
+  
+  .radio-card:hover {
+    border-color: var(--color-accent);
+  }
+  
+  .radio-card.selected {
+    border-color: var(--color-accent);
+    background: rgba(77, 168, 218, 0.05);
+  }
+  
+  .radio-card input[type="radio"] {
+    display: none;
+  }
+  
+  .radio-icon {
+    font-size: 1.5rem;
+    color: var(--color-accent);
+    margin-bottom: 0.5rem;
+  }
+  
+  .stats-card {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  
+  @media (max-width: 768px) {
+    .selection-bar {
+      position: relative;
+      top: 0;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bulk-container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h2 fw-bold mb-2">Bulk Price Update</h1>
+      <p class="text-muted">Update prices for multiple products at once</p>
+    </div>
+    <div>
+      <span class="badge bg-primary fs-6 p-2">{{ total_products }} Total Products</span>
+    </div>
+  </div>
+
+  <!-- Selection Bar (Sticky) -->
+  <div class="selection-bar" id="selectionBar">
+    <div class="row align-items-center">
+      <div class="col-md-4">
+        <div class="d-flex align-items-center">
+          <div class="form-check me-3">
+            <input type="checkbox" class="form-check-input" id="selectAllCheckbox">
+            <label class="form-check-label" for="selectAllCheckbox">Select All</label>
+          </div>
+          <span class="text-muted" id="selectedCount">0 products selected</span>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="d-flex gap-2 justify-content-end">
+          <button class="btn btn-outline-secondary" id="clearSelectionBtn">
+            <i class="bi bi-x-circle me-2"></i>Clear
+          </button>
+          <button class="btn btn-primary" id="updateSelectedBtn" data-bs-toggle="modal" data-bs-target="#priceUpdateModal" disabled>
+            <i class="bi bi-pencil-square me-2"></i>Update Selected
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <form method="POST" id="bulkUpdateForm">
+    {% csrf_token %}
+    
+    {% if products %}
+    <div class="row g-4">
+      {% for product in products %}
+      <div class="col-xl-3 col-lg-4 col-md-6">
+        <div class="card product-select-card position-relative" data-product-id="{{ product.id }}">
+          <div class="price-badge">₦{{ product.price }}</div>
+          <input type="checkbox" name="selected_products" value="{{ product.id }}" class="product-checkbox" id="product_{{ product.id }}">
+          
+          <!-- Product Image -->
+          <div class="product-image">
+            {% if product.product.image %}
+            <img src="{{ product.product.image.url }}" alt="{{ product.product.name }}" style="height: 120px; width: 100%; object-fit: cover;">
+            {% else %}
+            <i class="bi bi-image" style="font-size: 2.5rem; color: var(--color-muted);"></i>
+            {% endif %}
+          </div>
+          
+          <div class="card-body">
+            <h6 class="fw-bold mb-1">{{ product.product.name }}</h6>
+            <div class="small text-muted mb-2">
+              <i class="bi bi-geo-alt me-1"></i>{{ product.market.name }}
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="badge bg-info">{{ product.product.unit }}</span>
+              <small class="text-muted">
+                <i class="bi bi-clock me-1"></i>{{ product.last_updated|timesince|truncatechars:10 }}
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+      <i class="bi bi-box-seam" style="font-size: 4rem; color: var(--color-muted);"></i>
+      <h3 class="fw-bold mt-3">No Products Found</h3>
+      <p class="text-muted">You haven't added any products yet.</p>
+      <a href="{% url 'add_product' %}" class="btn btn-primary mt-3">
+        <i class="bi bi-plus-circle me-2"></i> Add Your First Product
+      </a>
+    </div>
+    {% endif %}
+  </form>
+
+  <!-- Price Update Modal -->
+  <div class="modal fade" id="priceUpdateModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-pencil-square me-2 text-primary"></i>
+            Update Prices
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Selected Products Summary -->
+          <div class="stats-card mb-4">
+            <h3 class="fw-bold mb-1" id="modalSelectedCount">0</h3>
+            <p class="text-muted mb-0">products selected for update</p>
+          </div>
+
+          <!-- Price Update Options -->
+          <div class="price-input-group">
+            <h6 class="fw-bold mb-3">Update Method</h6>
+            
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <label class="radio-card text-center" id="radioFixed">
+                  <input type="radio" name="price_type" value="fixed" checked>
+                  <div class="radio-icon">
+                    <i class="bi bi-coin"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1">Fixed Price</h6>
+                  <small class="text-muted">Set to specific amount</small>
+                </label>
+              </div>
+              
+              <div class="col-md-4">
+                <label class="radio-card text-center" id="radioIncrease">
+                  <input type="radio" name="price_type" value="percentage_increase">
+                  <div class="radio-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1">Increase %</h6>
+                  <small class="text-muted">Add percentage</small>
+                </label>
+              </div>
+              
+              <div class="col-md-4">
+                <label class="radio-card text-center" id="radioDecrease">
+                  <input type="radio" name="price_type" value="percentage_decrease">
+                  <div class="radio-icon">
+                    <i class="bi bi-graph-down-arrow"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1">Decrease %</h6>
+                  <small class="text-muted">Subtract percentage</small>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Price Input -->
+            <div class="mb-3">
+              <label for="price_value" class="form-label fw-bold">Value</label>
+              <div class="input-group">
+                <span class="input-group-text" id="priceSymbol">₦</span>
+                <input type="number" name="price_value" id="price_value" class="form-control form-control-lg" 
+                       placeholder="Enter amount" step="0.01" min="0" required>
+                <span class="input-group-text" id="priceUnit">Fixed</span>
+              </div>
+              <div class="form-text" id="priceHelp">
+                Set the new price in Nigerian Naira
+              </div>
+            </div>
+            
+            <!-- Example Preview -->
+            <div class="alert alert-info bg-light border-0 mt-3" id="previewBox">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-calculator fs-4 me-3 text-primary"></i>
+                <div>
+                  <small class="text-muted d-block">Example:</small>
+                  <span id="pricePreview">₦1,000 → ₦1,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warning for large changes -->
+          <div class="alert alert-warning bg-light border-0 small" id="warningBox" style="display: none;">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span id="warningMessage">Price change exceeds 20%</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-2"></i>Cancel
+          </button>
+          <button type="submit" form="bulkUpdateForm" class="btn btn-primary" id="confirmUpdateBtn">
+            <i class="bi bi-check-lg me-2"></i>Update Products
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.product-checkbox');
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const modalSelectedCount = document.getElementById('modalSelectedCount');
+    const updateSelectedBtn = document.getElementById('updateSelectedBtn');
+    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+    const productCards = document.querySelectorAll('.product-select-card');
+    
+    // Radio button elements
+    const radioFixed = document.getElementById('radioFixed');
+    const radioIncrease = document.getElementById('radioIncrease');
+    const radioDecrease = document.getElementById('radioDecrease');
+    const priceValue = document.getElementById('price_value');
+    const priceSymbol = document.getElementById('priceSymbol');
+    const priceUnit = document.getElementById('priceUnit');
+    const priceHelp = document.getElementById('priceHelp');
+    const pricePreview = document.getElementById('pricePreview');
+    const warningBox = document.getElementById('warningBox');
+    const warningMessage = document.getElementById('warningMessage');
+    
+    // Sample product price for preview (use first selected product or default)
+    let samplePrice = 1000;
+    
+    // Update selected count
+    function updateSelectedCount() {
+      const checked = document.querySelectorAll('.product-checkbox:checked').length;
+      selectedCountSpan.textContent = `${checked} product${checked !== 1 ? 's' : ''} selected`;
+      modalSelectedCount.textContent = checked;
+      
+      // Enable/disable update button
+      updateSelectedBtn.disabled = checked === 0;
+      
+      // Update select all checkbox
+      if (selectAllCheckbox) {
+        selectAllCheckbox.checked = checked === checkboxes.length;
+        selectAllCheckbox.indeterminate = checked > 0 && checked < checkboxes.length;
+      }
+      
+      // Update card selection styling
+      productCards.forEach(card => {
+        const checkbox = card.querySelector('.product-checkbox');
+        if (checkbox.checked) {
+          card.classList.add('selected');
+        } else {
+          card.classList.remove('selected');
+        }
+      });
+      
+      // Get a sample price from first selected product for preview
+      const firstSelected = document.querySelector('.product-checkbox:checked');
+      if (firstSelected) {
+        const card = firstSelected.closest('.product-select-card');
+        const priceBadge = card.querySelector('.price-badge');
+        if (priceBadge) {
+          samplePrice = parseFloat(priceBadge.textContent.replace('₦', '').replace(',', ''));
+        }
+      }
+      updatePricePreview();
+    }
+    
+    // Update price preview
+    function updatePricePreview() {
+      const priceType = document.querySelector('input[name="price_type"]:checked')?.value || 'fixed';
+      const value = parseFloat(priceValue.value) || 0;
+      
+      let newPrice = samplePrice;
+      let symbol = '₦';
+      let unit = 'Fixed';
+      let helpText = 'Set the new price in Nigerian Naira';
+      
+      if (priceType === 'fixed') {
+        newPrice = value;
+        symbol = '₦';
+        unit = 'Fixed';
+        helpText = 'Set the new price in Nigerian Naira';
+      } else if (priceType === 'percentage_increase') {
+        newPrice = samplePrice * (1 + value / 100);
+        symbol = '%';
+        unit = 'Increase';
+        helpText = 'Enter percentage to increase by';
+      } else if (priceType === 'percentage_decrease') {
+        newPrice = samplePrice * (1 - value / 100);
+        symbol = '%';
+        unit = 'Decrease';
+        helpText = 'Enter percentage to decrease by';
+      }
+      
+      priceSymbol.textContent = symbol;
+      priceUnit.textContent = unit;
+      priceHelp.textContent = helpText;
+      
+      // Format for display
+      const formattedSample = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(samplePrice);
+      const formattedNew = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(newPrice);
+      pricePreview.textContent = `${formattedSample} → ${formattedNew}`;
+      
+      // Show warning for large changes (>20%)
+      const changePercent = Math.abs((newPrice - samplePrice) / samplePrice * 100);
+      if (changePercent > 20 && value > 0) {
+        warningBox.style.display = 'block';
+        warningMessage.textContent = `Price change of ${changePercent.toFixed(1)}% exceeds 20%`;
+      } else {
+        warningBox.style.display = 'none';
+      }
+    }
+    
+    // Handle card click to toggle checkbox
+    productCards.forEach(card => {
+      card.addEventListener('click', function(e) {
+        // Don't toggle if clicking directly on checkbox
+        if (e.target.type !== 'checkbox') {
+          const checkbox = this.querySelector('.product-checkbox');
+          checkbox.checked = !checkbox.checked;
+          updateSelectedCount();
+        }
+      });
+    });
+    
+    // Handle checkbox change
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateSelectedCount);
+    });
+    
+    // Select all functionality
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', function() {
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = this.checked;
+        });
+        updateSelectedCount();
+      });
+    }
+    
+    // Clear selection
+    if (clearSelectionBtn) {
+      clearSelectionBtn.addEventListener('click', function() {
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = false;
+        });
+        updateSelectedCount();
+      });
+    }
+    
+    // Radio button click handlers
+    [radioFixed, radioIncrease, radioDecrease].forEach(radio => {
+      radio.addEventListener('click', function() {
+        const radioInput = this.querySelector('input[type="radio"]');
+        radioInput.checked = true;
+        
+        // Update styling
+        [radioFixed, radioIncrease, radioDecrease].forEach(r => r.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        updatePricePreview();
+      });
+    });
+    
+    // Set initial selected state for radio
+    radioFixed.classList.add('selected');
+    
+    // Price input update
+    priceValue.addEventListener('input', updatePricePreview);
+    
+    // Initialize
+    updateSelectedCount();
+    updatePricePreview();
+    
+    // Form validation
+    document.getElementById('bulkUpdateForm').addEventListener('submit', function(e) {
+      const checked = document.querySelectorAll('.product-checkbox:checked').length;
+      if (checked === 0) {
+        e.preventDefault();
+        alert('Please select at least one product to update.');
+        return false;
+      }
+      
+      const priceType = document.querySelector('input[name="price_type"]:checked');
+      if (!priceType) {
+        e.preventDefault();
+        alert('Please select a price update method.');
+        return false;
+      }
+      
+      const priceVal = parseFloat(priceValue.value);
+      if (isNaN(priceVal) || priceVal < 0) {
+        e.preventDefault();
+        alert('Please enter a valid price value.');
+        return false;
+      }
+      
+      return true;
+    });
+  });
+</script>
+{% endblock %}

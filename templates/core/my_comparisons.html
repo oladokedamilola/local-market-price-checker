@@ -1,0 +1,294 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}My Comparisons - MarketLens{% endblock %}
+
+{% block page_title %}My Saved Comparisons{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">My Comparisons</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-2">My Comparisons</h1>
+            <p class="text-muted">View and manage your saved product comparisons</p>
+        </div>
+        <div>
+            <a href="{% url 'compare' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i> New Comparison
+            </a>
+        </div>
+    </div>
+
+    {% if comparisons %}
+    <!-- Comparisons Grid -->
+    <div class="row g-4">
+        {% for comparison in comparisons %}
+        <div class="col-xl-4 col-lg-6">
+            <div class="card h-100 comparison-card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-truncate" style="max-width: 200px;" title="{{ comparison.name }}">
+                        {{ comparison.name }}
+                    </h5>
+                    <span class="badge bg-primary">{{ comparison.product_count }} Products</span>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Products Preview -->
+                    <div class="mb-3">
+                        <h6 class="fw-bold mb-2">Products:</h6>
+                        <ul class="list-unstyled">
+                            {% for product in comparison.products.all|slice:":3" %}
+                            <li class="small mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-dot text-primary me-1"></i>
+                                        <span class="fw-medium">{{ product.product.name }}</span>
+                                        <br>
+                                        <small class="text-muted ms-3">
+                                            ₦{{ product.price }} • {{ product.market.name }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                            {% if comparison.products.count > 3 %}
+                            <li class="small text-muted mt-2">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                +{{ comparison.products.count|add:"-3" }} more products
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <!-- Metadata -->
+                    <div class="small text-muted mb-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="bi bi-calendar me-2"></i>
+                            Created: {{ comparison.created_at|date:"M d, Y" }}
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock me-2"></i>
+                            Last updated: {{ comparison.updated_at|timesince }} ago
+                        </div>
+                    </div>
+
+                    <!-- Price Summary (if available) -->
+                    {% if comparison.products.all %}
+                        {% with prices=comparison.products.all %}
+                            {% with min_price=prices|dictsort:"price"|first %}
+                            {% with max_price=prices|dictsort:"price"|last %}
+                            <div class="bg-light p-2 rounded-3 mb-3">
+                                <div class="row g-2 text-center">
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Min</small>
+                                        <span class="fw-bold text-success">₦{{ min_price.price }}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Max</small>
+                                        <span class="fw-bold text-danger">₦{{ max_price.price }}</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Range</small>
+                                        <span class="fw-bold text-primary">₦{{ max_price.price|add:min_price.price|cut:'-' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endwith %}
+                            {% endwith %}
+                        {% endwith %}
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'shared_comparison' comparison.share_uuid %}" 
+                           class="btn btn-outline-primary flex-grow-1" 
+                           target="_blank"
+                           title="View comparison">
+                            <i class="bi bi-eye me-1"></i> View
+                        </a>
+                        <button class="btn btn-outline-secondary" 
+                                onclick="copyShareLink('{{ comparison.share_uuid }}')"
+                                title="Copy share link">
+                            <i class="bi bi-share"></i>
+                        </button>
+                        <a href="{% url 'comparison_detail' comparison.id %}" 
+                           class="btn btn-outline-primary"
+                           title="Edit comparison">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-white py-2">
+                    <small class="text-muted">
+                        <i class="bi bi-share me-1"></i>
+                        Share UUID: {{ comparison.share_uuid|truncatechars:16 }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="d-flex justify-content-center mt-5">
+        <nav aria-label="Comparisons pagination">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for i in page_obj.paginator.page_range %}
+                    {% if page_obj.number == i %}
+                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5">
+        <i class="bi bi-files" style="font-size: 4rem; color: var(--color-muted);"></i>
+        <h3 class="fw-bold mt-3">No Saved Comparisons</h3>
+        <p class="text-muted mb-4">
+            You haven't saved any product comparisons yet. 
+            Start comparing products and save them for later!
+        </p>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-0 bg-light">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">How to create a comparison:</h5>
+                        <ol class="text-start">
+                            <li class="mb-2">Go to <a href="{% url 'search' %}">Search Products</a></li>
+                            <li class="mb-2">Click the <span class="badge bg-primary">Compare</span> button on products you're interested in</li>
+                            <li class="mb-2">Visit the <a href="{% url 'compare' %}">Compare page</a> to view your selection</li>
+                            <li class="mb-2">Click "Save Comparison" to save it for later</li>
+                            <li>Come back here to view your saved comparisons anytime!</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'search' %}" class="btn btn-primary btn-lg px-5 mt-4">
+            <i class="bi bi-search me-2"></i> Start Searching
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Share Link Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Share Comparison</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">Anyone with this link can view your comparison:</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="shareLinkInput" readonly>
+                    <button class="btn btn-primary" type="button" onclick="copyModalLink()">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                </div>
+                <div class="alert alert-info bg-light border-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Shared comparisons are viewable by anyone with the link, even without logging in.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .comparison-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid var(--color-border);
+    }
+    .comparison-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-soft);
+    }
+    .bg-light {
+        background-color: var(--color-bg) !important;
+    }
+</style>
+
+<script>
+function copyShareLink(uuid) {
+    const url = window.location.origin + "{% url 'shared_comparison' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', uuid);
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(url).then(function() {
+        // Show success toast
+        showToast('Link copied to clipboard!', 'success');
+    }, function() {
+        // Show error toast
+        showToast('Failed to copy link. Please try again.', 'danger');
+    });
+}
+
+function showToast(message, type) {
+    const toastContainer = document.querySelector('.toast-container');
+    if (toastContainer) {
+        const toastHtml = `
+            <div class="toast show align-items-center text-white bg-${type} border-0 mb-2" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `;
+        toastContainer.innerHTML = toastHtml;
+        setTimeout(() => {
+            toastContainer.innerHTML = '';
+        }, 3000);
+    }
+}
+
+// Optional: Auto-refresh every 30 seconds to update timestamps
+setTimeout(function() {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

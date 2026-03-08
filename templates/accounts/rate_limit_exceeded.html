@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Too Many Attempts - MarketLens{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h1 class="fw-bold mb-3">Too Many Attempts</h1>
+                    
+                    <p class="lead text-muted mb-4">
+                        You've made too many {{ action_display|lower }} attempts.
+                    </p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-clock me-2"></i>
+                        Please try again in <strong>{{ minutes_remaining }} minutes</strong>.
+                    </div>
+                    
+                    <p class="text-muted small mb-4">
+                        This helps us protect your account from unauthorized access.
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'login' %}" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Back to Login
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-house me-2"></i> Go to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

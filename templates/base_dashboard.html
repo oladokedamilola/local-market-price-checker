@@ -1,0 +1,1197 @@
+<!--templates\base_dashboard.html-->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Dashboard | MarketLens{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  
+  <!-- Styles -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="icon" href="{% static 'images/fav.png' %}" type = "image/x-icon">
+
+
+  <style>
+    /* Dashboard Layout */
+    .dashboard-wrapper {
+      display: flex;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+    }
+    
+    /* Sidebar Styles */
+    .sidebar {
+      width: 280px;
+      background: var(--color-primary);
+      color: #fff;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    .sidebar::-webkit-scrollbar {
+      width: 5px;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+    
+    .sidebar-header {
+      padding: 1.5rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-brand {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .sidebar-brand:hover {
+      color: white;
+    }
+    
+    .sidebar-nav {
+      padding: 1.5rem 0.75rem;
+      flex: 1;
+    }
+    
+    .nav-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .nav-section-title {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      margin: 0.25rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      position: relative;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(5px);
+    }
+    
+    .nav-link.active {
+      background: rgba(77, 168, 218, 0.2);
+      color: white;
+      font-weight: 500;
+    }
+    
+    .nav-link.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--color-accent);
+      border-radius: 0 3px 3px 0;
+    }
+    
+    .nav-link i {
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+    }
+    
+    .nav-badge {
+      margin-left: auto;
+      background: var(--color-accent);
+      color: white;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+    }
+    
+    .sidebar-footer {
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: auto;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .user-details h6 {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    
+    .user-details small {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.8rem;
+    }
+    
+    /* Content Area */
+    .content {
+      flex: 1;
+      margin-left: 280px;
+      transition: margin-left 0.3s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Topbar */
+    .topbar {
+      background: white;
+      border-bottom: 1px solid var(--color-border);
+      padding: 1rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .topbar-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 0;
+    }
+    
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .sidebar-toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 0.5rem;
+      font-size: 1.25rem;
+      color: var(--color-text);
+    }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 1.5rem;
+      background: var(--color-bg);
+    }
+    
+    /* Stats Cards */
+    .stat-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-soft);
+      height: 100%;
+      border: 1px solid var(--color-border);
+    }
+    
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    
+    .stat-icon.primary {
+      background: rgba(77, 168, 218, 0.1);
+      color: var(--color-accent);
+    }
+    
+    .stat-icon.success {
+      background: rgba(46, 204, 113, 0.1);
+      color: var(--color-success);
+    }
+    
+    .stat-icon.warning {
+      background: rgba(244, 162, 97, 0.1);
+      color: var(--color-warning);
+    }
+    
+    .stat-icon.danger {
+      background: rgba(230, 57, 70, 0.1);
+      color: var(--color-danger);
+    }
+    
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+      color: var(--color-muted);
+      font-size: 0.9rem;
+    }
+    
+    .stat-change {
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    
+    .stat-change.positive {
+      color: var(--color-success);
+    }
+    
+    .stat-change.negative {
+      color: var(--color-danger);
+    }
+    
+    /* Backdrop */
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+    
+    /* Collapsed State */
+    .sidebar-collapsed .sidebar {
+      transform: translateX(-100%);
+    }
+    
+    .sidebar-collapsed .content {
+      margin-left: 0;
+    }
+    
+    .sidebar-open .sidebar-backdrop {
+      display: block;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1199px) {
+      .sidebar {
+        width: 250px;
+      }
+      .content {
+        margin-left: 250px;
+      }
+    }
+    
+    @media (max-width: 991px) {
+      .sidebar {
+        width: 240px;
+      }
+      .content {
+        margin-left: 240px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 280px;
+        transform: translateX(-100%);
+      }
+      
+      .content {
+        margin-left: 0;
+      }
+      
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .sidebar-open .sidebar {
+        transform: translateX(0);
+      }
+      
+      .sidebar-open .sidebar-backdrop {
+        display: block;
+      }
+      
+      .topbar {
+        padding: 1rem;
+      }
+      
+      .main-content {
+        padding: 1rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .topbar-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .topbar-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .page-title {
+        font-size: 1.25rem;
+      }
+      
+      .stat-value {
+        font-size: 1.5rem;
+      }
+    }
+    
+    /* Theme Support */
+    [data-bs-theme="dark"] .stat-card,
+    [data-bs-theme="dark"] .topbar {
+      background: var(--color-primary);
+      border-color: var(--color-border);
+    }
+    
+    [data-bs-theme="dark"] .topbar {
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    [data-bs-theme="dark"] .stat-value {
+      color: #fff;
+    }
+    
+    /* Dashboard Footer */
+    .dashboard-footer {
+      background: var(--color-primary);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.85rem;
+      border-top: 1px solid var(--color-border);
+    }
+    
+    [data-bs-theme="dark"] .dashboard-footer {
+      background: rgba(0, 0, 0, 0.2);
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+<div class="dashboard-wrapper sidebar-collapsed" id="dashboardWrapper">
+
+  <!-- Sidebar Backdrop -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar d-flex flex-column">
+    <!-- Brand -->
+    <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+            <i class="bi bi-search-heart"></i>
+            <span>MarketLens</span>
+        </a>
+    </div>
+
+    <!-- Navigation -->
+    <div class="sidebar-nav d-flex flex-column flex-grow-1">
+        <!-- Main Navigation -->
+        <div class="nav-section">
+            <div class="nav-section-title">Main</div>
+            <a href="{% url 'dashboard' %}" class="nav-link {% if request.path == '/dashboard/' or request.path == '/dashboard' %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+        </div>
+
+        <!-- CONSUMER LINKS -->
+        {% for group in user.groups.all %}
+            {% if group.name == 'CONSUMER' %}
+            <div class="nav-section">
+                <div class="nav-section-title">Shopping</div>
+                <a href="{% url 'search' %}" class="nav-link {% if 'search' in request.path %}active{% endif %}">
+                    <i class="bi bi-search"></i>
+                    <span>Search Products</span>
+                </a>
+                
+                <a href="{% url 'compare' %}" class="nav-link {% if 'compare' in request.path %}active{% endif %}">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Compare Products</span>
+                </a>
+                
+                <a href="{% url 'my_comparisons' %}" class="nav-link {% if 'my-comparisons' in request.path %}active{% endif %}">
+                    <i class="bi bi-files"></i>
+                    <span>My Comparisons</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">My Stuff</div>
+                <a href="{% url 'consumer_favorites' %}" class="nav-link {% if 'favorites' in request.path %}active{% endif %}">
+                    <i class="bi bi-star"></i>
+                    <span>My Favorites</span>
+                </a>
+                
+                <a href="{% url 'consumer_price_alerts' %}" class="nav-link {% if 'price-alerts' in request.path %}active{% endif %}">
+                    <i class="bi bi-bell"></i>
+                    <span>Price Alerts</span>
+                </a>
+            </div>
+            {% endif %}
+        {% endfor %}
+
+        <!-- VENDOR LINKS - Check KYC status -->
+        {% for group in user.groups.all %}
+            {% if group.name == 'VENDOR' %}
+                {% with vendor_kyc_status=user.vendorprofile.kyc_status %}
+                {% with is_verified=user.vendorprofile.is_verified %}
+                
+                <!-- KYC Status Indicator -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        KYC Status
+                        {% if is_verified %}
+                        <span class="badge bg-success ms-2">Verified</span>
+                        {% elif vendor_kyc_status and vendor_kyc_status.reviewed_at %}
+                        <span class="badge bg-danger ms-2">Rejected</span>
+                        {% elif vendor_kyc_status %}
+                        <span class="badge bg-warning ms-2">Pending</span>
+                        {% else %}
+                        <span class="badge bg-secondary ms-2">Required</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Vendor Dashboard</div>
+                    
+                    <!-- Overview - Always accessible -->
+                    <a href="{% url 'vendor_dashboard' %}" class="nav-link {% if 'vendor/dashboard' in request.path %}active{% endif %}">
+                        <i class="bi bi-shop"></i>
+                        <span>Overview</span>
+                    </a>
+                    
+                    <!-- My Products - Frozen if not verified -->
+                    {% if is_verified %}
+                    <a href="{% url 'product_list' %}" class="nav-link {% if 'products' in request.path %}active{% endif %}">
+                        <i class="bi bi-box"></i>
+                        <span>My Products</span>
+                    </a>
+                    {% else %}
+                    <div class="nav-link disabled-link" title="KYC verification required">
+                        <i class="bi bi-box text-muted"></i>
+                        <span class="text-muted">My Products</span>
+                        <span class="nav-badge bg-secondary">Locked</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Add Product - Frozen if not verified -->
+                    {% if is_verified %}
+                    <a href="{% url 'add_product' %}" class="nav-link {% if 'add' in request.path %}active{% endif %}">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Add Product</span>
+                    </a>
+                    {% else %}
+                    <div class="nav-link disabled-link" title="KYC verification required">
+                        <i class="bi bi-plus-circle text-muted"></i>
+                        <span class="text-muted">Add Product</span>
+                        <span class="nav-badge bg-secondary">Locked</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    
+                    <!-- Bulk Price Update - Frozen if not verified -->
+                    {% if is_verified %}
+
+                    {% else %}
+                    <div class="nav-link disabled-link" title="KYC verification required">
+                        <i class="bi bi-pencil-square text-muted"></i>
+                        <span class="text-muted">Bulk Price Update</span>
+                        <span class="nav-badge bg-secondary">Locked</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Request Category - Always accessible (useful even if not verified) -->
+                    <a href="{% url 'request_category' %}" class="nav-link {% if 'request-category' in request.path %}active{% endif %}">
+                        <i class="bi bi-tag"></i>
+                        <span>Request Category</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Analytics</div>
+                    
+                    <!-- Analytics - Frozen if not verified -->
+                    {% if is_verified %}
+                    <a href="{% url 'vendor_analytics' %}" class="nav-link {% if 'analytics' in request.path %}active{% endif %}">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Analytics</span>
+                    </a>
+                    {% else %}
+                    <div class="nav-link disabled-link" title="KYC verification required">
+                        <i class="bi bi-graph-up text-muted"></i>
+                        <span class="text-muted">Analytics</span>
+                        <span class="nav-badge bg-secondary">Locked</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Stale Products - Frozen if not verified -->
+                    {% if is_verified %}
+                    <a href="{% url 'stale_products' %}" class="nav-link {% if 'stale' in request.path %}active{% endif %}">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>Stale Products</span>
+                    </a>
+                    {% else %}
+                    <div class="nav-link disabled-link" title="KYC verification required">
+                        <i class="bi bi-exclamation-triangle text-muted"></i>
+                        <span class="text-muted">Stale Products</span>
+                        <span class="nav-badge bg-secondary">Locked</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Export Products - Frozen if not verified -->
+                    {% if is_verified %}
+                    <a href="{% url 'export_products' %}" class="nav-link {% if 'export' in request.path %}active{% endif %}">
+                        <i class="bi bi-download"></i>
+                        <span>Export Products</span>
+                    </a>
+                    {% else %}
+                    <div class="nav-link disabled-link" title="KYC verification required">
+                        <i class="bi bi-download text-muted"></i>
+                        <span class="text-muted">Export Products</span>
+                        <span class="nav-badge bg-secondary">Locked</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endwith %}
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+
+        <!-- ADMIN LINKS -->
+        {% if user.is_staff %}
+        <div class="nav-section">
+            <div class="nav-section-title">Admin Dashboard</div>
+            <a href="{% url 'admin_dashboard' %}" class="nav-link {% if 'admin/dashboard' in request.path %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i>
+                <span>Overview</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">User Management</div>
+            <a href="{% url 'admin_users' %}" class="nav-link {% if 'admin/users' in request.path %}active{% endif %}">
+                <i class="bi bi-people"></i>
+                <span>All Users</span>
+            </a>
+            
+            <a href="{% url 'admin_consumers' %}" class="nav-link {% if 'admin/consumers' in request.path %}active{% endif %}">
+                <i class="bi bi-person"></i>
+                <span>Consumers</span>
+            </a>
+            
+            <a href="{% url 'admin_vendor_verification' %}" class="nav-link {% if 'admin/vendor-verification' in request.path %}active{% endif %}">
+                <i class="bi bi-shield-check"></i>
+                <span>Vendor Verification</span>
+                <span class="nav-badge" id="pendingVendorsCount">0</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Market Management</div>
+            <a href="{% url 'admin_markets' %}" class="nav-link {% if 'admin/markets' in request.path %}active{% endif %}">
+                <i class="bi bi-geo-alt"></i>
+                <span>Markets</span>
+            </a>
+            
+            <a href="{% url 'admin_categories' %}" class="nav-link {% if 'admin/categories' in request.path %}active{% endif %}">
+                <i class="bi bi-tags"></i>
+                <span>Categories</span>
+            </a>
+            
+            <a href="{% url 'admin_category_requests' %}" class="nav-link {% if 'admin/category-requests' in request.path %}active{% endif %}">
+                <i class="bi bi-question-circle"></i>
+                <span>Category Requests</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Content</div>
+            <a href="{% url 'admin_vendor_products' %}" class="nav-link {% if 'admin/vendor-products' in request.path %}active{% endif %}">
+                <i class="bi bi-box-seam"></i>
+                <span>Vendor Products</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Reports</div>
+            <a href="{% url 'admin_reports' %}" class="nav-link {% if 'admin/reports' in request.path %}active{% endif %}">
+                <i class="bi bi-bar-chart"></i>
+                <span>System Reports</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- ACCOUNT LINKS (Visible to all authenticated users) -->
+        <div class="nav-section">
+            <div class="nav-section-title">Account</div>
+            <a href="{% url 'profile' %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
+                <i class="bi bi-person"></i>
+                <span>Profile Settings</span>
+            </a>
+            
+            <a href="{% url 'notifications:notification_center' %}" class="nav-link {% if 'notifications' in request.path %}active{% endif %}">
+                <i class="bi bi-bell"></i>
+                <span>Notifications</span>
+                <span class="nav-badge" id="unreadNotifications">{{ unread_notifications_count }}</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- User Info -->
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar">
+                {% if user.profile.profile_picture %}
+                <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                <i class="bi bi-person" style="color: white;"></i>
+                {% endif %}
+            </div>
+            <div class="user-details">
+                <h6>{{ user.first_name|default:user.username|truncatechars:20 }}</h6>
+                <small>
+                    {% if user.is_staff %}
+                    Admin Account
+                    {% elif 'VENDOR' in user.groups.all|join:"," %}
+                    Vendor Account
+                    {% elif 'CONSUMER' in user.groups.all|join:"," %}
+                    Shopper Account
+                    {% endif %}
+                </small>
+            </div>
+            <a href="{% url 'logout' %}" class="ms-auto text-danger" title="Logout">
+                <i class="bi bi-box-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<style>
+    /* Disabled link styling */
+    .disabled-link {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
+        background-color: transparent !important;
+        color: var(--color-muted) !important;
+        position: relative;
+    }
+    
+    .disabled-link:hover {
+        transform: none !important;
+        background: transparent !important;
+    }
+    
+    .disabled-link .nav-badge {
+        background-color: var(--color-muted) !important;
+    }
+    
+    /* Tooltip for disabled links */
+    .disabled-link[title] {
+        position: relative;
+    }
+    
+    .disabled-link[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        left: 50%;
+        bottom: 100%;
+        transform: translateX(-50%);
+        background: var(--color-primary);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        z-index: 1000;
+        margin-bottom: 5px;
+        pointer-events: none;
+        box-shadow: var(--shadow-soft);
+    }
+    
+    /* KYC Status badge styling */
+    .nav-section-title .badge {
+        font-size: 0.6rem;
+        padding: 0.2rem 0.4rem;
+        vertical-align: middle;
+    }
+</style>
+
+  <!-- Content Area -->
+  <div class="content">
+   <!-- Topbar -->
+<header class="topbar">
+  <div class="topbar-content">
+    <div class="d-flex align-items-center gap-3">
+      <button class="sidebar-toggle" id="toggleSidebarBtn">
+        <i class="bi bi-list"></i>
+      </button>
+      <h1 class="page-title mb-0">{% block page_title %}Dashboard{% endblock %}</h1>
+    </div>
+    
+    <div class="topbar-actions">
+      <!-- Notification Bell -->
+      <div class="dropdown me-2">
+        <button class="btn btn-outline-secondary position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-bell fs-5"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" 
+                style="font-size: 0.6rem; display: {% if unread_notifications_count > 0 %}inline-block{% else %}none{% endif %};"
+                id="unreadNotificationsBadge">
+            {{ unread_notifications_count }}
+          </span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end dropdown-menu-lg p-0" aria-labelledby="notificationDropdown" style="width: 350px;">
+          <div class="dropdown-header d-flex justify-content-between align-items-center bg-light py-2 px-3">
+            <h6 class="mb-0 fw-bold">Notifications</h6>
+            <a href="{% url 'notifications:notification_center' %}" class="small text-primary">View All</a>
+          </div>
+          <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
+            {% for notification in recent_notifications %}
+            <a href="{% if notification.action_url %}{{ notification.action_url }}{% else %}{% url 'notifications:notification_center' %}{% endif %}" 
+               class="dropdown-item notification-item {% if not notification.is_read %}unread{% endif %} py-2 px-3" 
+               data-id="{{ notification.id }}"
+               onclick="if({{ notification.id }}) markNotificationRead({{ notification.id }})">
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi {{ notification.get_icon_class }} {{ notification.get_color_class }} mt-1"></i>
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="fw-bold">{{ notification.title|truncatechars:30 }}</small>
+                    <small class="text-muted ms-2">{{ notification.created_at|timesince }} ago</small>
+                  </div>
+                  <small class="text-muted d-block">{{ notification.message|truncatechars:50 }}</small>
+                </div>
+                {% if not notification.is_read %}
+                <span class="badge bg-primary rounded-circle p-1" style="width: 8px; height: 8px;"></span>
+                {% endif %}
+              </div>
+            </a>
+            {% empty %}
+            <div class="text-center py-4">
+              <i class="bi bi-bell-slash text-muted" style="font-size: 2rem;"></i>
+              <p class="small text-muted mb-0 mt-2">No new notifications</p>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="dropdown-footer text-center p-2 border-top">
+            <button class="btn btn-sm btn-link text-primary" id="markAllReadBtn" onclick="markAllNotificationsRead()">
+              Mark all as read
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button class="btn btn-outline-secondary me-2" id="themeToggle" title="Toggle Theme">
+        <i class="bi bi-moon-stars"></i>
+      </button>
+      
+      <!-- Quick Actions Dropdown -->
+      <div class="dropdown">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <i class="bi bi-lightning"></i> Quick Actions
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-soft">
+          {% if user.groups.filter.name == 'VENDOR' %}
+          <li><a class="dropdown-item" href="{% url 'add_product' %}">
+            <i class="bi bi-plus-circle me-2"></i> Add New Product
+          </a></li>
+          <li><a class="dropdown-item" href="{% url 'vendor_kyc' %}">
+            <i class="bi bi-shield-check me-2"></i> Check KYC Status
+          </a></li>
+          {% elif user.groups.filter.name == 'CONSUMER' %}
+          <li><a class="dropdown-item" href="{% url 'search' %}">
+            <i class="bi bi-search me-2"></i> Search Prices
+          </a></li>
+          <li><a class="dropdown-item" href="{% url 'consumer_price_alerts' %}">
+            <i class="bi bi-bell me-2"></i> Price Alerts
+          </a></li>
+          <li><a class="dropdown-item" href="{% url 'consumer_favorites' %}">
+            <i class="bi bi-star me-2"></i> My Favorites
+          </a></li>
+          {% elif user.is_staff %}
+          <li><a class="dropdown-item" href="{% url 'admin_vendor_verification' %}">
+            <i class="bi bi-shield-check me-2"></i> Verify Vendors
+          </a></li>
+          <li><a class="dropdown-item" href="{% url 'admin_users' %}">
+            <i class="bi bi-people me-2"></i> Manage Users
+          </a></li>
+          <li><a class="dropdown-item" href="{% url 'admin_category_requests' %}">
+            <i class="bi bi-tags me-2"></i> Category Requests
+          </a></li>
+          {% endif %}
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="{% url 'profile' %}">
+            <i class="bi bi-gear me-2"></i> Settings
+          </a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .notification-item.unread {
+    background-color: rgba(77, 168, 218, 0.05);
+  }
+  .notification-item:hover {
+    background-color: #f8f9fa;
+  }
+  .notification-badge {
+    transform: translate(50%, -50%);
+  }
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .btn-outline-secondary {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+  .btn-outline-secondary:hover {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+  }
+</style>
+
+<script>
+// JavaScript for notification handling
+function markNotificationRead(notificationId) {
+  fetch(`/notifications/api/mark-read/${notificationId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      updateUnreadCount(data.unread_count);
+      // Update the UI
+      const notificationItem = document.querySelector(`[data-id="${notificationId}"]`);
+      if (notificationItem) {
+        notificationItem.classList.remove('unread');
+        const badge = notificationItem.querySelector('.badge');
+        if (badge) badge.remove();
+      }
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+function markAllNotificationsRead() {
+  fetch('{% url "notifications:api_mark_all_read" %}', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      updateUnreadCount(0);
+      // Update all notification items
+      document.querySelectorAll('.notification-item').forEach(item => {
+        item.classList.remove('unread');
+        const badge = item.querySelector('.badge');
+        if (badge) badge.remove();
+      });
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+function updateUnreadCount(count) {
+  const badge = document.getElementById('unreadNotificationsBadge');
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// Auto-refresh notifications every 60 seconds
+{% if user.is_authenticated %}
+setInterval(function() {
+  fetch('{% url "notifications:api_notifications" %}?limit=5')
+    .then(response => response.json())
+    .then(data => {
+      updateUnreadCount(data.unread_count);
+      // Update notification dropdown content if needed
+      const notificationList = document.querySelector('.notification-list');
+      if (notificationList && data.notifications.length > 0) {
+        // You could update the list with new notifications here
+        // For now, just update the count
+      }
+    })
+    .catch(error => console.error('Error fetching notifications:', error));
+}, 60000);
+{% endif %}
+
+// Theme Toggle (already in your base_dashboard.html)
+const themeToggle = document.getElementById('themeToggle');
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-bs-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    html.setAttribute('data-bs-theme', newTheme);
+    
+    // Update icon
+    const icon = themeToggle.querySelector('i');
+    if (newTheme === 'dark') {
+      icon.className = 'bi bi-sun';
+      themeToggle.title = 'Switch to Light Mode';
+    } else {
+      icon.className = 'bi bi-moon-stars';
+      themeToggle.title = 'Switch to Dark Mode';
+    }
+    
+    // Save preference
+    localStorage.setItem('dashboard-theme', newTheme);
+  });
+  
+  // Load saved theme
+  const savedTheme = localStorage.getItem('dashboard-theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    const icon = themeToggle.querySelector('i');
+    if (savedTheme === 'dark') {
+      icon.className = 'bi bi-sun';
+      themeToggle.title = 'Switch to Light Mode';
+    }
+  }
+}
+</script>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Breadcrumbs -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-transparent p-0">
+          <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+          {% block breadcrumb_items %}{% endblock %}
+        </ol>
+      </nav>
+
+      <!-- Flash Messages -->
+      <div class="toast-container position-fixed top-1 end-1 p-3" style="z-index:1055;">
+        {% for message in messages %}
+        <div class="toast show align-items-center text-white bg-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} border-0 mb-2" role="alert">
+          <div class="d-flex">
+            <div class="toast-body">
+              <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% elif message.tags == 'error' %}x-circle{% else %}info-circle{% endif %} me-2"></i>
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Page Content -->
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.getElementById('dashboardWrapper');
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const themeToggle = document.getElementById('themeToggle');
+    
+    // Sidebar Toggle
+    toggleBtn.addEventListener('click', () => {
+      wrapper.classList.toggle('sidebar-collapsed');
+      wrapper.classList.toggle('sidebar-open');
+    });
+    
+    // Backdrop Close
+    backdrop.addEventListener('click', () => {
+      wrapper.classList.add('sidebar-collapsed');
+      wrapper.classList.remove('sidebar-open');
+    });
+    
+    // Close sidebar when clicking a link on mobile
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 768) {
+          wrapper.classList.add('sidebar-collapsed');
+          wrapper.classList.remove('sidebar-open');
+        }
+      });
+    });
+    
+    // Theme Toggle
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        html.setAttribute('data-bs-theme', newTheme);
+        
+        // Update icon
+        const icon = themeToggle.querySelector('i');
+        if (newTheme === 'dark') {
+          icon.className = 'bi bi-sun';
+          themeToggle.title = 'Switch to Light Mode';
+        } else {
+          icon.className = 'bi bi-moon-stars';
+          themeToggle.title = 'Switch to Dark Mode';
+        }
+        
+        // Save preference
+        localStorage.setItem('dashboard-theme', newTheme);
+      });
+      
+      // Load saved theme
+      const savedTheme = localStorage.getItem('dashboard-theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        const icon = themeToggle.querySelector('i');
+        if (savedTheme === 'dark') {
+          icon.className = 'bi bi-sun';
+          themeToggle.title = 'Switch to Light Mode';
+        }
+      }
+    }
+    
+    // Auto-hide toasts
+    setTimeout(() => {
+      document.querySelectorAll('.toast').forEach(toast => {
+        const bsToast = bootstrap.Toast.getOrCreateInstance(toast);
+        bsToast.hide();
+      });
+    }, 7000);
+    
+    // Mark active nav link based on current URL
+    function setActiveNavLink() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('.nav-link');
+      
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href');
+        
+        if (href === currentPath) {
+          link.classList.add('active');
+        } else if (href && currentPath.startsWith(href) && href !== '/') {
+          link.classList.add('active');
+        }
+      });
+    }
+    
+    setActiveNavLink();
+    
+    // Resize handler - auto-collapse sidebar on small screens
+    function handleResize() {
+      if (window.innerWidth < 768) {
+        wrapper.classList.add('sidebar-collapsed');
+        wrapper.classList.remove('sidebar-open');
+      } else {
+        wrapper.classList.remove('sidebar-collapsed');
+        wrapper.classList.remove('sidebar-open');
+      }
+    }
+    
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial check
+    
+    // Fetch pending vendors count
+    {% if user.is_staff %}
+    fetch('/api/pending-vendors-count/')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('pendingVendorsCount').textContent = data.count;
+      })
+      .catch(error => {
+        console.error('Error fetching pending vendors:', error);
+        document.getElementById('pendingVendorsCount').textContent = '0';
+      });
+    {% endif %}
+  });
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

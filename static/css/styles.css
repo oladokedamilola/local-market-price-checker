@@ -1,0 +1,340 @@
+/* =========================
+   MarketLens Design System
+   ========================= */
+
+/* Root Variables */
+:root {
+  --color-primary: #1E2A38;
+  --color-accent: #4DA8DA;
+  --color-bg: #F5F7FA;
+  --color-success: #2ECC71;
+  --color-warning: #F4A261;
+  --color-danger: #E63946;
+  --color-text: #2B2D42;
+  --color-muted: #6C757D;
+  --color-border: #DEE2E6;
+  --radius: 8px;
+  --shadow-soft: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Base */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5 {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--color-primary);
+  box-shadow: var(--shadow-soft);
+}
+
+.navbar-brand, .navbar-nav .nav-link {
+  color: #ffffff !important;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--color-accent) !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--color-accent);
+  border: none;
+  border-radius: var(--radius);
+}
+
+.btn-primary:hover {
+  background-color: #3b94c7;
+}
+
+.btn-outline-primary {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  border-radius: var(--radius);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-accent);
+  color: #ffffff;
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Forms */
+.form-control, .form-select {
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 0.2rem rgba(77, 168, 218, 0.25);
+}
+
+/* Tables */
+.table {
+  background-color: #ffffff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.table thead {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(77, 168, 218, 0.08);
+}
+
+/* Alerts */
+.alert-success {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: var(--color-success);
+  border: none;
+}
+
+.alert-warning {
+  background-color: rgba(244, 162, 97, 0.15);
+  color: var(--color-warning);
+  border: none;
+}
+
+.alert-danger {
+  background-color: rgba(230, 57, 70, 0.15);
+  color: var(--color-danger);
+  border: none;
+}
+
+/* Footer */
+.footer {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  padding: 2rem 0;
+  margin-top: 4rem;
+}
+
+/* Utility */
+.text-muted {
+  color: var(--color-muted) !important;
+}
+
+.rounded-soft {
+  border-radius: var(--radius);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+
+/* Add to existing styles.css */
+
+/* Dark mode support */
+[data-bs-theme="dark"] {
+  --color-primary: #0d1117;
+  --color-bg: #161b22;
+  --color-text: #e6edf3;
+  --color-border: #30363d;
+  --color-muted: #8b949e;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Active nav link */
+.nav-link.active {
+  color: var(--color-accent) !important;
+  font-weight: 600;
+  position: relative;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-accent);
+  border-radius: 2px;
+}
+
+/* Breadcrumb improvements */
+.breadcrumb {
+  background: transparent;
+  padding: 0.5rem 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: var(--color-muted);
+}
+
+/* Footer improvements */
+.footer {
+  background-color: var(--color-primary) !important;
+}
+
+/* Theme toggle button */
+#themeToggle {
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+/* Install button */
+#installAppBtn {
+  transition: all 0.3s ease;
+}
+
+#installAppBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Improved toast animations */
+.toast {
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Preloader animation */
+#preloader {
+  transition: opacity 0.3s ease;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .navbar-nav {
+    padding: 1rem 0;
+  }
+  
+  .dropdown-menu {
+    border: none;
+    box-shadow: none;
+    background-color: rgba(30, 42, 56, 0.95);
+  }
+}
+
+
+/* Dashboard Specific Styles */
+.avatar-lg {
+  width: 120px;
+  height: 120px;
+}
+
+.avatar-md {
+  width: 80px;
+  height: 80px;
+}
+
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+}
+
+/* Timeline Styles (for vendor dashboard) */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-border);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -2rem;
+  top: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--color-border);
+}
+
+.timeline-content {
+  padding-left: 0.5rem;
+}
+
+/* Profile Page Specific */
+.form-switch .form-check-input {
+  width: 3rem;
+  height: 1.5rem;
+}
+
+/* KYC Badges */
+.kyc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(46, 204, 113, 0.1);
+  color: var(--color-success);
+  border-radius: 50px;
+  font-size: 0.9rem;
+}
+
+.kyc-badge.pending {
+  background: rgba(244, 162, 97, 0.1);
+  color: var(--color-warning);
+}
+
+/* EMERGENCY FIX - Force all links to be clickable */
+a, button, .btn, .nav-link, .dropdown-item, [onclick], [href] {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 9999 !important;
+  cursor: pointer !important;
+}
+
+/* Disable any potential overlay */
+.position-fixed.top-0.start-0.w-100.h-100 {
+  display: none !important;
+}
+
+/* Make sure body is clickable */
+body {
+  pointer-events: auto !important;
+}
