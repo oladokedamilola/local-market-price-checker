@@ -19,7 +19,7 @@ ls -la
 
 # Set Python path to include current directory
 export PYTHONPATH="${PYTHONPATH}:${PWD}"
-export DJANGO_SETTINGS_MODULE=market_prices.settings_production
+export DJANGO_SETTINGS_MODULE=market_prices.settings  # Changed from settings_production
 
 # Verify Django can be imported
 echo "Verifying Django installation..."
@@ -28,6 +28,7 @@ import django
 print(f'✅ Django {django.get_version()} imported successfully')
 from django.conf import settings
 print('✅ Django settings module can be loaded')
+print(f'✅ DEBUG mode: {settings.DEBUG}')
 "
 
 # Create static directory if it doesn't exist

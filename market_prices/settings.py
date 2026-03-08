@@ -18,6 +18,10 @@ DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# Add Render domain automatically if in production
+if not DEBUG:
+    ALLOWED_HOSTS.extend(['.onrender.com', 'marketlens.com', 'www.marketlens.com'])
+
 # Site URL
 SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
 SITE_ID = 1
@@ -51,6 +55,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Added for production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -82,14 +87,27 @@ TEMPLATES = [
 WSGI_APPLICATION = 'market_prices.wsgi.application'
 
 # ============================================================================
-# DATABASE
+# DATABASE - Switch between SQLite and PostgreSQL based on env
 # ============================================================================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+import dj_database_url
+
+if os.getenv('DATABASE_URL'):
+    # Production - PostgreSQL on Render
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Development - SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ============================================================================
 # AUTHENTICATION
@@ -136,9 +154,10 @@ ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_SESSION_REMEMBER = True
 
-# User settings
+# User settings - CRITICAL for email-only auth
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # We're using email for login
+ACCOUNT_USERNAME_REQUIRED = False  # Must be False for email-only auth
 
 # Password settings
 ACCOUNT_PASSWORD_MIN_LENGTH = 8  # Minimum password length
@@ -150,6 +169,7 @@ ACCOUNT_USERNAME_BLACKLIST = []  # List of forbidden usernames (not used since w
 # Email template mapping
 ACCOUNT_EMAIL_CONFIRMATION_HTML = True
 ACCOUNT_EMAIL_CONFIRMATION_SUBJECT = 'Confirm Your Email - MarketLens'
+
 # ============================================================================
 # SOCIAL ACCOUNT SETTINGS
 # ============================================================================
@@ -162,6 +182,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
 ACCOUNT_INACTIVE_URL = 'account_inactive'
+
 # ============================================================================
 # PROVIDER SPECIFIC SETTINGS
 # ============================================================================
@@ -234,6 +255,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# Use WhiteNoise for static files in production
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -260,6 +285,18 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 # ============================================================================
+# SECURITY HEADERS (Production only)
+# ============================================================================
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# ============================================================================
 # TOKEN EXPIRY SETTINGS
 # ============================================================================
 OTP_EXPIRY_MINUTES = int(os.getenv('OTP_EXPIRY_MINUTES', 10))
@@ -278,9 +315,9 @@ RATE_LIMIT_WINDOW_HOURS = int(os.getenv('RATE_LIMIT_WINDOW_HOURS', 1))
 # ============================================================================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-
-# Add to settings.py for debugging
+# ============================================================================
+# LOGGING
+# ============================================================================
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
