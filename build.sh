@@ -2,117 +2,51 @@
 # Exit on error
 set -o errexit
 
-# Print commands for debugging
-set -x
+echo "🚀 Starting build process..."
 
 # Show Python version
-echo "Python version being used:"
+echo "Python version:"
 python --version
 
 # Install dependencies
+echo "Installing dependencies..."
 pip install -r requirements.txt
 
-# Show current directory structure (for debugging)
-echo "Current directory structure:"
+# Ensure we're in the right directory
+echo "Current directory: $(pwd)"
+echo "Listing files:"
 ls -la
-echo "Static directory contents:"
-ls -la static/ || echo "Static directory not found"
 
-# ============ DJANGO DEBUGGING SECTION ============
-echo "=== DJANGO DEBUG ==="
-python -c "
-import sys
-print(f'Python executable: {sys.executable}')
-print(f'Python version: {sys.version}')
-print(f'Python path: {sys.path}')
-
-try:
-    import django
-    print(f'✓ Django found! Version: {django.get_version()}')
-    print(f'✓ Django location: {django.__file__}')
-    
-    # Try to import management commands
-    from django.core.management import execute_from_command_line
-    print('✓ Django management imported successfully')
-    
-    # List all available management commands
-    from django.core.management import get_commands
-    commands = get_commands()
-    print(f'Available commands: {list(commands.keys())}')
-    
-except ImportError as e:
-    print(f'✗ Django import failed: {e}')
-    sys.exit(1)
-"
-
-# Check if manage.py exists and is readable
-echo "=== CHECKING MANAGE.PY ==="
-if [ -f "manage.py" ]; then
-    echo "✓ manage.py exists"
-    head -n 5 manage.py
-    chmod +x manage.py
-else
-    echo "✗ manage.py not found!"
-    exit 1
-fi
-
-# Try to get help from manage.py
-echo "=== TESTING MANAGE.PY ==="
-python manage.py help || echo "✗ manage.py help failed"
-
-# Set Django settings module
+# Set Python path to include current directory
+export PYTHONPATH="${PYTHONPATH}:${PWD}"
 export DJANGO_SETTINGS_MODULE=market_prices.settings_production
-echo "✓ DJANGO_SETTINGS_MODULE set to: $DJANGO_SETTINGS_MODULE"
 
-# Try collectstatic with different methods
-echo "=== ATTEMPTING COLLECTSTATIC (Method 1) ==="
-python manage.py collectstatic --no-input -v 3 --traceback || {
-    echo "Method 1 failed, trying Method 2..."
-    
-    echo "=== ATTEMPTING COLLECTSTATIC (Method 2) ==="
-    python -m django collectstatic --settings=market_prices.settings_production --no-input -v 3 || {
-        echo "Method 2 failed, trying Method 3..."
-        
-        echo "=== ATTEMPTING COLLECTSTATIC (Method 3) ==="
-        DJANGO_SETTINGS_MODULE=market_prices.settings_production django-admin collectstatic --no-input -v 3 || {
-            echo "✗ All collectstatic methods failed"
-            
-            # List installed packages for debugging
-            echo "=== INSTALLED PACKAGES ==="
-            pip list
-            
-            # Check Django installation details
-            echo "=== DJANGO INSTALLATION DETAILS ==="
-            python -c "
+# Verify Django can be imported
+echo "Verifying Django installation..."
+python -c "
 import django
-print(f'Django version: {django.get_version()}')
-print(f'Django path: {django.__file__}')
-print(f'Django package contents:')
-import os
-for root, dirs, files in os.walk(os.path.dirname(django.__file__)):
-    level = root.replace(os.path.dirname(django.__file__), '').count(os.sep)
-    indent = ' ' * 2 * level
-    print(f'{indent}{os.path.basename(root)}/')
-    subindent = ' ' * 2 * (level + 1)
-    for f in files[:5]:  # Show first 5 files in each directory
-        print(f'{subindent}{f}')
+print(f'✅ Django {django.get_version()} imported successfully')
+from django.conf import settings
+print('✅ Django settings module can be loaded')
 "
-            exit 1
-        }
-    }
-}
-# ============ END DEBUGGING SECTION ============
+
+# Create static directory if it doesn't exist
+mkdir -p staticfiles
+
+# Run collectstatic with full Python path
+echo "Collecting static files..."
+python -m django collectstatic --noinput -v 2
 
 # Make migrations
-echo "=== MAKING MIGRATIONS ==="
-python manage.py makemigrations accounts core market notifications vendor --no-input
+echo "Making migrations..."
+python manage.py makemigrations --noinput
 
-# Run database migrations
-echo "=== RUNNING MIGRATIONS ==="
-python manage.py migrate --no-input
+# Run migrations
+echo "Running migrations..."
+python manage.py migrate --noinput
 
-# Create superuser if it doesn't exist (optional)
-echo "=== CREATING SUPERUSER (IF NEEDED) ==="
+# Create superuser
+echo "Creating superuser if needed..."
 python manage.py shell <<EOF
 import os
 from django.contrib.auth import get_user_model
@@ -123,9 +57,9 @@ if not User.objects.filter(is_superuser=True).exists():
         email=os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@marketlens.com'),
         password=os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'changeme123')
     )
-    print("✓ Superuser created successfully")
+    print('✅ Superuser created')
 else:
-    print("✓ Superuser already exists")
+    print('✅ Superuser already exists')
 EOF
 
-echo "=== BUILD COMPLETED SUCCESSFULLY ==="
+echo "✅ Build completed successfully!"
