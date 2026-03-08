@@ -10,20 +10,23 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ============================================================================
-# SECURITY SETTINGS
+# SECURITY SETTINGS - PRODUCTION
 # ============================================================================
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-fallback-key-change-in-production')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
-DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('true', '1', 't')
+# IMPORTANT: Set DEBUG to False in production
+DEBUG = False
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
-# Add Render domain automatically if in production
-if not DEBUG:
-    ALLOWED_HOSTS.extend(['.onrender.com', 'marketlens.com', 'www.marketlens.com'])
+# Add your PythonAnywhere domain to ALLOWED_HOSTS
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'marketlens.pythonanywhere.com',
+    'marketlens-qmum.onrender.com',
+]
 
 # Site URL
-SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')
+SITE_URL = os.getenv('SITE_URL', 'https://marketlens-qmum.onrender.com')
 SITE_ID = 1
 
 # ============================================================================
@@ -55,7 +58,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Added for production
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -87,27 +90,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'market_prices.wsgi.application'
 
 # ============================================================================
-# DATABASE - Switch between SQLite and PostgreSQL based on env
+# DATABASE - SQLite for PythonAnywhere
 # ============================================================================
-import dj_database_url
-
-if os.getenv('DATABASE_URL'):
-    # Production - PostgreSQL on Render
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.getenv('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    # Development - SQLite
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 # ============================================================================
 # AUTHENTICATION
@@ -119,13 +109,16 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # ============================================================================
-# DJANGO-ALLAUTH SETTINGS
+# DJANGO-ALLAUTH SETTINGS - UPDATED FOR VERSION 64.2.1
 # ============================================================================
 
-# Authentication methods - use email only
-ACCOUNT_LOGIN_METHODS = {'email'}
+# Authentication - use email only (ACCOUNT_LOGIN_METHODS is deprecated)
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_UNIQUE_EMAIL = True
 
-# Signup fields configuration
+# Signup fields configuration - updated format for 64.2.1
 ACCOUNT_SIGNUP_FIELDS = [
     'email*',      # Required
     'password1*',  # Required
@@ -141,30 +134,28 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
 
 # Template settings - Use our custom templates
-ACCOUNT_TEMPLATE_EXTENSION = 'html'  # Use .html templates
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # Confirm email on GET request
+ACCOUNT_TEMPLATE_EXTENSION = 'html'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 # Email confirmation redirects
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'pending_verification'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = 'pending_verification'
 
 # Login/Logout settings
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # Auto-login after email confirmation
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_SESSION_REMEMBER = True
 
-# User settings - CRITICAL for email-only auth
-ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # We're using email for login
-ACCOUNT_USERNAME_REQUIRED = False  # Must be False for email-only auth
+# User settings
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
 # Password settings
-ACCOUNT_PASSWORD_MIN_LENGTH = 8  # Minimum password length
+ACCOUNT_PASSWORD_MIN_LENGTH = 8
 
-# Signup settings
-ACCOUNT_SIGNUP_REDIRECT_URL = 'pending_verification'  # Redirect after signup
-ACCOUNT_USERNAME_BLACKLIST = []  # List of forbidden usernames (not used since we don't use usernames)
+# Signup redirect
+ACCOUNT_SIGNUP_REDIRECT_URL = 'pending_verification'
+ACCOUNT_USERNAME_BLACKLIST = []
 
 # Email template mapping
 ACCOUNT_EMAIL_CONFIRMATION_HTML = True
@@ -173,11 +164,9 @@ ACCOUNT_EMAIL_CONFIRMATION_SUBJECT = 'Confirm Your Email - MarketLens'
 # ============================================================================
 # SOCIAL ACCOUNT SETTINGS
 # ============================================================================
-
-# Social account settings
-SOCIALACCOUNT_LOGIN_ON_GET = True  # Skip the intermediate page
+SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_EMAIL_REQUIRED = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # Google already verifies email
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_ADAPTER = 'accounts.adapters.CustomSocialAccountAdapter'
@@ -186,7 +175,6 @@ ACCOUNT_INACTIVE_URL = 'account_inactive'
 # ============================================================================
 # PROVIDER SPECIFIC SETTINGS
 # ============================================================================
-
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
@@ -196,16 +184,14 @@ SOCIALACCOUNT_PROVIDERS = {
         },
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
-        # Additional Google-specific settings
-        'EMAIL_AUTHENTICATION': True,  # Use email for authentication
-        'VERIFIED_EMAIL': True,  # Google emails are verified
+        'EMAIL_AUTHENTICATION': True,
+        'VERIFIED_EMAIL': True,
     }
 }
 
 # ============================================================================
 # REDIRECT URLS
 # ============================================================================
-
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/accounts/login/'
 LOGOUT_REDIRECT_URL = '/'
@@ -213,13 +199,11 @@ LOGOUT_REDIRECT_URL = '/'
 # ============================================================================
 # RATE LIMITING SETTINGS (Allauth)
 # ============================================================================
-
-# Rate limiting for allauth (prevents abuse)
 ACCOUNT_RATE_LIMITS = {
-    'login_failed': '5/5m',        # 5 attempts per 5 minutes
-    'signup': '3/1h',               # 3 signups per hour
-    'confirm_email': '10/5m',       # 10 email confirmations per 5 minutes
-    'reset_password': '5/1h',       # 5 password resets per hour
+    'login_failed': '5/5m',
+    'signup': '3/1h',
+    'confirm_email': '10/5m',
+    'reset_password': '5/1h',
 }
 
 # ============================================================================
@@ -249,18 +233,33 @@ USE_I18N = True
 USE_TZ = True
 
 # ============================================================================
-# STATIC & MEDIA FILES
+# STATIC & MEDIA FILES - PRODUCTION
 # ============================================================================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Use WhiteNoise for static files in production
-if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# ============================================================================
+# WHITENOISE CONFIGURATION
+# ============================================================================
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# ============================================================================
+# SECURITY HEADERS (Production)
+# ============================================================================
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # ============================================================================
 # EMAIL CONFIGURATION
@@ -277,24 +276,11 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'MarketLens <noreply@market
 # SESSION SETTINGS
 # ============================================================================
 SESSION_ENGINE = os.getenv('SESSION_ENGINE', 'django.contrib.sessions.backends.db')
-SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', 86400))  # 24 hours default
+SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', 86400))
 SESSION_SAVE_EVERY_REQUEST = os.getenv('SESSION_SAVE_EVERY_REQUEST', 'True').lower() in ('true', '1', 't')
 SESSION_EXPIRE_AT_BROWSER_CLOSE = os.getenv('SESSION_EXPIRE_AT_BROWSER_CLOSE', 'False').lower() in ('true', '1', 't')
-SESSION_COOKIE_SECURE = not DEBUG  # Only send over HTTPS in production
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
-
-# ============================================================================
-# SECURITY HEADERS (Production only)
-# ============================================================================
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
 
 # ============================================================================
 # TOKEN EXPIRY SETTINGS
@@ -316,24 +302,56 @@ RATE_LIMIT_WINDOW_HOURS = int(os.getenv('RATE_LIMIT_WINDOW_HOURS', 1))
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============================================================================
-# LOGGING
+# LOGGING CONFIGURATION (Production)
 # ============================================================================
+import os
+
+# Ensure logs directory exists
+LOG_DIR = BASE_DIR / 'logs'
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR, exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',  # Changed to RotatingFileHandler
+            'filename': LOG_DIR / 'django.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
         'console': {
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
         },
     },
     'root': {
-        'handlers': ['console'],
+        'handlers': ['console', 'file'],
         'level': 'INFO',
     },
     'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
         'accounts': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
             'propagate': False,
         },
     },
