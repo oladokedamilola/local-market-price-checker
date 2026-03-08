@@ -1,6 +1,7 @@
 # market_prices/market_prices/settings_production.py
 from .settings import *
 import dj_database_url
+import os
 
 # Security Settings
 DEBUG = False
@@ -22,13 +23,27 @@ DATABASES = {
     )
 }
 
-# Static files with Whitenoise
+# Static files with Whitenoise - FIXED CONFIGURATION
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Add this line - it was missing!
+
+# Use WhiteNoise for static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Add Whitenoise middleware (after SecurityMiddleware)
-MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+# CRITICAL: Ensure WhiteNoise is in middleware and properly positioned
+# We need to rebuild MIDDLEWARE to ensure correct order
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Must be here, after SecurityMiddleware
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+]
 
 # Security Headers
 SECURE_SSL_REDIRECT = True
@@ -70,5 +85,11 @@ LOGGING = {
     'root': {
         'handlers': ['console'],
         'level': 'INFO',
+    },
+    'loggers': {
+        'whitenoise': {  # Add this to debug static files
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
     },
 }
